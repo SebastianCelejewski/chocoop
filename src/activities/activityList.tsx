@@ -19,13 +19,15 @@ function ActivityList() {
     const navigate = useNavigate();
     
     useEffect(() => {
-        client.models.Activity.observeQuery({
-            authMode: 'userPool',
-        }).subscribe({
-            next: (data: activityQueryResult) => { 
-              setActivities(sortByDateTime([...data.items]))
-            }
-        });
+        if (client.models.Activity !== undefined) {
+          client.models.Activity.observeQuery({
+              authMode: 'userPool',
+          }).subscribe({
+              next: (data: activityQueryResult) => { 
+                setActivities(sortByDateTime([...data.items]))
+              }
+          });
+        }
     }, []);
 
     function createActivity() {

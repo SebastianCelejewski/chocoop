@@ -7,7 +7,7 @@ const schema = a.schema({
           value: a.integer().required(),
           comment: a.string().required()
       })
-      .authorization(allow => [allow.owner().to(['create', 'read', 'update', 'delete'])]),
+      .authorization((allow) => [allow.publicApiKey()]),
   Activity: a
       .model({
           user: a.string().required(),
@@ -16,8 +16,7 @@ const schema = a.schema({
           exp: a.integer().required(),
           comment: a.string().required()
       })
-      .authorization(allow => [allow.owner().to(['create', 'read', 'update', 'delete'])]),
-
+      .authorization((allow) => [allow.publicApiKey()]),
 });
 
 export const data = defineData({

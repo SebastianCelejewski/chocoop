@@ -51,14 +51,18 @@ function ActivityAdd() {
             comment: activityComment
         }
 
-        const result = client.models.Activity.create(newActivity,   
-        {
-            authMode: 'userPool',
-        });
+        if (client.models.Activity !== undefined) {
+            const result = client.models.Activity.create(newActivity,   
+            {
+                authMode: 'userPool',
+            });
 
-        result.then(() => {
-            navigate("/activities")
-        })
+            result.then(() => {
+                navigate("/activities")
+            })
+        } else {
+            alert("Nie mogę dodać czynności: Brak dostępu do danych czynności.")
+        }
     }
 
     function handleCancel() {
@@ -77,17 +81,14 @@ function ActivityAdd() {
                         onChange={handleActivityDateTimeChange}
                     /></p>
 
-                <p className="label">Okoliczności</p>
-                <p><textarea id="activityComment" className="newActivityTextArea" rows={5} onChange={handleActivityCommentChange}/></p>
-
                 <p className="label">Wykonawca</p>
-                <p><textarea id="activityUser" className="newActivityTextArea" rows={5} onChange={handleActivityUserChange}/></p>
+                <p><input type="text" id="activityUser" className="newActivityTextArea" onChange={handleActivityUserChange}/></p>
 
                 <p className="label">Czynność</p>
-                <p><textarea id="activityComment" className="newactivityTextArea" rows={5} onChange={handleActivityTypeChange}/></p>
+                <p><input type="text" id="activityComment" className="newactivityTextArea" onChange={handleActivityTypeChange}/></p>
 
                 <p className="label">Zdobyte punkty doświadczenia</p>
-                <p><textarea id="activityComment" className="newactivityTextArea" rows={5} onChange={handleActivityExpChange}/></p>
+                <p><input type="text" id="activityComment" className="newactivityTextArea" onChange={handleActivityExpChange}/></p>
 
                 <p className="label">Komentarz</p>
                 <p><textarea id="activityComment" className="newactivityTextArea" rows={5} onChange={handleActivityCommentChange}/></p>
