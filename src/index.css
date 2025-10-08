@@ -1,24 +1,35 @@
 body {
   margin: 0;
-  background: linear-gradient(180deg, rgb(117, 81, 194), rgb(255, 255, 255));
-  display: flex;
+  color: white;
+  background: black;
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   height: 100vh;
   width: 100vw;
   justify-content: center;
-  align-items: center;
 }
 
-main {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
+.subheader {
+  font-size: smaller;
+  margin-left: 6px;
+  margin-right: 6px
+}
+
+.userInfo {
+  float: left
+}
+
+.versionInfo {
+  float: right
+}
+
+h1 {
+  text-align: center;
 }
 
 button {
-  border-radius: 8px;
+  border-radius: 48px;
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
+  padding: 0.8em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
@@ -26,6 +37,8 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
   color: white;
+  right: 0;
+  bottom: 0;
 }
 button:hover {
   border-color: #646cff;
@@ -40,14 +53,100 @@ ul {
   margin-block-start: 0;
   margin-block-end: 0;
   list-style-type: none;
-  display: flex;
-  flex-direction: column;
   margin: 8px 0;
   border: 1px solid black;
   gap: 1px;
   background-color: black;
   border-radius: 8px;
   overflow: auto;
+}
+
+.entryList {
+  background-color: white;
+  overflow: scroll;
+  height: 80vh;
+}
+
+.entryListElement {
+  border-radius: 8px;
+  margin: 5px;
+  padding: 2px;
+  color: black;
+  border: none;
+  background-color: #e0e0e0;
+}
+
+.entryDetails {
+  margin: 0;
+  background-color: #e0e0e0;
+  color: black;
+  height: 100%;
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.measurementDateTime {
+  margin-left: 5px;
+  font-weight: bold;
+}
+
+.measurementValue {
+  float: right;
+  text-align: right;
+  margin-right: 5px;
+  font-size: 20px;
+}
+
+.measurementValue img {
+  height: 48px;
+}
+
+.measurementComment {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.label {
+  font-weight: bold;
+  clear: both;
+  margin-top: 12px;
+}
+
+p {
+  margin: 0;
+}
+
+.verticalRadio {
+  width: 32px;
+  text-align: center;
+  float: left;
+}
+
+.radioIcon {
+  height: 24px;
+}
+
+.newMeasurementTextArea {
+  width: 100%;
+ -webkit-box-sizing: border-box;
+ -moz-box-sizing: border-box;
+ box-sizing: border-box;
+}
+
+#dyspnoeaNone {
+  color: #ff57cf;
+}
+
+#dyspnoeaLow {
+  color: #ac57ff;
+}
+
+#dyspnoeaMedium {
+  color: #5c57ff;
+}
+
+#dyspnoeaHigh {
+  color: #2a4392;
 }
 
 li {
@@ -63,3 +162,8 @@ a {
   font-weight: 800;
   text-decoration: none;
 }
+
+h1 {
+  font-size: 12pt;
+}
+

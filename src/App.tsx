@@ -1,39 +1,52 @@
-import { useEffect, useState } from "react";
-import type { Schema } from "../amplify/data/resource";
-import { generateClient } from "aws-amplify/data";
+import { BrowserRouter, Routes, Route } from "react-router";
 
-const client = generateClient<Schema>();
+import MeasurementList from "./measurements/measurementList.tsx"
+import MeasurementDetails from "./measurements/measurementDetails.tsx"
+import MeasurementAdd from "./measurements/measurementAdd.tsx"
+import { Authenticator } from '@aws-amplify/ui-react';
+import { fetchUserAttributes } from 'aws-amplify/auth';
+import { useState} from 'react'
 
 function App() {
-  const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
 
-  useEffect(() => {
-    client.models.Todo.observeQuery().subscribe({
-      next: (data) => setTodos([...data.items]),
-    });
-  }, []);
+  const [userNickname, setUserNickname] = useState<string>("");
 
-  function createTodo() {
-    client.models.Todo.create({ content: window.prompt("Todo content") });
+  function getUserNickname() {
+    fetchUserAttributes().then((attributes) => {
+      if (attributes.nickname === undefined) {
+        setUserNickname("")
+      } else {
+        setUserNickname(attributes.nickname)
+      }
+    })
   }
 
+  getUserNickname()
+
   return (
-    <main>
-      <h1>My todos</h1>
-      <button onClick={createTodo}>+ new</button>
-      <ul>
-        {todos.map((todo) => (
-          <li key={todo.id}>{todo.content}</li>
-        ))}
-      </ul>
-      <div>
-        🥳 App successfully hosted. Try creating a new todo.
-        <br />
-        <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
-          Review next step of this tutorial.
-        </a>
-      </div>
-    </main>
+    <Authenticator>
+      {({ signOut }) => {
+        return ( 
+          <main>
+            <h1>Chores Cooperative</h1>
+            <div className="subheader">
+              <p className="userInfo">Witaj, {userNickname}</p>
+              <p className="versionInfo">Wersja 0.1.0</p>
+            </div>
+            <div style={{clear: 'both'}}/>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<MeasurementList />} />
+                <Route path="/measurements" element={<MeasurementList />} />
+                <Route path="/measurements/new" element={<MeasurementAdd />} />
+                <Route path="/measurements/:id" element={<MeasurementDetails />} />
+              </Routes>
+            </BrowserRouter>
+            <button onClick={signOut}>Wyloguj się</button>
+          </main>
+        )
+      }}
+    </Authenticator>
   );
 }
 
