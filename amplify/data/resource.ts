@@ -7,7 +7,17 @@ const schema = a.schema({
           value: a.integer().required(),
           comment: a.string().required()
       })
-      .authorization(allow => [allow.owner().to(['create', 'read', 'update', 'delete'])])
+      .authorization(allow => [allow.owner().to(['create', 'read', 'update', 'delete'])]),
+  Activity: a
+      .model({
+          user: a.string().required(),
+          dateTime: a.datetime().required(),
+          type: a.string().required(),
+          exp: a.integer().required(),
+          comment: a.string().required()
+      })
+      .authorization(allow => [allow.owner().to(['create', 'read', 'update', 'delete'])]),
+
 });
 
 export const data = defineData({

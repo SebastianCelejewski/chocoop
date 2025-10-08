@@ -3,6 +3,9 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import MeasurementList from "./measurements/measurementList.tsx"
 import MeasurementDetails from "./measurements/measurementDetails.tsx"
 import MeasurementAdd from "./measurements/measurementAdd.tsx"
+import ActivityList from "./activities/activityList.tsx"
+import ActivityDetails from "./activities/activityDetails.tsx"
+import ActivityAdd from "./activities/activityAdd.tsx"
 import { Authenticator } from '@aws-amplify/ui-react';
 import { fetchUserAttributes } from 'aws-amplify/auth';
 import { useState} from 'react'
@@ -36,10 +39,13 @@ function App() {
             <div style={{clear: 'both'}}/>
             <BrowserRouter>
               <Routes>
-                <Route path="/" element={<MeasurementList />} />
+                <Route path="/" element={<ActivityList />} />
                 <Route path="/measurements" element={<MeasurementList />} />
                 <Route path="/measurements/new" element={<MeasurementAdd />} />
                 <Route path="/measurements/:id" element={<MeasurementDetails />} />
+                <Route path="/activities" element={<ActivityList />} />
+                <Route path="/activities/new" element={<ActivityAdd />} />
+                <Route path="/activities/:id" element={<ActivityDetails />} />
               </Routes>
             </BrowserRouter>
             <button onClick={signOut}>Wyloguj się</button>
