@@ -1,4 +1,8 @@
 # Release Notes
 
-## Version v0.1.0
-- Initial implementation allowing to enter activities using a form
+## Version v0.1.1
+- Initial implementation
+- User creation and authentication
+- Showing a list of activities
+- Adding a new activity
+- Displaying details of an activity
