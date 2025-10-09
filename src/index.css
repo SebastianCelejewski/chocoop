@@ -112,6 +112,10 @@ ul {
   margin-right: 5px;
 }
 
+.validationMessage {
+  color: red;
+}
+
 
 .entryDetails {
   margin: 0;

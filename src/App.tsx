@@ -34,7 +34,7 @@ function App() {
             <h1>Chores Cooperative</h1>
             <div className="subheader">
               <p className="userInfo">Witaj, {userNickname}</p>
-              <p className="versionInfo">Wersja 0.1.0</p>
+              <p className="versionInfo">Wersja 0.1.1</p>
             </div>
             <div style={{clear: 'both'}}/>
             <BrowserRouter>
