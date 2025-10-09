@@ -25,8 +25,6 @@ function ActivityAdd() {
     const [activityExpErrorMessage, setActivityExpErrorMessage] = useState("");
     const [activityCommentErrorMessage, setActivityCommentErrorMessage] = useState("");
 
-    const [validationStatus, setValidationStatus] = useState(true);
-
     function handleActivityDateTimeChange(e: any) {
         setActivityDateTime(e.target.value)
     }
@@ -73,13 +71,12 @@ function ActivityAdd() {
 
         setActivityCommentErrorMessage("")
 
-        setValidationStatus(temporaryValidationStatus)
+        return temporaryValidationStatus
     }
 
     function handleSubmit(e: any) {
         e.preventDefault();
-
-        validateInputs()
+        const validationStatus = validateInputs()
 
         if (validationStatus == false) {
             return
@@ -93,15 +90,11 @@ function ActivityAdd() {
             comment: activityComment
         }
 
-        if (client.models.Activity !== undefined) {
-            const result = client.models.Activity.create(newActivity);
+        const result = client.models.Activity.create(newActivity);
 
-            result.then(() => {
-                navigate("/activities")
-            })
-        } else {
-            alert("Nie mogę dodać czynności: Brak dostępu do danych czynności.")
-        }
+        result.then(() => {
+            navigate("/activities")
+        })
     }
 
     function handleCancel() {
