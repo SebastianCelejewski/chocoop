@@ -61,13 +61,17 @@ ul {
   overflow: auto;
 }
 
-.entryList {
+/*
+  activityList.tsx
+*/
+
+.activityList {
   background-color: white;
   overflow: scroll;
   height: 80vh;
 }
 
-.entryListElement {
+.activityListElement {
   border-radius: 8px;
   margin: 5px;
   padding: 2px;
@@ -75,6 +79,39 @@ ul {
   border: none;
   background-color: #e0e0e0;
 }
+
+.activityDateTime {
+  margin-left: 5px;
+  font-weight: bold;
+}
+
+.activityPerson {
+  margin-left: 6px;
+  margin-right: 6px;
+  padding-top: 6px;
+  float: left;
+  font-weight: bold;
+}
+
+.activityType {
+  margin-left: 6px;
+  margin-right: 6px;
+  padding-top: 6px;
+  float: left;
+}
+
+.activityExp {
+  float: right;
+  text-align: right;
+  margin-right: 5px;
+  font-size: 20px;
+}
+
+.activityComment {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
 
 .entryDetails {
   margin: 0;
@@ -85,26 +122,6 @@ ul {
   border-radius: 6px;
 }
 
-.measurementDateTime {
-  margin-left: 5px;
-  font-weight: bold;
-}
-
-.measurementValue {
-  float: right;
-  text-align: right;
-  margin-right: 5px;
-  font-size: 20px;
-}
-
-.measurementValue img {
-  height: 48px;
-}
-
-.measurementComment {
-  margin-left: 5px;
-  margin-right: 5px;
-}
 
 .label {
   font-weight: bold;

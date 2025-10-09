@@ -20,7 +20,7 @@ function ActivityDetails() {
     }
 
     async function getactivity(activityId: string) {
-        return await client.models.Activity.get({ id: activityId }, { authMode: 'userPool' });
+        return await client.models.Activity.get({ id: activityId });
     }
 
     if (activity == undefined && activityIdParam != undefined) {

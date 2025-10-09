@@ -20,9 +20,7 @@ function ActivityList() {
     
     useEffect(() => {
         if (client.models.Activity !== undefined) {
-          client.models.Activity.observeQuery({
-              authMode: 'userPool',
-          }).subscribe({
+          client.models.Activity.observeQuery().subscribe({
               next: (data: activityQueryResult) => { 
                 setActivities(sortByDateTime([...data.items]))
               }
@@ -42,10 +40,10 @@ function ActivityList() {
 
     return (
           <>
-            <ul className="entryList">
+            <ul className="activityList">
             {activities.map(activity => {
                 return <li
-                        className="entryListElement"
+                        className="activityListElement"
                         onClick={() => showActivity(activity.id)}
                         key={activity.id}>
                         <div>
@@ -53,8 +51,8 @@ function ActivityList() {
                             <p className="activityPerson">{activity.user}</p>
                             <p className="activityType">{activity.type}</p>
                             <p className="activityExp">{activity.exp} xp</p>
-                            <p className="activityComment">{activity.comment}</p>
                             <div style={{clear: 'both'}}/>
+                            <p className="activityComment">{activity.comment}</p>
                         </div>
                       </li>
                 }

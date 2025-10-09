@@ -51,11 +51,10 @@ function ActivityAdd() {
             comment: activityComment
         }
 
+        console.log(JSON.stringify(client.models))
+
         if (client.models.Activity !== undefined) {
-            const result = client.models.Activity.create(newActivity,   
-            {
-                authMode: 'userPool',
-            });
+            const result = client.models.Activity.create(newActivity);
 
             result.then(() => {
                 navigate("/activities")
