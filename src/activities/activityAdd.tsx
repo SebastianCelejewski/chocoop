@@ -71,7 +71,7 @@ function ActivityAdd() {
             setActivityExpErrorMessage("")
         }
 
-        setActivityExpErrorMessage("")
+        setActivityCommentErrorMessage("")
 
         setValidationStatus(temporaryValidationStatus)
     }
