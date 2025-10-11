@@ -1,8 +1,13 @@
 # Release Notes
 
-## Version v0.1.1
+## Version v0.1
 - Initial implementation
 - User creation and authentication
 - Showing a list of activities
 - Adding a new activity
 - Displaying details of an activity
+
+## Version v0.2
+- Automated filling of Person field when adding a new activity
+- Activity templates with associated experience points
+- Improved UI
