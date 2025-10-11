@@ -58,7 +58,9 @@ function ActivityList() {
                 }
             )}
           </ul>
-        <button onClick={createActivity}>Dodaj czynność</button>
+          <div className="buttonPanel">
+            <button onClick={createActivity}>Dodaj czynność</button>
+          </div>
     </>
   );
 }

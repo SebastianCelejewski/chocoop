@@ -55,7 +55,9 @@ function ActivityDetails() {
                 <p className="label">Komentarz</p>
                 <p>{activity.comment}</p>
             </div>
-            <button type="button" onClick={handleBack}>Wróć na listę czynności</button>
+            <div className="buttonPanel">
+                <button type="button" onClick={handleBack}>Wróć</button>
+            </div>
         </>
     }
 }

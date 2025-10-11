@@ -4,10 +4,32 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { generateClient } from "aws-amplify/data";
 
+import vacuuming from "../assets/images/activities/vacuuming.png?url";
+import dishwashing from "../assets/images/activities/dishwashing.png?url";
+import shopping_local from "../assets/images/activities/shopping_local.png?url";
+import shopping_Auchan from "../assets/images/activities/shopping_Auchan.png?url";
+import cooking from "../assets/images/activities/cooking.png?url";
+import laundry_start from "../assets/images/activities/laundry_start.png?url";
+import laundry_end from "../assets/images/activities/laundry_end.png?url";
+import laundry_sorting from "../assets/images/activities/laundry_sorting.png?url";
+import taking_garbage_out from "../assets/images/activities/taking_garbage_out.png?url";
+
+import { fetchUserAttributes } from 'aws-amplify/auth';
+
 const client = generateClient<Schema>();
 
 function ActivityAdd() {
     const navigate = useNavigate();
+
+    function getUserNickname() {
+        fetchUserAttributes().then((attributes) => {
+            if (attributes.nickname !== undefined) {
+                setActivityPerson(attributes.nickname)
+            }
+        })
+    }
+
+    getUserNickname()
 
     const currentDateTimeUTC = new Date()
     const timeZoneOffset = currentDateTimeUTC.getTimezoneOffset()
@@ -101,6 +123,12 @@ function ActivityAdd() {
         navigate("/activities")
     }
 
+    function fillTemplate(type: string, exp: number) {
+        setActivityType(type)
+        setActivityExp(exp)
+    }
+
+
     return <>
         <form onSubmit={handleSubmit}>
             <div className="entryDetails">
@@ -115,22 +143,37 @@ function ActivityAdd() {
 
                 <p className="label">Wykonawca</p>
                 { activityPersonErrorMessage.length > 0 ? (<p className="validationMessage">{activityPersonErrorMessage}</p>) : (<></>) }
-                <p><input id="activityPerson" type="text" className="newActivityTextArea" onChange={handleActivityPersonChange}/></p>
+                <p><input id="activityPerson" type="text" className="newActivityTextArea" onChange={handleActivityPersonChange} value={activityPerson}/></p>
+
+                <p className="label">Szablony</p>
+                <div className="templateActivities">
+                    <img src={vacuuming} onClick={() => fillTemplate("odkurzanie", 10)} alt="odkurzanie"></img>
+                    <img src={dishwashing} onClick={() => fillTemplate("zmywanie naczyń", 20)} alt="zmywanie naczyń"></img>
+                    <img src={shopping_local} onClick={() => fillTemplate("zakupy osiedle", 10)} alt="zakupy osiedle"></img>
+                    <img src={shopping_Auchan} onClick={() => fillTemplate("zakupy Auchan", 20)} alt="zakupy Auchan"></img>
+                    <img src={cooking} onClick={() => fillTemplate("ugotowanie obiadu", 40)} alt="ugotowanie obiadu"></img>
+                    <img src={laundry_start} onClick={() => fillTemplate("nastawianie prania", 10)} alt="nastawianie prania"></img>
+                    <img src={laundry_end} onClick={() => fillTemplate("wywieszanie prania", 10)} alt="wywieszanie prania"></img>
+                    <img src={laundry_sorting} onClick={() => fillTemplate("ściąganie prania", 10)} alt="ściąganie prania"></img>
+                    <img src={taking_garbage_out} onClick={() => fillTemplate("wyniesienie śmieci", 10)} alt="wyniesienie śmieci"></img>
+                </div>
 
                 <p className="label">Czynność</p>
                 { activityTypeErrorMessage.length > 0 ? (<p className="validationMessage">{activityTypeErrorMessage}</p>) : (<></>) }
-                <p><input type="text" id="activityComment" className="newactivityTextArea" onChange={handleActivityTypeChange}/></p>
+                <p><input type="text" id="activityComment" className="newactivityTextArea" onChange={handleActivityTypeChange} value={activityType}/></p>
 
                 <p className="label">Zdobyte punkty doświadczenia</p>
                 { activityExpErrorMessage.length > 0 ? (<p className="validationMessage">{activityExpErrorMessage}</p>) : (<></>) }
-                <p><input type="text" id="activityComment" className="newactivityTextArea" onChange={handleActivityExpChange}/></p>
+                <p><input type="text" id="activityComment" className="newactivityTextArea" onChange={handleActivityExpChange} value={activityExp}/></p>
 
                 <p className="label">Komentarz</p>
                 { activityCommentErrorMessage.length > 0 ? (<p className="validationMessage">{activityCommentErrorMessage}</p>) : (<></>) }
-                <p><textarea id="activityComment" className="newactivityTextArea" rows={5} onChange={handleActivityCommentChange}/></p>
+                <p><textarea id="activityComment" className="newactivityTextArea" rows={5} onChange={handleActivityCommentChange} value={activityComment}/></p>
             </div>
-            <button type="submit">Zatwierdź</button>
-            <button type="button" onClick={handleCancel}>Anuluj</button>
+            <div>
+                <button type="submit">Zatwierdź</button>
+                <button type="button" onClick={handleCancel}>Anuluj</button>
+            </div>
         </form>
     </>
 }
