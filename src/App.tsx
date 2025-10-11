@@ -21,7 +21,9 @@ function App() {
     })
   }
 
-  getUserNickname()
+  if (userNickname == "") {
+    getUserNickname()
+  }
 
   return (
     <Authenticator>
