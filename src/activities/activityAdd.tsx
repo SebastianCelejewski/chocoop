@@ -1,7 +1,7 @@
 import type { Schema } from "../../amplify/data/resource";
 
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { generateClient } from "aws-amplify/data";
 
 import vacuuming from "../assets/images/activities/vacuuming.png?url";
@@ -19,24 +19,19 @@ import { fetchUserAttributes } from 'aws-amplify/auth';
 const client = generateClient<Schema>();
 
 function ActivityAdd() {
+
     const navigate = useNavigate();
 
-    function getUserNickname() {
-        fetchUserAttributes().then((attributes) => {
-            if (attributes.nickname !== undefined) {
-                setActivityPerson(attributes.nickname)
-            }
-        })
-    }
-
-    getUserNickname()
+    const params = useParams();
+    const activityIdParam = params["id"]
 
     const currentDateTimeUTC = new Date()
     const timeZoneOffset = currentDateTimeUTC.getTimezoneOffset()
     const currentDateTimeLocal = new Date(currentDateTimeUTC.getTime() - timeZoneOffset * 60 * 1000)
     const currentDateTime = currentDateTimeLocal.toISOString().split(".")[0]
 
-    const [activityDateTime, setActivityDateTime] = useState(currentDateTime);
+    const [activityId, setActivityId] = useState(String || undefined)
+    const [activityDateTime, setActivityDateTime] = useState(String || undefined);
     const [activityPerson, setActivityPerson] = useState("");
     const [activityType, setActivityType] = useState("");
     const [activityExp, setActivityExp] = useState(0);
@@ -45,7 +40,63 @@ function ActivityAdd() {
     const [activityPersonErrorMessage, setActivityPersonErrorMessage] = useState("")
     const [activityTypeErrorMessage, setActivityTypeErrorMessage] = useState("");
     const [activityExpErrorMessage, setActivityExpErrorMessage] = useState("");
-    const [activityCommentErrorMessage, setActivityCommentErrorMessage] = useState("");
+    const [activityCommentErrorMessage, setActivityCommentErrorMessage] = useState("");    
+
+    let mode : String | undefined
+    const [personLoadingInProgress, setPersonLoadingInProgress] = useState(false)
+    const [dateTimeSettingInProgress, setDateTimeLoadingInProgress] = useState(false)
+
+    function setNewActivityPerson() {
+        fetchUserAttributes().then((attributes) => {
+            if (attributes.nickname !== undefined) {
+                setActivityPerson(attributes.nickname)
+            }
+        })
+        setPersonLoadingInProgress(true)
+    }
+
+    function setNewActivityDateTime() {
+        setActivityDateTime(currentDateTime)
+        setDateTimeLoadingInProgress(true)
+    }
+    
+    async function getActivity(activityId: string) {
+        return await client.models.Activity.get({ id: activityId });
+    }
+
+    if (mode === undefined) {
+        if (activityIdParam !== undefined && activityIdParam != "new") { 
+            mode = "edit"
+        } else {
+            mode = "create"
+        }
+    }
+
+    if (mode == "edit" && activityIdParam !== undefined && activityId == "") {
+        getActivity(activityIdParam).then((result) => {
+            if (result["data"] != undefined) {
+                const activityDateTimeFromDatabaseAsString = result["data"]["dateTime"]
+                const activityDateTimeFromDatabaseAsDate = Date.parse(activityDateTimeFromDatabaseAsString)
+                const activityDateTimeLocal = new Date(activityDateTimeFromDatabaseAsDate - timeZoneOffset * 60 * 1000)
+                const activityDateTimeToSetToDateTimePicker = activityDateTimeLocal.toISOString().split(".")[0]
+
+                setActivityId(result["data"]["id"]);
+                setActivityPerson(result["data"]["user"]);
+                setActivityDateTime(activityDateTimeToSetToDateTimePicker);
+                setActivityType(result["data"]["type"]);
+                setActivityExp(result["data"]["exp"]);
+                setActivityComment(result["data"]["comment"]);
+            }
+        })
+    }
+
+    if (mode == "create" && activityPerson === "" && personLoadingInProgress == false) {
+        setNewActivityPerson()                
+    }
+
+    if (mode == "create" && activityDateTime === "" && dateTimeSettingInProgress == false) {
+        setNewActivityDateTime()
+    }
 
     function handleActivityDateTimeChange(e: any) {
         setActivityDateTime(e.target.value)
@@ -103,24 +154,46 @@ function ActivityAdd() {
         if (validationStatus == false) {
             return
         }
+        
+        if (mode == "create") {
+            const newActivity = {
+                dateTime: new Date(activityDateTime).toISOString(),
+                user: activityPerson,
+                type: activityType,
+                exp: activityExp,
+                comment: activityComment
+            }
 
-        const newActivity = {
-            dateTime: new Date(activityDateTime).toISOString(),
-            user: activityPerson,
-            type: activityType,
-            exp: activityExp,
-            comment: activityComment
+            const result = client.models.Activity.create(newActivity);
+            result.then(() => {
+                navigate("/activities/list")
+            })
         }
 
-        const result = client.models.Activity.create(newActivity);
+        if (mode == "edit") {
+            const updatedActivity = {
+                id: activityId,
+                dateTime: new Date(activityDateTime).toISOString(),
+                user: activityPerson,
+                type: activityType,
+                exp: activityExp,
+                comment: activityComment
+            }
 
-        result.then(() => {
-            navigate("/activities")
-        })
+            const result = client.models.Activity.update(updatedActivity);
+
+            result.then(() => {
+                navigate("/activities/show/" + activityId)
+            })
+        }
     }
 
     function handleCancel() {
-        navigate("/activities")
+        if (mode == "create") {
+            navigate("/activities/list")
+        } else {
+            navigate("/activities/show/" + activityId)
+        }
     }
 
     function fillTemplate(type: string, exp: number) {

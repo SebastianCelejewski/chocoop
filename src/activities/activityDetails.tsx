@@ -16,11 +16,11 @@ function ActivityDetails() {
     const [activity, setActivity] = useState<Schema["Activity"]["type"]>();
 
     function handleBack() {
-        navigate("/activities")
+        navigate("/activities/list")
     }
 
     function handleEdit() {
-        const navLink = `/activities/${activityIdParam}/edit`
+        const navLink = `/activities/edit/${activityIdParam}`
         navigate(navLink)
     }
 
@@ -30,7 +30,7 @@ function ActivityDetails() {
                 + activity.dateTime + "\n"
                 + activity.user + " " + activity.type + "\n\nCzy na pewno chcesz usunąć tę aktywność?") == true) {
                 client.models.Activity.delete({ id: activityIdParam }).then(() => {
-                    navigate("/activities")
+                    navigate("/activities/list")
                 })
             } 
         }
