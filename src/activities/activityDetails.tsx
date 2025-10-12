@@ -19,6 +19,23 @@ function ActivityDetails() {
         navigate("/activities")
     }
 
+    function handleEdit() {
+        const navLink = `/activities/${activityIdParam}/edit`
+        navigate(navLink)
+    }
+
+    function handleDelete() {
+        if (activityIdParam != undefined && activity !== undefined) {
+            if (confirm("Usuwanie aktywności\n\n"
+                + activity.dateTime + "\n"
+                + activity.user + " " + activity.type + "\n\nCzy na pewno chcesz usunąć tę aktywność?") == true) {
+                client.models.Activity.delete({ id: activityIdParam }).then(() => {
+                    navigate("/activities")
+                })
+            } 
+        }
+    }
+
     async function getactivity(activityId: string) {
         return await client.models.Activity.get({ id: activityId });
     }
@@ -57,6 +74,8 @@ function ActivityDetails() {
             </div>
             <div className="buttonPanel">
                 <button type="button" onClick={handleBack}>Wróć</button>
+                <button type="button" onClick={handleEdit}>Edytuj</button>
+                <button type="button" onClick={handleDelete}>Usuń</button>
             </div>
         </>
     }
