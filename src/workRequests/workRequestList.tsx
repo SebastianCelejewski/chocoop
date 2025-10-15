@@ -40,19 +40,19 @@ function WorkRequestList() {
 
     return (
           <>
-            <ul className="workRequestList">
+            <ul className="entityList">
             {workRequests.map(workRequest => {
                 return <li
-                        className="workRequestListElement"
+                        className="entityListElement"
                         onClick={() => showWorkRequest(workRequest.id)}
                         key={workRequest.id}>
                         <div>
-                            <p className="workRequestCreatedDateTime">{dateToString(workRequest.createdDateTime)}</p>
-                            <p className="workRequestCreatedBy">{workRequest.createdBy}</p>
-                            <p className="workRequestType">{workRequest.type}</p>
-                            <p className="workRequestExp">{workRequest.exp} xp</p>
-                            <p className="workRequestUrgency">{workRequest.urgency}</p>
+                            <p className="entityDateTime">{dateToString(workRequest.createdDateTime)}</p>
+                            <p className="entityPerson">{workRequest.createdBy}</p>
+                            <p className="entityType">{workRequest.type}</p>
+                            <p className="entityExp">{workRequest.exp} xp</p>
                             <div style={{clear: 'both'}}/>
+                            <p className="workRequestUrgency">Pilność: {workRequest.urgency}</p>
                         </div>
                       </li>
                 }

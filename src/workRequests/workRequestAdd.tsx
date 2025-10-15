@@ -181,7 +181,7 @@ function WorkRequestAdd() {
 
             const result = client.models.WorkRequest.create(newWorkRequest);
             result.then(() => {
-                navigate("/worrequests/list")
+                navigate("/workRequests/list")
             })
         }
 
@@ -206,9 +206,9 @@ function WorkRequestAdd() {
 
     function handleCancel() {
         if (mode == "create") {
-            navigate("/worrequests/list")
+            navigate("/workRequests/list")
         } else {
-            navigate("/worrequests/show/" + workRequestId)
+            navigate("/workRequests/show/" + workRequestId)
         }
     }
 

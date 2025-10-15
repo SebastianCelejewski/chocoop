@@ -78,13 +78,13 @@ ul {
   activityList.tsx
 */
 
-.activityList {
+.entityList {
   background-color: white;
   overflow: scroll;
   height: 80vh;
 }
 
-.activityListElement {
+.entityListElement {
   border-radius: 8px;
   margin: 5px;
   padding: 2px;
@@ -93,12 +93,12 @@ ul {
   background-color: #e0e0e0;
 }
 
-.activityDateTime {
+.entityDateTime {
   margin-left: 5px;
   font-weight: bold;
 }
 
-.activityPerson {
+.entityPerson {
   margin-left: 6px;
   margin-right: 6px;
   padding-top: 6px;
@@ -106,21 +106,28 @@ ul {
   font-weight: bold;
 }
 
-.activityType {
+.entityType {
   margin-left: 6px;
   margin-right: 6px;
   padding-top: 6px;
   float: left;
 }
 
-.activityExp {
+.entityExp {
   float: right;
   text-align: right;
   margin-right: 5px;
   font-size: 20px;
 }
 
-.activityComment {
+.workRequestUrgency {
+  margin-top: 5px;
+  margin-left: 5px;
+  margin-right: 5px;
+  font-weight: bold;
+}
+
+.activityComment, .workRequestInstructions {
   margin-top: 5px;
   margin-left: 5px;
   margin-right: 5px;
