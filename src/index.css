@@ -91,6 +91,27 @@ ul {
   width: 16px
 }
 
+/* user menu */
+
+.userMenu {
+  float: right;
+  z-index: 50;
+  right: 0px;
+  top: 0px;
+  position: absolute;
+}
+
+.userMenu img {
+  margin-right: 6px;
+  margin-top: 6px;
+  width: 24px;
+}
+
+.userMenu a {
+  color: -webkit-link;
+  padding: 8px;
+}
+
 /*
   Page structure
 */
