@@ -37,11 +37,9 @@ h1 {
 }
 
 .buttonPanel {
-  /* position: absolute;
+  position: absolute;
   right: 0;
-  bottom: 0; */
-  margin-bottom: 2px;
-  padding-bottom: 2px;
+  bottom: 0;
 }
 
 button {

@@ -98,6 +98,12 @@ function ActivityAdd() {
         setNewActivityDateTime()
     }
 
+    var pageTitle = "Dodawanie wykonanej czynności"
+
+    if (mode == "edit") {
+        pageTitle = "Edycja czynności"
+    }
+
     function handleActivityDateTimeChange(e: any) {
         setActivityDateTime(e.target.value)
     }
@@ -203,7 +209,7 @@ function ActivityAdd() {
 
 
     return <>
-        <p className="pageTitle">Dodawanie wykonanej czynności</p>
+        <p className="pageTitle">{pageTitle}</p>
         <form onSubmit={handleSubmit}>
             <div className="entryDetails">
                 <p className="label">Data i godzina wykonania czynności</p>
