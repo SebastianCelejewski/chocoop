@@ -11,3 +11,6 @@
 - Automated filling of Person field when adding a new activity
 - Activity templates with associated experience points
 - Improved UI
+
+## Version v0.3
+- Support for job requests
