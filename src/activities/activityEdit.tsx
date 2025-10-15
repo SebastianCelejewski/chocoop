@@ -18,12 +18,13 @@ import { fetchUserAttributes } from 'aws-amplify/auth';
 
 const client = generateClient<Schema>();
 
-function ActivityAdd() {
+function ActivityEdit() {
 
     const navigate = useNavigate();
 
     const params = useParams();
-    const activityIdParam = params["id"]
+    const operationParam = params["operation"]
+    const objectIdParam = params["id"]
 
     const currentDateTimeUTC = new Date()
     const timeZoneOffset = currentDateTimeUTC.getTimezoneOffset()
@@ -37,12 +38,13 @@ function ActivityAdd() {
     const [activityExp, setActivityExp] = useState(0);
     const [activityComment, setActivityComment] = useState("");
 
+    const [workRequestId, setWorkRequestId] = useState(String || undefined)
+
     const [activityPersonErrorMessage, setActivityPersonErrorMessage] = useState("")
     const [activityTypeErrorMessage, setActivityTypeErrorMessage] = useState("");
     const [activityExpErrorMessage, setActivityExpErrorMessage] = useState("");
     const [activityCommentErrorMessage, setActivityCommentErrorMessage] = useState("");    
 
-    let mode : String | undefined
     const [personLoadingInProgress, setPersonLoadingInProgress] = useState(false)
     const [dateTimeSettingInProgress, setDateTimeLoadingInProgress] = useState(false)
 
@@ -64,16 +66,12 @@ function ActivityAdd() {
         return await client.models.Activity.get({ id: activityId });
     }
 
-    if (mode === undefined) {
-        if (activityIdParam !== undefined && activityIdParam != "new") { 
-            mode = "edit"
-        } else {
-            mode = "create"
-        }
+    async function getWorkRequest(workRequestId: string) {
+        return await client.models.WorkRequest.get({ id: workRequestId});
     }
 
-    if (mode == "edit" && activityIdParam !== undefined && activityId == "") {
-        getActivity(activityIdParam).then((result) => {
+    if (operationParam == "update" && objectIdParam !== undefined && activityId == "") {
+        getActivity(objectIdParam).then((result) => {
             if (result["data"] != undefined) {
                 const activityDateTimeFromDatabaseAsString = result["data"]["dateTime"]
                 const activityDateTimeFromDatabaseAsDate = Date.parse(activityDateTimeFromDatabaseAsString)
@@ -90,12 +88,35 @@ function ActivityAdd() {
         })
     }
 
-    if (mode == "create" && activityPerson === "" && personLoadingInProgress == false) {
+    if (operationParam == "promoteWorkRequest" && objectIdParam !== undefined && workRequestId == "") {
+        getWorkRequest(objectIdParam).then((result) => {
+            if (result["data"] != undefined) {
+                setWorkRequestId(result["data"]["id"]);
+                setActivityPerson(result["data"]["createdBy"]);
+                setActivityDateTime(currentDateTime);
+                setActivityType(result["data"]["type"]);
+                setActivityExp(result["data"]["exp"]);
+                setActivityComment("Utworzone na podstawie zlecenia: " + result["data"]["instructions"] );
+            }
+        })
+    }
+
+    if ((operationParam == "create" || operationParam == "promoteWebRequest") && activityPerson === "" && personLoadingInProgress == false) {
         setNewActivityPerson()                
     }
 
-    if (mode == "create" && activityDateTime === "" && dateTimeSettingInProgress == false) {
+    if ((operationParam == "create" || operationParam == "promoteWebRequest") && activityDateTime === "" && dateTimeSettingInProgress == false) {
         setNewActivityDateTime()
+    }
+
+    var pageTitle = "Dodawanie wykonanej czynności"
+
+    if (operationParam == "update") {
+        pageTitle = "Edycja czynności"
+    }
+
+    if (operationParam == "promoteWorkRequest") {
+        pageTitle = "Wykonane zlecenie zlecenie"
     }
 
     function handleActivityDateTimeChange(e: any) {
@@ -155,7 +176,7 @@ function ActivityAdd() {
             return
         }
         
-        if (mode == "create") {
+        if (operationParam == "create" || operationParam == "promoteWorkRequest") {
             const newActivity = {
                 dateTime: new Date(activityDateTime).toISOString(),
                 user: activityPerson,
@@ -166,11 +187,11 @@ function ActivityAdd() {
 
             const result = client.models.Activity.create(newActivity);
             result.then(() => {
-                navigate("/activities/list")
+                navigate("/ActivityList")
             })
         }
 
-        if (mode == "edit") {
+        if (operationParam == "update") {
             const updatedActivity = {
                 id: activityId,
                 dateTime: new Date(activityDateTime).toISOString(),
@@ -183,16 +204,18 @@ function ActivityAdd() {
             const result = client.models.Activity.update(updatedActivity);
 
             result.then(() => {
-                navigate("/activities/show/" + activityId)
+                navigate("/ActivityDetails/" + activityId)
             })
         }
     }
 
     function handleCancel() {
-        if (mode == "create") {
-            navigate("/activities/list")
+        if (operationParam == "create") {
+            navigate("/ActivityList")
+        } else if (operationParam == "promoteWorkRequest") {
+            navigate("/WorkRequestDetails/" + workRequestId)
         } else {
-            navigate("/activities/show/" + activityId)
+            navigate("/ActivityDetails/" + activityId)
         }
     }
 
@@ -201,8 +224,8 @@ function ActivityAdd() {
         setActivityExp(exp)
     }
 
-
     return <>
+        <p className="pageTitle">{pageTitle}</p>
         <form onSubmit={handleSubmit}>
             <div className="entryDetails">
                 <p className="label">Data i godzina wykonania czynności</p>
@@ -216,7 +239,7 @@ function ActivityAdd() {
 
                 <p className="label">Wykonawca</p>
                 { activityPersonErrorMessage.length > 0 ? (<p className="validationMessage">{activityPersonErrorMessage}</p>) : (<></>) }
-                <p><input id="activityPerson" type="text" className="newActivityTextArea" onChange={handleActivityPersonChange} value={activityPerson}/></p>
+                <p><input id="activityPerson" type="text" onChange={handleActivityPersonChange} value={activityPerson}/></p>
 
                 <p className="label">Szablony</p>
                 <div className="templateActivities">
@@ -233,15 +256,15 @@ function ActivityAdd() {
 
                 <p className="label">Czynność</p>
                 { activityTypeErrorMessage.length > 0 ? (<p className="validationMessage">{activityTypeErrorMessage}</p>) : (<></>) }
-                <p><input type="text" id="activityComment" className="newactivityTextArea" onChange={handleActivityTypeChange} value={activityType}/></p>
+                <p><input type="text" id="activityComment" className="entityTextArea" onChange={handleActivityTypeChange} value={activityType}/></p>
 
                 <p className="label">Zdobyte punkty doświadczenia</p>
                 { activityExpErrorMessage.length > 0 ? (<p className="validationMessage">{activityExpErrorMessage}</p>) : (<></>) }
-                <p><input type="text" id="activityComment" className="newactivityTextArea" onChange={handleActivityExpChange} value={activityExp}/></p>
+                <p><input type="text" id="activityComment" onChange={handleActivityExpChange} value={activityExp}/></p>
 
                 <p className="label">Komentarz</p>
                 { activityCommentErrorMessage.length > 0 ? (<p className="validationMessage">{activityCommentErrorMessage}</p>) : (<></>) }
-                <p><textarea id="activityComment" className="newactivityTextArea" rows={5} onChange={handleActivityCommentChange} value={activityComment}/></p>
+                <p><textarea id="activityComment" className="entityTextArea" rows={5} onChange={handleActivityCommentChange} value={activityComment}/></p>
             </div>
             <div>
                 <button type="submit">Zatwierdź</button>
@@ -251,4 +274,4 @@ function ActivityAdd() {
     </>
 }
 
-export default ActivityAdd;
+export default ActivityEdit;

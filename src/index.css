@@ -15,11 +15,13 @@ body {
 }
 
 .userInfo {
-  float: left
+  float: left;
 }
 
 .versionInfo {
-  float: right
+  float: right;
+  font-size: 14px;
+  margin-right: 2px;
 }
 
 h1 {
@@ -43,12 +45,12 @@ h1 {
 button {
   border-radius: 48px;
   border: 1px solid transparent;
-  padding: 0.8em 1.2em;
+  padding: 0.4em 0.6em;
   margin: 2px;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #2a2a2a;
+  background-color: #4a4a4a;
   cursor: pointer;
   transition: border-color 0.25s;
   color: white;
@@ -75,30 +77,87 @@ ul {
 }
 
 /*
+  application menu
+*/
+
+.appMenu {
+  float: left;
+  z-index: 50;
+  position: absolute;
+}
+
+.appMenu img {
+  margin-left: 6px;
+  width: 16px
+}
+
+/* user menu */
+
+.userMenu {
+  float: right;
+  z-index: 50;
+  right: 0px;
+  top: 0px;
+  position: absolute;
+}
+
+.userMenu img {
+  margin-right: 6px;
+  margin-top: 6px;
+  width: 24px;
+}
+
+.userMenu a {
+  color: -webkit-link;
+  padding: 8px;
+}
+
+/*
+  Page structure
+*/
+
+.pageTitle {
+  text-align: center;
+  color: black;
+  font-weight: bold;
+  background: #e0e0e0;
+  border: 1px solid black;
+  border-radius: 6px;
+  padding: 6px;
+  margin: 1px;
+}
+
+/*
   activityList.tsx
 */
 
-.activityList {
+.entityList {
   background-color: white;
-  overflow: scroll;
+  overflow: auto;
   height: 80vh;
+  flex: 1;
+  margin-top: 0px;
+  margin-left: 1px;
+  margin-right: 1px;
 }
 
-.activityListElement {
+.entityListElement {
   border-radius: 8px;
   margin: 5px;
   padding: 2px;
   color: black;
   border: none;
   background-color: #e0e0e0;
+  max-height: 100px;
+  overflow: hidden;
 }
 
-.activityDateTime {
+.entityDateTime {
   margin-left: 5px;
   font-weight: bold;
 }
 
-.activityPerson {
+.entityPerson {
   margin-left: 6px;
   margin-right: 6px;
   padding-top: 6px;
@@ -106,21 +165,28 @@ ul {
   font-weight: bold;
 }
 
-.activityType {
+.entityType {
   margin-left: 6px;
   margin-right: 6px;
   padding-top: 6px;
   float: left;
 }
 
-.activityExp {
+.entityExp {
   float: right;
   text-align: right;
   margin-right: 5px;
   font-size: 20px;
 }
 
-.activityComment {
+.workRequestUrgency {
+  margin-top: 5px;
+  margin-left: 5px;
+  margin-right: 5px;
+  font-weight: bold;
+}
+
+.activityComment, .workRequestInstructions {
   margin-top: 5px;
   margin-left: 5px;
   margin-right: 5px;
@@ -134,10 +200,12 @@ ul {
 /* ActivityDetails */
 
 .entryDetails {
-  margin: 0;
+  overflow: scroll;
+  height: 80vh;
+  margin-left: 2px;
+  margin-right: 2px;
   background-color: #e0e0e0;
   color: black;
-  height: 100%;
   padding: 6px;
   border-radius: 6px;
 }
@@ -154,10 +222,6 @@ p {
   margin: 0;
 }
 
-.templateActivities {
-  
-}
-
 .templateActivities img {
   border: 1px solid grey;
   background-color: lightgrey;
@@ -165,7 +229,17 @@ p {
   margin-right: 2px;
 }
 
+.entityTextArea {
+  width: 100%;
+    padding: 5px;
+    margin-right: 0;
 
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;     
+}
 
 li {
   background-color: white;

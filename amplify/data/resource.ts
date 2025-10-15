@@ -1,22 +1,25 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 
 const schema = a.schema({
-  Measurement: a
-      .model({
-          dateTime: a.datetime().required(),
-          value: a.integer().required(),
-          comment: a.string().required()
-      })
-      .authorization((allow) => [allow.publicApiKey()]),
-  Activity: a
-      .model({
-          user: a.string().required(),
-          dateTime: a.datetime().required(),
-          type: a.string().required(),
-          exp: a.integer().required(),
-          comment: a.string().required()
-      })
-      .authorization((allow) => [allow.publicApiKey()]),
+    Activity: a
+        .model({
+            user: a.string().required(),
+            dateTime: a.datetime().required(),
+            type: a.string().required(),
+            exp: a.integer().required(),
+            comment: a.string().required()
+        })
+        .authorization((allow) => [allow.publicApiKey()]),
+    WorkRequest: a
+        .model({
+            createdBy: a.string().required(),
+            createdDateTime: a.datetime().required(),
+            type: a.string().required(),
+            exp: a.integer().required(),
+            urgency: a.integer().required(),
+            instructions: a.string().required()
+        })
+    .authorization((allow) => [allow.publicApiKey()]),
 });
 
 export const data = defineData({

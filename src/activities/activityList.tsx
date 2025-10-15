@@ -29,28 +29,29 @@ function ActivityList() {
     }, []);
 
     function createActivity() {
-        const navLink = `/activities/add/new`
+        const navLink = `/ActivityEdit/create`
         navigate(navLink)
     }
 
     function showActivity(id: string) {
-        const navLink = `/activities/show/${id}`
+        const navLink = `/ActivityDetails/${id}`
         navigate(navLink)
     }
 
     return (
           <>
-            <ul className="activityList">
+            <p className="pageTitle">Lista wykonanych czynności</p>
+            <ul className="entityList">
             {activities.map(activity => {
                 return <li
-                        className="activityListElement"
+                        className="entityListElement"
                         onClick={() => showActivity(activity.id)}
                         key={activity.id}>
                         <div>
-                            <p className="activityDateTime">{dateToString(activity.dateTime)}</p>
-                            <p className="activityPerson">{activity.user}</p>
-                            <p className="activityType">{activity.type}</p>
-                            <p className="activityExp">{activity.exp} xp</p>
+                            <p className="entityDateTime">{dateToString(activity.dateTime)}</p>
+                            <p className="entityPerson">{activity.user}</p>
+                            <p className="entityType">{activity.type}</p>
+                            <p className="entityExp">{activity.exp} xp</p>
                             <div style={{clear: 'both'}}/>
                             <p className="activityComment">{activity.comment}</p>
                         </div>
