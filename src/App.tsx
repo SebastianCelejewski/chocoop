@@ -3,6 +3,9 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import ActivityList from "./activities/activityList.tsx"
 import ActivityDetails from "./activities/activityDetails.tsx"
 import ActivityAdd from "./activities/activityAdd.tsx"
+import WorkRequestList from "./workRequests/workRequestList.tsx"
+import WorkRequestDetails from "./workRequests/workRequestDetails.tsx"
+import WorkRequestAdd from "./workRequests/workRequestAdd.tsx"
 import { Authenticator } from '@aws-amplify/ui-react';
 import { fetchUserAttributes } from 'aws-amplify/auth';
 import { useState } from "react";
@@ -45,6 +48,10 @@ function App() {
                                 <Route path="/activities/add/:id" element={<ActivityAdd />} />
                                 <Route path="/activities/show/:id" element={<ActivityDetails />} />
                                 <Route path="/activities/edit/:id" element={<ActivityAdd />} />
+                                <Route path="/workRequests/list" element={<WorkRequestList />} />
+                                <Route path="/workRequests/add/:id" element={<WorkRequestAdd />} />
+                                <Route path="/workRequests/show/:id" element={<WorkRequestDetails />} />
+                                <Route path="/workRequests/edit/:id" element={<WorkRequestAdd />} />
                             </Routes>
                         </BrowserRouter>
                     </main>
