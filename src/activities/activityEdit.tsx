@@ -96,16 +96,16 @@ function ActivityEdit() {
                 setActivityDateTime(currentDateTime);
                 setActivityType(result["data"]["type"]);
                 setActivityExp(result["data"]["exp"]);
-                setActivityComment("");
+                setActivityComment("Utworzone na podstawie zlecenia: " + result["data"]["instructions"] );
             }
         })
     }
 
-    if (operationParam == "create" && activityPerson === "" && personLoadingInProgress == false) {
+    if ((operationParam == "create" || operationParam == "promoteWebRequest") && activityPerson === "" && personLoadingInProgress == false) {
         setNewActivityPerson()                
     }
 
-    if (operationParam == "create" && activityDateTime === "" && dateTimeSettingInProgress == false) {
+    if ((operationParam == "create" || operationParam == "promoteWebRequest") && activityDateTime === "" && dateTimeSettingInProgress == false) {
         setNewActivityDateTime()
     }
 
@@ -213,7 +213,7 @@ function ActivityEdit() {
         if (operationParam == "create") {
             navigate("/ActivityList")
         } else if (operationParam == "promoteWorkRequest") {
-            navigate("/WorkRequestDetails/" + activityId) // TODO: Use workRequestId instead of activityId
+            navigate("/WorkRequestDetails/" + workRequestId)
         } else {
             navigate("/ActivityDetails/" + activityId)
         }
