@@ -24,9 +24,7 @@ function ActivityEdit() {
 
     const params = useParams();
     const operationParam = params["operation"]
-    const activityIdParam = params["id"]
-
-    console.log("Operation: " + operationParam)
+    const objectIdParam = params["id"]
 
     const currentDateTimeUTC = new Date()
     const timeZoneOffset = currentDateTimeUTC.getTimezoneOffset()
@@ -39,6 +37,8 @@ function ActivityEdit() {
     const [activityType, setActivityType] = useState("");
     const [activityExp, setActivityExp] = useState(0);
     const [activityComment, setActivityComment] = useState("");
+
+    const [workRequestId, setWorkRequestId] = useState(String || undefined)
 
     const [activityPersonErrorMessage, setActivityPersonErrorMessage] = useState("")
     const [activityTypeErrorMessage, setActivityTypeErrorMessage] = useState("");
@@ -66,8 +66,12 @@ function ActivityEdit() {
         return await client.models.Activity.get({ id: activityId });
     }
 
-    if (operationParam == "update" && activityIdParam !== undefined && activityId == "") {
-        getActivity(activityIdParam).then((result) => {
+    async function getWorkRequest(workRequestId: string) {
+        return await client.models.WorkRequest.get({ id: workRequestId});
+    }
+
+    if (operationParam == "update" && objectIdParam !== undefined && activityId == "") {
+        getActivity(objectIdParam).then((result) => {
             if (result["data"] != undefined) {
                 const activityDateTimeFromDatabaseAsString = result["data"]["dateTime"]
                 const activityDateTimeFromDatabaseAsDate = Date.parse(activityDateTimeFromDatabaseAsString)
@@ -84,6 +88,19 @@ function ActivityEdit() {
         })
     }
 
+    if (operationParam == "promoteWorkRequest" && objectIdParam !== undefined && workRequestId == "") {
+        getWorkRequest(objectIdParam).then((result) => {
+            if (result["data"] != undefined) {
+                setWorkRequestId(result["data"]["id"]);
+                setActivityPerson(result["data"]["createdBy"]);
+                setActivityDateTime(currentDateTime);
+                setActivityType(result["data"]["type"]);
+                setActivityExp(result["data"]["exp"]);
+                setActivityComment("");
+            }
+        })
+    }
+
     if (operationParam == "create" && activityPerson === "" && personLoadingInProgress == false) {
         setNewActivityPerson()                
     }
@@ -96,6 +113,10 @@ function ActivityEdit() {
 
     if (operationParam == "update") {
         pageTitle = "Edycja czynności"
+    }
+
+    if (operationParam == "promoteWorkRequest") {
+        pageTitle = "Wykonane zlecenie zlecenie"
     }
 
     function handleActivityDateTimeChange(e: any) {
@@ -155,7 +176,7 @@ function ActivityEdit() {
             return
         }
         
-        if (operationParam == "create") {
+        if (operationParam == "create" || operationParam == "promoteWorkRequest") {
             const newActivity = {
                 dateTime: new Date(activityDateTime).toISOString(),
                 user: activityPerson,
@@ -191,6 +212,8 @@ function ActivityEdit() {
     function handleCancel() {
         if (operationParam == "create") {
             navigate("/ActivityList")
+        } else if (operationParam == "promoteWorkRequest") {
+            navigate("/WorkRequestDetails/" + activityId) // TODO: Use workRequestId instead of activityId
         } else {
             navigate("/ActivityDetails/" + activityId)
         }

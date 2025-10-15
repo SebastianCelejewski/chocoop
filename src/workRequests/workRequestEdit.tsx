@@ -26,8 +26,6 @@ function WorkRequestEdit() {
     const operationParam = params["operation"]
     const workrequestIdParam = params["id"]
 
-    console.log("Operation: " + operationParam)
-
     const currentDateTimeUTC = new Date()
     const timeZoneOffset = currentDateTimeUTC.getTimezoneOffset()
     const currentDateTimeLocal = new Date(currentDateTimeUTC.getTime() - timeZoneOffset * 60 * 1000)

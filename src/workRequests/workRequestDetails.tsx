@@ -37,15 +37,15 @@ function WorkRequestDetails() {
     }
 
     function handleDone() {
-
+        navigate("/ActivityEdit/promoteWorkRequest/" + workRequestIdParam)
     }
 
-    async function getworkRequest(workRequestId: string) {
+    async function getWorkRequest(workRequestId: string) {
         return await client.models.WorkRequest.get({ id: workRequestId });
     }
 
     if (workRequest == undefined && workRequestIdParam != undefined) {
-        getworkRequest(workRequestIdParam).then((result) => {
+        getWorkRequest(workRequestIdParam).then((result) => {
             if (result["data"] != undefined) {
                 setWorkRequest(result["data"])
             }
