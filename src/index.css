@@ -15,11 +15,13 @@ body {
 }
 
 .userInfo {
-  float: left
+  float: left;
 }
 
 .versionInfo {
-  float: right
+  float: right;
+  font-size: 14px;
+  margin-right: 2px;
 }
 
 h1 {
@@ -35,20 +37,22 @@ h1 {
 }
 
 .buttonPanel {
-  position: absolute;
+  /* position: absolute;
   right: 0;
-  bottom: 0;
+  bottom: 0; */
+  margin-bottom: 2px;
+  padding-bottom: 2px;
 }
 
 button {
   border-radius: 48px;
   border: 1px solid transparent;
-  padding: 0.8em 1.2em;
+  padding: 0.4em 0.6em;
   margin: 2px;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #2a2a2a;
+  background-color: #4a4a4a;
   cursor: pointer;
   transition: border-color 0.25s;
   color: white;
@@ -75,13 +79,47 @@ ul {
 }
 
 /*
+  application menu
+*/
+
+.appMenu {
+  float: left;
+  z-index: 50;
+  position: absolute;
+}
+
+.appMenu img {
+  margin-left: 6px;
+  width: 16px
+}
+
+/*
+  Page structure
+*/
+
+.pageTitle {
+  text-align: center;
+  color: black;
+  font-weight: bold;
+  background: #e0e0e0;
+  border: 1px solid black;
+  border-radius: 6px;
+  padding: 6px;
+  margin: 1px;
+}
+
+/*
   activityList.tsx
 */
 
 .entityList {
   background-color: white;
-  overflow: scroll;
+  overflow: auto;
   height: 80vh;
+  flex: 1;
+  margin-top: 0px;
+  margin-left: 1px;
+  margin-right: 1px;
 }
 
 .entityListElement {
@@ -141,10 +179,12 @@ ul {
 /* ActivityDetails */
 
 .entryDetails {
-  margin: 0;
+  overflow: scroll;
+  height: 80vh;
+  margin-left: 2px;
+  margin-right: 2px;
   background-color: #e0e0e0;
   color: black;
-  height: 100%;
   padding: 6px;
   border-radius: 6px;
 }
@@ -161,10 +201,6 @@ p {
   margin: 0;
 }
 
-.templateActivities {
-  
-}
-
 .templateActivities img {
   border: 1px solid grey;
   background-color: lightgrey;
@@ -172,7 +208,17 @@ p {
   margin-right: 2px;
 }
 
+.entityTextArea {
+  width: 100%;
+    padding: 5px;
+    margin-right: 0;
 
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;     
+}
 
 li {
   background-color: white;

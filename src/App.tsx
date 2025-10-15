@@ -9,11 +9,13 @@ import WorkRequestAdd from "./workRequests/workRequestAdd.tsx"
 import { Authenticator } from '@aws-amplify/ui-react';
 import { fetchUserAttributes } from 'aws-amplify/auth';
 import { useState } from "react";
+import appMenuIcon from "./assets/images/menu/appMenu.png?url";
 
 function App() {
 
     const [userNickname, setUserNickname] = useState("")
     const [userNicknameFetchInProgress, setUserNicknameFetchInProgress] = useState(false)
+    const [appMenuExpanded, setAppMenuExpanded] = useState(false)
 
     function getUserNickname() {
         setUserNicknameFetchInProgress(true)
@@ -28,13 +30,30 @@ function App() {
         getUserNickname()
     }
 
+    function AppMenu() {
+        if (appMenuExpanded) {
+            return <div className="appMenu">
+                <img src={appMenuIcon} alt="menu" onClick={() => setAppMenuExpanded(false)}/>
+                <ul>
+                    <li><a href="/activities/list">Wykonane czynności</a></li>
+                    <li><a href="/workRequests/list">Zlecenia do wykonania</a></li>
+                </ul>
+            </div>
+        } else {
+            return <div className="appMenu">
+                <img src={appMenuIcon} alt="menu" onClick={() => setAppMenuExpanded(true)}/>
+            </div>
+        }
+    }
+
     return (
         <Authenticator>
             {({ signOut }) => {
                 return ( 
                     <main>
+                        <AppMenu/>
                         <h1>Chores Cooperative</h1>
-                        <p className="versionInfo">Wersja 0.2.2</p>
+                        <p className="versionInfo">Wersja 0.3.1</p>
 
                         <div className="subheader">
                             <p className="userInfo">Witaj, {userNickname}</p>

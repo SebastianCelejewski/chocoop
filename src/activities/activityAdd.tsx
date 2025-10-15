@@ -203,6 +203,7 @@ function ActivityAdd() {
 
 
     return <>
+        <p className="pageTitle">Dodawanie wykonanej czynności</p>
         <form onSubmit={handleSubmit}>
             <div className="entryDetails">
                 <p className="label">Data i godzina wykonania czynności</p>
@@ -216,7 +217,7 @@ function ActivityAdd() {
 
                 <p className="label">Wykonawca</p>
                 { activityPersonErrorMessage.length > 0 ? (<p className="validationMessage">{activityPersonErrorMessage}</p>) : (<></>) }
-                <p><input id="activityPerson" type="text" className="newActivityTextArea" onChange={handleActivityPersonChange} value={activityPerson}/></p>
+                <p><input id="activityPerson" type="text" onChange={handleActivityPersonChange} value={activityPerson}/></p>
 
                 <p className="label">Szablony</p>
                 <div className="templateActivities">
@@ -233,15 +234,15 @@ function ActivityAdd() {
 
                 <p className="label">Czynność</p>
                 { activityTypeErrorMessage.length > 0 ? (<p className="validationMessage">{activityTypeErrorMessage}</p>) : (<></>) }
-                <p><input type="text" id="activityComment" className="newactivityTextArea" onChange={handleActivityTypeChange} value={activityType}/></p>
+                <p><input type="text" id="activityComment" className="entityTextArea" onChange={handleActivityTypeChange} value={activityType}/></p>
 
                 <p className="label">Zdobyte punkty doświadczenia</p>
                 { activityExpErrorMessage.length > 0 ? (<p className="validationMessage">{activityExpErrorMessage}</p>) : (<></>) }
-                <p><input type="text" id="activityComment" className="newactivityTextArea" onChange={handleActivityExpChange} value={activityExp}/></p>
+                <p><input type="text" id="activityComment" onChange={handleActivityExpChange} value={activityExp}/></p>
 
                 <p className="label">Komentarz</p>
                 { activityCommentErrorMessage.length > 0 ? (<p className="validationMessage">{activityCommentErrorMessage}</p>) : (<></>) }
-                <p><textarea id="activityComment" className="newactivityTextArea" rows={5} onChange={handleActivityCommentChange} value={activityComment}/></p>
+                <p><textarea id="activityComment" className="entityTextArea" rows={5} onChange={handleActivityCommentChange} value={activityComment}/></p>
             </div>
             <div>
                 <button type="submit">Zatwierdź</button>

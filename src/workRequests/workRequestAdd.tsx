@@ -218,6 +218,7 @@ function WorkRequestAdd() {
     }
 
     return <>
+        <p className="pageTitle">Dodawanie zlecenia</p>
         <form onSubmit={handleSubmit}>
             <div className="entryDetails">
                 <p className="label">Data i godzina utworzenia zlecenia</p>
@@ -248,7 +249,7 @@ function WorkRequestAdd() {
 
                 <p className="label">Czynność</p>
                 { workRequestTypeErrorMessage.length > 0 ? (<p className="validationMessage">{workRequestTypeErrorMessage}</p>) : (<></>) }
-                <p><input type="text" id="workRequestComment" className="newWorkrequestTextArea" onChange={handleWorkRequestTypeChange} value={workRequestType}/></p>
+                <p><input type="text" id="workRequestComment" className="entityTextArea" onChange={handleWorkRequestTypeChange} value={workRequestType}/></p>
 
                 <p className="label">Punkty doświadczenia do zdobycia</p>
                 { workRequestExpErrorMessage.length > 0 ? (<p className="validationMessage">{workRequestExpErrorMessage}</p>) : (<></>) }
@@ -260,7 +261,7 @@ function WorkRequestAdd() {
 
                 <p className="label">Instrukcje</p>
                 { workRequestInstructionsErrorMessage.length > 0 ? (<p className="validationMessage">{workRequestInstructionsErrorMessage}</p>) : (<></>) }
-                <p><textarea id="workRequestComment" className="newWorkrequestTextArea" rows={5} onChange={handleWorkRequestInstructionsChange} value={workRequestInstructions}/></p>
+                <p><textarea id="workRequestComment" className="entityTextArea" rows={5} onChange={handleWorkRequestInstructionsChange} value={workRequestInstructions}/></p>
             </div>
             <div>
                 <button type="submit">Zatwierdź</button>

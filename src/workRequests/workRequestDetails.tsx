@@ -37,7 +37,7 @@ function WorkRequestDetails() {
     }
 
     function handleDone() {
-        
+
     }
 
     async function getworkRequest(workRequestId: string) {
@@ -60,6 +60,7 @@ function WorkRequestDetails() {
         </>
     } else {
         return <>
+            <p className="pageTitle">Szczegóły zlecenia</p>
             <div className="entryDetails">
                 <p className="label">Data i godzina utworzenia zlecenia</p>
                 <p>{dateToString(workRequest.createdDateTime)}</p>
@@ -81,8 +82,8 @@ function WorkRequestDetails() {
             </div>
             <div className="buttonPanel">
                 <button type="button" onClick={handleBack}>Wróć</button>
-                <button type="button" onClick={handleDone}>Zamień w czynność wykonaną</button>
                 <button type="button" onClick={handleEdit}>Edytuj</button>
+                <button type="button" onClick={handleDone}>Zrobione</button>
                 <button type="button" onClick={handleDelete}>Usuń</button>
             </div>
         </>

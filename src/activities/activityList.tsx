@@ -40,6 +40,7 @@ function ActivityList() {
 
     return (
           <>
+            <p className="pageTitle">Lista wykonanych czynności</p>
             <ul className="entityList">
             {activities.map(activity => {
                 return <li

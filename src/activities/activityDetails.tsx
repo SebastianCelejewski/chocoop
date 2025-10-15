@@ -56,6 +56,7 @@ function ActivityDetails() {
         </>
     } else {
         return <>
+            <p className="pageTitle">Szczegóły wykonanej czynności</p>
             <div className="entryDetails">
                 <p className="label">Data i godzina czynności</p>
                 <p>{dateToString(activity.dateTime)}</p>

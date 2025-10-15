@@ -40,6 +40,7 @@ function WorkRequestList() {
 
     return (
           <>
+            <p className="pageTitle">Lista zleceń do wykonania</p>
             <ul className="entityList">
             {workRequests.map(workRequest => {
                 return <li
