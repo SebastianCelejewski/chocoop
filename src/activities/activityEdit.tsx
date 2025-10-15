@@ -18,7 +18,7 @@ import { fetchUserAttributes } from 'aws-amplify/auth';
 
 const client = generateClient<Schema>();
 
-function ActivityAdd() {
+function ActivityEdit() {
 
     const navigate = useNavigate();
 
@@ -172,7 +172,7 @@ function ActivityAdd() {
 
             const result = client.models.Activity.create(newActivity);
             result.then(() => {
-                navigate("/activities/list")
+                navigate("/ActivityList")
             })
         }
 
@@ -189,16 +189,16 @@ function ActivityAdd() {
             const result = client.models.Activity.update(updatedActivity);
 
             result.then(() => {
-                navigate("/activities/show/" + activityId)
+                navigate("/ActivityDetails/" + activityId)
             })
         }
     }
 
     function handleCancel() {
         if (mode == "create") {
-            navigate("/activities/list")
+            navigate("/ActivityList")
         } else {
-            navigate("/activities/show/" + activityId)
+            navigate("/ActivityDetails/" + activityId)
         }
     }
 
@@ -206,7 +206,6 @@ function ActivityAdd() {
         setActivityType(type)
         setActivityExp(exp)
     }
-
 
     return <>
         <p className="pageTitle">{pageTitle}</p>
@@ -258,4 +257,4 @@ function ActivityAdd() {
     </>
 }
 
-export default ActivityAdd;
+export default ActivityEdit;

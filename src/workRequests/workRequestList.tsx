@@ -29,12 +29,12 @@ function WorkRequestList() {
     }, []);
 
     function createWorkRequest() {
-        const navLink = `/workRequests/add/new`
+        const navLink = `/WorkRequestEdit/create`
         navigate(navLink)
     }
 
     function showWorkRequest(id: string) {
-        const navLink = `/workRequests/show/${id}`
+        const navLink = `/WorkRequestDetails/${id}`
         navigate(navLink)
     }
 

@@ -29,12 +29,12 @@ function ActivityList() {
     }, []);
 
     function createActivity() {
-        const navLink = `/activities/add/new`
+        const navLink = `/ActivityEdit/create`
         navigate(navLink)
     }
 
     function showActivity(id: string) {
-        const navLink = `/activities/show/${id}`
+        const navLink = `/ActivityDetails/${id}`
         navigate(navLink)
     }
 

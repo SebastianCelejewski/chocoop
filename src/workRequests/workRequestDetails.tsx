@@ -16,11 +16,11 @@ function WorkRequestDetails() {
     const [workRequest, setWorkRequest] = useState<Schema["WorkRequest"]["type"]>();
 
     function handleBack() {
-        navigate("/workRequests/list")
+        navigate("/WorkRequestList")
     }
 
     function handleEdit() {
-        const navLink = `/workRequests/edit/${workRequestIdParam}`
+        const navLink = `/WorkRequestEdit/update/${workRequestIdParam}`
         navigate(navLink)
     }
 
@@ -30,7 +30,7 @@ function WorkRequestDetails() {
                 + workRequest.createdDateTime + "\n"
                 + workRequest.createdBy + " " + workRequest.type + "\n\nCzy na pewno chcesz usunąć to zlecenie?") == true) {
                 client.models.WorkRequest.delete({ id: workRequestIdParam }).then(() => {
-                    navigate("/workRequests/list")
+                    navigate("/WorkRequestList")
                 })
             } 
         }
@@ -55,7 +55,7 @@ function WorkRequestDetails() {
     if (workRequest == undefined) {
         return <>
             <nav>
-                  <NavLink to="/activitie" end>Powrót na listę czynności</NavLink>
+                  <NavLink to="/WorkRequestList" end>Powrót na listę zleceń</NavLink>
             </nav>
         </>
     } else {

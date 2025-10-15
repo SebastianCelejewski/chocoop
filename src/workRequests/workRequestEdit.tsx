@@ -18,7 +18,7 @@ import { fetchUserAttributes } from 'aws-amplify/auth';
 
 const client = generateClient<Schema>();
 
-function WorkRequestAdd() {
+function WorkRequestEdit() {
 
     const navigate = useNavigate();
 
@@ -271,4 +271,4 @@ function WorkRequestAdd() {
     </>
 }
 
-export default WorkRequestAdd;
+export default WorkRequestEdit;

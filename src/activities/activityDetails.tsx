@@ -16,11 +16,11 @@ function ActivityDetails() {
     const [activity, setActivity] = useState<Schema["Activity"]["type"]>();
 
     function handleBack() {
-        navigate("/activities/list")
+        navigate("/ActivityList")
     }
 
     function handleEdit() {
-        const navLink = `/activities/edit/${activityIdParam}`
+        const navLink = `/ActivityEdit/update/${activityIdParam}`
         navigate(navLink)
     }
 
@@ -30,7 +30,7 @@ function ActivityDetails() {
                 + activity.dateTime + "\n"
                 + activity.user + " " + activity.type + "\n\nCzy na pewno chcesz usunąć tę aktywność?") == true) {
                 client.models.Activity.delete({ id: activityIdParam }).then(() => {
-                    navigate("/activities/list")
+                    navigate("/ActivityList")
                 })
             } 
         }
@@ -51,7 +51,7 @@ function ActivityDetails() {
     if (activity == undefined) {
         return <>
             <nav>
-                  <NavLink to="/activitie" end>Powrót na listę czynności</NavLink>
+                  <NavLink to="/ActivityList" end>Powrót na listę czynności</NavLink>
             </nav>
         </>
     } else {

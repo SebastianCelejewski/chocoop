@@ -2,10 +2,10 @@ import { BrowserRouter, Routes, Route } from "react-router";
 
 import ActivityList from "./activities/activityList.tsx"
 import ActivityDetails from "./activities/activityDetails.tsx"
-import ActivityAdd from "./activities/activityAdd.tsx"
+import ActivityEdit from "./activities/activityEdit.tsx"
 import WorkRequestList from "./workRequests/workRequestList.tsx"
 import WorkRequestDetails from "./workRequests/workRequestDetails.tsx"
-import WorkRequestAdd from "./workRequests/workRequestAdd.tsx"
+import WorkRequestEdit from "./workRequests/workRequestEdit.tsx"
 import { Authenticator } from '@aws-amplify/ui-react';
 import { fetchUserAttributes } from 'aws-amplify/auth';
 import { useState } from "react";
@@ -63,14 +63,12 @@ function App() {
                         <BrowserRouter>
                             <Routes>
                                 <Route path="/" element={<ActivityList />} />
-                                <Route path="/activities/list" element={<ActivityList />} />
-                                <Route path="/activities/add/:id" element={<ActivityAdd />} />
-                                <Route path="/activities/show/:id" element={<ActivityDetails />} />
-                                <Route path="/activities/edit/:id" element={<ActivityAdd />} />
-                                <Route path="/workRequests/list" element={<WorkRequestList />} />
-                                <Route path="/workRequests/add/:id" element={<WorkRequestAdd />} />
-                                <Route path="/workRequests/show/:id" element={<WorkRequestDetails />} />
-                                <Route path="/workRequests/edit/:id" element={<WorkRequestAdd />} />
+                                <Route path="/ActivityList" element={<ActivityList />} />
+                                <Route path="/ActivityDetails/:id" element={<ActivityDetails />} />
+                                <Route path="/ActivityEdit/:operation/:id?" element={<ActivityEdit />} />
+                                <Route path="/WorkRequestList" element={<WorkRequestList />} />
+                                <Route path="/workRequestsDetails/:id" element={<WorkRequestDetails />} />
+                                <Route path="/WorkRequestEdit/:operation/:id?" element={<WorkRequestEdit />} />
                             </Routes>
                         </BrowserRouter>
                     </main>
