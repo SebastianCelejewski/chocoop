@@ -23,7 +23,10 @@ function WorkRequestEdit() {
     const navigate = useNavigate();
 
     const params = useParams();
+    const operationParam = params["operation"]
     const workrequestIdParam = params["id"]
+
+    console.log("Operation: " + operationParam)
 
     const currentDateTimeUTC = new Date()
     const timeZoneOffset = currentDateTimeUTC.getTimezoneOffset()
@@ -44,7 +47,6 @@ function WorkRequestEdit() {
     const [workRequestUrgencyErrorMessage, setWorkRequestUrgencyErrorMessage] = useState("");
     const [workRequestInstructionsErrorMessage, setWorkRequestInstructionsErrorMessage] = useState("");    
 
-    let mode : String | undefined
     const [personLoadingInProgress, setPersonLoadingInProgress] = useState(false)
     const [dateTimeSettingInProgress, setDateTimeLoadingInProgress] = useState(false)
 
@@ -66,15 +68,7 @@ function WorkRequestEdit() {
         return await client.models.WorkRequest.get({ id: workrequestId });
     }
 
-    if (mode === undefined) {
-        if (workrequestIdParam !== undefined && workrequestIdParam != "new") { 
-            mode = "edit"
-        } else {
-            mode = "create"
-        }
-    }
-
-    if (mode == "edit" && workrequestIdParam !== undefined && workRequestId == "") {
+    if (operationParam == "update" && workrequestIdParam !== undefined && workRequestId == "") {
         getWorkRequest(workrequestIdParam).then((result) => {
             if (result["data"] != undefined) {
                 const workrequestDateTimeFromDatabaseAsString = result["data"]["createdDateTime"]
@@ -93,11 +87,11 @@ function WorkRequestEdit() {
         })
     }
 
-    if (mode == "create" && workRequestCreatedBy === "" && personLoadingInProgress == false) {
+    if (operationParam == "create" && workRequestCreatedBy === "" && personLoadingInProgress == false) {
         setNewWorkRequestPerson()                
     }
 
-    if (mode == "create" && workRequestCreatedDateTime === "" && dateTimeSettingInProgress == false) {
+    if (operationParam == "create" && workRequestCreatedDateTime === "" && dateTimeSettingInProgress == false) {
         setNewWorkRequestDateTime()
     }
 
@@ -169,7 +163,7 @@ function WorkRequestEdit() {
             return
         }
         
-        if (mode == "create") {
+        if (operationParam == "create") {
             const newWorkRequest = {
                 createdDateTime: new Date(workRequestCreatedDateTime).toISOString(),
                 createdBy: workRequestCreatedBy,
@@ -181,11 +175,11 @@ function WorkRequestEdit() {
 
             const result = client.models.WorkRequest.create(newWorkRequest);
             result.then(() => {
-                navigate("/workRequests/list")
+                navigate("/WorkRequestList")
             })
         }
 
-        if (mode == "edit") {
+        if (operationParam == "update") {
             const updatedWorkRequest = {
                 id: workRequestId,
                 createdDateTime: new Date(workRequestCreatedDateTime).toISOString(),
@@ -199,16 +193,16 @@ function WorkRequestEdit() {
             const result = client.models.WorkRequest.update(updatedWorkRequest);
 
             result.then(() => {
-                navigate("/workRequests/show/" + workRequestId)
+                navigate("/WorkRequestDetails/" + workRequestId)
             })
         }
     }
 
     function handleCancel() {
-        if (mode == "create") {
-            navigate("/workRequests/list")
+        if (operationParam == "create") {
+            navigate("/WorkRequestList")
         } else {
-            navigate("/workRequests/show/" + workRequestId)
+            navigate("/WorkRequestDetails/" + workRequestId)
         }
     }
 

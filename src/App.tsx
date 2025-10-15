@@ -35,8 +35,8 @@ function App() {
             return <div className="appMenu">
                 <img src={appMenuIcon} alt="menu" onClick={() => setAppMenuExpanded(false)}/>
                 <ul>
-                    <li><a href="/activities/list">Wykonane czynności</a></li>
-                    <li><a href="/workRequests/list">Zlecenia do wykonania</a></li>
+                    <li><a href="/ActivityList">Wykonane czynności</a></li>
+                    <li><a href="/WorkRequestList">Zlecenia do wykonania</a></li>
                 </ul>
             </div>
         } else {
@@ -67,7 +67,7 @@ function App() {
                                 <Route path="/ActivityDetails/:id" element={<ActivityDetails />} />
                                 <Route path="/ActivityEdit/:operation/:id?" element={<ActivityEdit />} />
                                 <Route path="/WorkRequestList" element={<WorkRequestList />} />
-                                <Route path="/workRequestsDetails/:id" element={<WorkRequestDetails />} />
+                                <Route path="/workRequestDetails/:id" element={<WorkRequestDetails />} />
                                 <Route path="/WorkRequestEdit/:operation/:id?" element={<WorkRequestEdit />} />
                             </Routes>
                         </BrowserRouter>

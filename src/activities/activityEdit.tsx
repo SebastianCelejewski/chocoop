@@ -23,7 +23,10 @@ function ActivityEdit() {
     const navigate = useNavigate();
 
     const params = useParams();
+    const operationParam = params["operation"]
     const activityIdParam = params["id"]
+
+    console.log("Operation: " + operationParam)
 
     const currentDateTimeUTC = new Date()
     const timeZoneOffset = currentDateTimeUTC.getTimezoneOffset()
@@ -42,7 +45,6 @@ function ActivityEdit() {
     const [activityExpErrorMessage, setActivityExpErrorMessage] = useState("");
     const [activityCommentErrorMessage, setActivityCommentErrorMessage] = useState("");    
 
-    let mode : String | undefined
     const [personLoadingInProgress, setPersonLoadingInProgress] = useState(false)
     const [dateTimeSettingInProgress, setDateTimeLoadingInProgress] = useState(false)
 
@@ -64,15 +66,7 @@ function ActivityEdit() {
         return await client.models.Activity.get({ id: activityId });
     }
 
-    if (mode === undefined) {
-        if (activityIdParam !== undefined && activityIdParam != "new") { 
-            mode = "edit"
-        } else {
-            mode = "create"
-        }
-    }
-
-    if (mode == "edit" && activityIdParam !== undefined && activityId == "") {
+    if (operationParam == "update" && activityIdParam !== undefined && activityId == "") {
         getActivity(activityIdParam).then((result) => {
             if (result["data"] != undefined) {
                 const activityDateTimeFromDatabaseAsString = result["data"]["dateTime"]
@@ -90,17 +84,17 @@ function ActivityEdit() {
         })
     }
 
-    if (mode == "create" && activityPerson === "" && personLoadingInProgress == false) {
+    if (operationParam == "create" && activityPerson === "" && personLoadingInProgress == false) {
         setNewActivityPerson()                
     }
 
-    if (mode == "create" && activityDateTime === "" && dateTimeSettingInProgress == false) {
+    if (operationParam == "create" && activityDateTime === "" && dateTimeSettingInProgress == false) {
         setNewActivityDateTime()
     }
 
     var pageTitle = "Dodawanie wykonanej czynności"
 
-    if (mode == "edit") {
+    if (operationParam == "update") {
         pageTitle = "Edycja czynności"
     }
 
@@ -161,7 +155,7 @@ function ActivityEdit() {
             return
         }
         
-        if (mode == "create") {
+        if (operationParam == "create") {
             const newActivity = {
                 dateTime: new Date(activityDateTime).toISOString(),
                 user: activityPerson,
@@ -176,7 +170,7 @@ function ActivityEdit() {
             })
         }
 
-        if (mode == "edit") {
+        if (operationParam == "update") {
             const updatedActivity = {
                 id: activityId,
                 dateTime: new Date(activityDateTime).toISOString(),
@@ -195,7 +189,7 @@ function ActivityEdit() {
     }
 
     function handleCancel() {
-        if (mode == "create") {
+        if (operationParam == "create") {
             navigate("/ActivityList")
         } else {
             navigate("/ActivityDetails/" + activityId)
