@@ -8,7 +8,7 @@ const schema = a.schema({
             type: a.string().required(),
             exp: a.integer().required(),
             comment: a.string().required(),
-            requestedAs: a.string().optional()
+            requestedAs: a.string()
         })
         .authorization((allow) => [allow.publicApiKey()]),
     WorkRequest: a
@@ -19,8 +19,8 @@ const schema = a.schema({
             exp: a.integer().required(),
             urgency: a.integer().required(),
             instructions: a.string().required(),
-            completed: a.boolean().optional(),
-            completedAs: a.string().optional()
+            completed: a.boolean(),
+            completedAs: a.string()
         })
     .authorization((allow) => [allow.publicApiKey()]),
 });
