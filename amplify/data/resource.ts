@@ -19,7 +19,7 @@ const schema = a.schema({
             exp: a.integer().required(),
             urgency: a.integer().required(),
             instructions: a.string().required(),
-            completed: a.boolean(),
+            completed: a.boolean().required(),
             completedAs: a.string()
         })
     .authorization((allow) => [allow.publicApiKey()]),

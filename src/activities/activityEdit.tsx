@@ -39,6 +39,12 @@ function ActivityEdit() {
     const [activityComment, setActivityComment] = useState("");
 
     const [workRequestId, setWorkRequestId] = useState(String || undefined)
+    const [workRequestCreatedDateTime, setWorkRequestCreatedDateTime] = useState(String || undefined);
+    const [workRequestCreatedBy, setWorkRequestCreatedBy] = useState("");
+    const [workRequestType, setWorkRequestType] = useState("");
+    const [workRequestExp, setWorkRequestExp] = useState(0);
+    const [workRequestUrgency, setWorkRequestUrgency] = useState(0);
+    const [workRequestInstructions, setWorkRequestInstructions] = useState("");
 
     const [activityPersonErrorMessage, setActivityPersonErrorMessage] = useState("")
     const [activityTypeErrorMessage, setActivityTypeErrorMessage] = useState("");
@@ -51,6 +57,7 @@ function ActivityEdit() {
     function setNewActivityPerson() {
         fetchUserAttributes().then((attributes) => {
             if (attributes.nickname !== undefined) {
+                console.log("Setting new activity person to " + attributes.nickname)
                 setActivityPerson(attributes.nickname)
             }
         })
@@ -91,8 +98,19 @@ function ActivityEdit() {
     if (operationParam == "promoteWorkRequest" && objectIdParam !== undefined && workRequestId == "") {
         getWorkRequest(objectIdParam).then((result) => {
             if (result["data"] != undefined) {
+                const workrequestDateTimeFromDatabaseAsString = result["data"]["createdDateTime"]
+                const workrequestDateTimeFromDatabaseAsDate = Date.parse(workrequestDateTimeFromDatabaseAsString)
+                const workrequestDateTimeLocal = new Date(workrequestDateTimeFromDatabaseAsDate - timeZoneOffset * 60 * 1000)
+                const workrequestDateTimeToSetToDateTimePicker = workrequestDateTimeLocal.toISOString().split(".")[0]
+
                 setWorkRequestId(result["data"]["id"]);
-                setActivityPerson(result["data"]["createdBy"]);
+                setWorkRequestCreatedBy(result["data"]["createdBy"]);
+                setWorkRequestCreatedDateTime(workrequestDateTimeToSetToDateTimePicker);
+                setWorkRequestType(result["data"]["type"]);
+                setWorkRequestExp(result["data"]["exp"]);
+                setWorkRequestUrgency(result["data"]["urgency"]);
+                setWorkRequestInstructions(result["data"]["instructions"]);
+
                 setActivityDateTime(currentDateTime);
                 setActivityType(result["data"]["type"]);
                 setActivityExp(result["data"]["exp"]);
@@ -102,6 +120,7 @@ function ActivityEdit() {
     }
 
     if ((operationParam == "create" || operationParam == "promoteWebRequest") && activityPerson === "" && personLoadingInProgress == false) {
+        console.log("Activity person needs to be filled with logged in person")
         setNewActivityPerson()                
     }
 
@@ -186,8 +205,70 @@ function ActivityEdit() {
             }
 
             const result = client.models.Activity.create(newActivity);
-            result.then(() => {
+            result.then((createActivityResponse) => {
+                if (createActivityResponse !== undefined
+                    && createActivityResponse.errors !== undefined
+                    && createActivityResponse.errors.length > 0) {
+                    console.log("Failed to create new activity:");
+                    console.log(JSON.stringify(createActivityResponse.errors))
+                    alert("Nie udało się utworzyć nowej czynności. Powiadom twórcę aplikacji.")
+                    return;
+                }
                 navigate("/ActivityList")
+            })
+        }
+
+        if (operationParam == "promoteWorkRequest") {
+            const newActivity = {
+                dateTime: new Date(activityDateTime).toISOString(),
+                user: activityPerson,
+                type: activityType,
+                exp: activityExp,
+                comment: activityComment,
+                requestedAs: workRequestId
+            }
+
+            const createActivityResult = client.models.Activity.create(newActivity);
+            createActivityResult.then((createActivityResponse) => {
+
+                if (createActivityResponse !== undefined
+                    && createActivityResponse.errors !== undefined
+                    && createActivityResponse.errors.length > 0) {
+                    console.log("Failed to create new activity:");
+                    console.log(JSON.stringify(createActivityResponse.errors))
+                    alert("Nie udało się utworzyć nowej czynności. Powiadom twórcę aplikacji.")
+                    return;
+                }
+
+                var newActivityId = "unknown"
+                if (createActivityResponse["data"] !== null) {
+                    newActivityId = createActivityResponse["data"]["id"]
+                }  
+
+                const updatedWorkRequest = {
+                    id: workRequestId,
+                    createdDateTime: new Date(workRequestCreatedDateTime).toISOString(),
+                    createdBy: workRequestCreatedBy,
+                    type: workRequestType,
+                    exp: workRequestExp,
+                    urgency: workRequestUrgency,
+                    instructions: workRequestInstructions,
+                    completed: true,
+                    completedAs: newActivityId
+                }
+
+                const workRequestUpdateResult = client.models.WorkRequest.update(updatedWorkRequest);
+
+                workRequestUpdateResult.then((updateWorkRequestResponse) => {
+                    if (updateWorkRequestResponse !== undefined
+                        && updateWorkRequestResponse.errors !== undefined
+                        && updateWorkRequestResponse.errors.length > 0) {
+                        console.log("Failed to update a work request:");
+                        console.log(JSON.stringify(updateWorkRequestResponse.errors))
+                        alert("Nie udało się utworzyć nowej czynności. Powiadom twórcę aplikacji.")
+                    }
+                    navigate("/ActivityList")
+                })
             })
         }
 
@@ -203,7 +284,14 @@ function ActivityEdit() {
 
             const result = client.models.Activity.update(updatedActivity);
 
-            result.then(() => {
+            result.then((updateActivityResponse) => {
+                 if (updateActivityResponse !== undefined
+                    && updateActivityResponse.errors !== undefined
+                    && updateActivityResponse.errors.length > 0) {
+                    console.log("Failed to update an activity:");
+                    console.log(JSON.stringify(updateActivityResponse.errors))
+                    alert("Nie udało się zaktualizować czynności. Powiadom twórcę aplikacji.")
+                }
                 navigate("/ActivityDetails/" + activityId)
             })
         }

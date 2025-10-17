@@ -38,6 +38,8 @@ function WorkRequestEdit() {
     const [workRequestExp, setWorkRequestExp] = useState(0);
     const [workRequestUrgency, setWorkRequestUrgency] = useState(0);
     const [workRequestInstructions, setWorkRequestInstructions] = useState("");
+    const [workRequestCompleted, setWorkRequestCompleted] = useState(false);
+    const [workRequestCompletedAs, setWorkRequestCompletedAs] = useState(String || null);
 
     const [workRequestCreatedByErrorMessage, setWorkRequestCreatedByErrorMessage] = useState("")
     const [workRequestTypeErrorMessage, setWorkRequestTypeErrorMessage] = useState("");
@@ -81,6 +83,8 @@ function WorkRequestEdit() {
                 setWorkRequestExp(result["data"]["exp"]);
                 setWorkRequestUrgency(result["data"]["urgency"]);
                 setWorkRequestInstructions(result["data"]["instructions"]);
+                setWorkRequestCompleted(result["data"]["completed"]);
+                setWorkRequestCompletedAs(result["data"]["completedAs"] || "");
             }
         })
     }
@@ -168,7 +172,8 @@ function WorkRequestEdit() {
                 type: workRequestType,
                 exp: workRequestExp,
                 urgency: workRequestUrgency,
-                instructions: workRequestInstructions
+                instructions: workRequestInstructions,
+                completed: false
             }
 
             const result = client.models.WorkRequest.create(newWorkRequest);
@@ -185,7 +190,9 @@ function WorkRequestEdit() {
                 type: workRequestType,
                 exp: workRequestExp,
                 urgency: workRequestUrgency,
-                instructions: workRequestInstructions
+                instructions: workRequestInstructions,
+                completed: workRequestCompleted,
+                completedAs: workRequestCompletedAs
             }
 
             const result = client.models.WorkRequest.update(updatedWorkRequest);

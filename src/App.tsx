@@ -66,7 +66,6 @@ function App() {
     return (
         <Authenticator>
             {({ signOut }) => {
-                console.log(typeof signOut);
                 return ( 
                     <main>
                         <AppMenu/>
