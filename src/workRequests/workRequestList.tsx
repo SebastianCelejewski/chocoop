@@ -1,6 +1,6 @@
 import type { Schema } from "../../amplify/data/resource";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router";
 import { generateClient } from "aws-amplify/data";
 import { dateToString } from "../utils/dateUtils";
 
@@ -38,9 +38,22 @@ function WorkRequestList() {
         navigate(navLink)
     }
 
+    function CompletnessStatus({ workRequest }: { workRequest: Schema["WorkRequest"]["type"]}) {
+      if (workRequest.completed) {
+        return <p className="workItemCompletness">Zlecenie wykonane</p>
+      } else {
+        return <></>
+      }
+    }
+
+    function navigateToActivities() {
+        const navLink = `/ActivityList`
+        navigate(navLink)
+    } 
+
     return (
           <>
-            <p className="pageTitle">Lista zleceń do wykonania</p>
+            <p className="pageTitle" onClick={navigateToActivities}>Lista zleceń do wykonania</p>
             <ul className="entityList">
             {workRequests.map(workRequest => {
                 return <li
@@ -54,6 +67,7 @@ function WorkRequestList() {
                             <p className="entityExp">{workRequest.exp} xp</p>
                             <div style={{clear: 'both'}}/>
                             <p className="workRequestUrgency">Pilność: {workRequest.urgency}</p>
+                            <CompletnessStatus workRequest={workRequest}/>
                         </div>
                       </li>
                 }

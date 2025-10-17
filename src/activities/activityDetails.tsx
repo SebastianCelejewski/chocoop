@@ -16,7 +16,7 @@ function ActivityDetails() {
     const [activity, setActivity] = useState<Schema["Activity"]["type"]>();
 
     function handleBack() {
-        navigate("/ActivityList")
+        navigate(-1)
     }
 
     function handleEdit() {

@@ -38,9 +38,14 @@ function ActivityList() {
         navigate(navLink)
     }
 
+    function navigateToWorkRequests() {
+        const navLink = `/WorkRequestList`
+        navigate(navLink)
+    } 
+
     return (
           <>
-            <p className="pageTitle">Lista wykonanych czynności</p>
+            <p className="pageTitle" onClick={navigateToWorkRequests}>Lista wykonanych czynności</p>
             <ul className="entityList">
             {activities.map(activity => {
                 return <li
