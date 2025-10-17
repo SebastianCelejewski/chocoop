@@ -16,7 +16,7 @@ function WorkRequestDetails() {
     const [workRequest, setWorkRequest] = useState<Schema["WorkRequest"]["type"]>();
 
     function handleBack() {
-        navigate(-1)
+        navigate("/WorkRequestList")
     }
 
     function handleEdit() {
@@ -104,7 +104,7 @@ function WorkRequestDetails() {
             <div className="buttonPanel">
                 <button type="button" onClick={handleBack}>Wróć</button>
                 <button type="button" onClick={handleEdit}>Edytuj</button>
-                <button type="button" onClick={handleDone}>Zrobione</button>
+                <button type="button" onClick={handleDone} disabled={workRequest.completed}>Zrobione</button>
                 <button type="button" onClick={handleDelete}>Usuń</button>
             </div>
         </>

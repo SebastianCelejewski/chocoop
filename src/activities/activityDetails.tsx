@@ -16,7 +16,7 @@ function ActivityDetails() {
     const [activity, setActivity] = useState<Schema["Activity"]["type"]>();
 
     function handleBack() {
-        navigate(-1)
+        navigate("/ActivityList/")
     }
 
     function handleEdit() {
@@ -40,6 +40,19 @@ function ActivityDetails() {
         return await client.models.Activity.get({ id: activityId });
     }
 
+    function WorkRequestInfo({ activity }: { activity: Schema["Activity"]["type"]}) {
+      if (activity.requestedAs !== undefined && activity.requestedAs != null && activity.requestedAs != "") {
+        const linkTarget = "/WorkRequestDetails/" + activity.requestedAs;
+        return <>
+            <p>Na podstawie zlecenia. <NavLink to={linkTarget}>Przejdź do zlecenia</NavLink></p>
+        </>
+      } else {
+        return <>
+            <p>Bez zlecenia</p>
+        </>
+      }
+    }
+
     if (activity == undefined && activityIdParam != undefined) {
         getactivity(activityIdParam).then((result) => {
             if (result["data"] != undefined) {
@@ -60,6 +73,9 @@ function ActivityDetails() {
             <div className="entryDetails">
                 <p className="label">Data i godzina czynności</p>
                 <p>{dateToString(activity.dateTime)}</p>
+
+                <p className="label">Tryb</p>
+                <WorkRequestInfo activity={activity}/>
 
                 <p className="label">Wykonawca</p>
                 <p>{activity.user}</p>

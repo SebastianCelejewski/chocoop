@@ -229,6 +229,9 @@ function WorkRequestEdit() {
                         onChange={handleWorkRequestCreatedDateTimeChange}
                     /></p>
 
+                <p className="label">Status</p>
+                <p>Zlecenie wykonane: <input type="checkbox" id="workRequestCompleted" checked={workRequestCompleted} onChange={(e) => setWorkRequestCompleted(e.target.checked)}/></p>
+
                 <p className="label">Zleceniodawca</p>
                 { workRequestCreatedByErrorMessage.length > 0 ? (<p className="validationMessage">{workRequestCreatedByErrorMessage}</p>) : (<></>) }
                 <p><input id="workRequestCreatedBy" type="text" className="newWorkRequestTextArea" onChange={handleWorkRequestCreatedByChange} value={workRequestCreatedBy}/></p>

@@ -57,7 +57,6 @@ function ActivityEdit() {
     function setNewActivityPerson() {
         fetchUserAttributes().then((attributes) => {
             if (attributes.nickname !== undefined) {
-                console.log("Setting new activity person to " + attributes.nickname)
                 setActivityPerson(attributes.nickname)
             }
         })
@@ -119,12 +118,11 @@ function ActivityEdit() {
         })
     }
 
-    if ((operationParam == "create" || operationParam == "promoteWebRequest") && activityPerson === "" && personLoadingInProgress == false) {
-        console.log("Activity person needs to be filled with logged in person")
+    if ((operationParam == "create" || operationParam == "promoteWorkRequest") && activityPerson === "" && personLoadingInProgress == false) {
         setNewActivityPerson()                
     }
 
-    if ((operationParam == "create" || operationParam == "promoteWebRequest") && activityDateTime === "" && dateTimeSettingInProgress == false) {
+    if ((operationParam == "create" || operationParam == "promoteWorkRequest") && activityDateTime === "" && dateTimeSettingInProgress == false) {
         setNewActivityDateTime()
     }
 
