@@ -12,5 +12,11 @@
 - Activity templates with associated experience points
 - Improved UI
 
-## Version v0.3
+## Version v0.3.1
 - Support for job requests
+
+## Version v0.3.2
+- Fixed bugs related to job requests
+- Added relationships between activities and job requests
+- Added job request status (completed or not)
+- Improved navigation
