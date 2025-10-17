@@ -193,6 +193,10 @@ ul {
   font-style: italic;
 }
 
+.workItemCompletness {
+  float: right;
+}
+
 .validationMessage {
   color: red;
 }
@@ -208,6 +212,10 @@ ul {
   color: black;
   padding: 6px;
   border-radius: 6px;
+}
+
+.verticalFill {
+  min-height: 60px;
 }
 
 /* ActivityAdd */

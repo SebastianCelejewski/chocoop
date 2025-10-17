@@ -40,6 +40,19 @@ function WorkRequestDetails() {
         navigate("/ActivityEdit/promoteWorkRequest/" + workRequestIdParam)
     }
 
+    function WorkRequestCompletness({ workRequest }: { workRequest: Schema["WorkRequest"]["type"]}) {
+      if (workRequest.completed) {
+        const linkTarget = "/ActivityDetails/" + workRequest.completedAs;
+        return <>
+            <p>Zlecenie wykonane. <NavLink to={linkTarget}>Przejdź do czynności</NavLink></p>
+        </>
+      } else {
+        return <>
+            <p>Zlecenie niewykonane</p>
+        </>
+      }
+    }
+
     async function getWorkRequest(workRequestId: string) {
         return await client.models.WorkRequest.get({ id: workRequestId });
     }
@@ -55,13 +68,16 @@ function WorkRequestDetails() {
     if (workRequest == undefined) {
         return <>
             <nav>
-                  <NavLink to="/WorkRequestList" end>Powrót na listę zleceń</NavLink>
+                <NavLink to="/WorkRequestList" end>Powrót na listę zleceń</NavLink>
             </nav>
         </>
     } else {
         return <>
             <p className="pageTitle">Szczegóły zlecenia</p>
             <div className="entryDetails">
+                <p className="label">Status</p>
+                <WorkRequestCompletness workRequest={workRequest}/>
+
                 <p className="label">Data i godzina utworzenia zlecenia</p>
                 <p>{dateToString(workRequest.createdDateTime)}</p>
 
@@ -79,11 +95,16 @@ function WorkRequestDetails() {
 
                 <p className="label">Instrukcje</p>
                 <p>{workRequest.instructions}</p>
+
+                <p className="label">Instrukcje</p>
+                <p>{workRequest.instructions}</p>
+
+                <div className="verticalFill"/>
             </div>
             <div className="buttonPanel">
                 <button type="button" onClick={handleBack}>Wróć</button>
                 <button type="button" onClick={handleEdit}>Edytuj</button>
-                <button type="button" onClick={handleDone}>Zrobione</button>
+                <button type="button" onClick={handleDone} disabled={workRequest.completed}>Zrobione</button>
                 <button type="button" onClick={handleDelete}>Usuń</button>
             </div>
         </>
