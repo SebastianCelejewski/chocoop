@@ -20,3 +20,6 @@
 - Added relationships between activities and job requests
 - Added job request status (completed or not)
 - Improved navigation
+
+## Version v0.4.1
+- Leaderboards
