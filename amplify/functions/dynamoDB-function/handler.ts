@@ -13,7 +13,8 @@ const logger = new Logger({
 });
 
 async function getParameter(name: string): Promise<string> {
-    const paramPath = `/secure-site/${envName}/${name}`;
+    const paramPath = `/pl.sebcel.chocoop/${envName}/${name}`;
+    logger.info(`Trying to get parameter ${paramPath} from SSM Parameter Store`);
     const command = new GetParameterCommand({ Name: paramPath });
     const response = await ssmClient.send(command);
     return response.Parameter?.Value || '';
@@ -31,7 +32,7 @@ const logDataChange = async (event: DynamoDBStreamEvent) => {
 
 const rebuildStatistics = async () => {
     logger.info("Rebuilding statistics")
-    const tableName = await getParameter('account-table-name');
+    const tableName = await getParameter('activity-table-name');
     logger.info(`Table name: ${tableName}`)
 
     const params = {
