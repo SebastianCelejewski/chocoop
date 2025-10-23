@@ -13,13 +13,14 @@
 - Improved UI
 
 ## Version v0.3.1
-- Support for job requests
+- Support for work requests
 
 ## Version v0.3.2
-- Fixed bugs related to job requests
-- Added relationships between activities and job requests
-- Added job request status (completed or not)
+- Fixed bugs related to work requests
+- Added relationships between activities and work requests
+- Added work request status (completed or not)
 - Improved navigation
 
 ## Version v0.4.1
-- Leaderboards
+- Data for leaderboards stored in a new DynamoDB table
+- Fixed duplicate description in work request details
