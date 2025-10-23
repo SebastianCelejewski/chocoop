@@ -5,9 +5,9 @@ import { DynamoDBClient, ScanCommand, PutItemCommand, PutItemCommandInput, PutIt
 
 const ssmClient = new SSMClient();
 const dynamoDbClient = new DynamoDBClient({});
-const envName = process.env.AMPLIFY_BRANCH || 'unknown';
+const envName = process.env.AWS_BRANCH || 'unknown';
 
-console.log("process.env.AMPLIFY_BRANCH: " + process.env.AMPLIFY_BRANCH);
+console.log("envName: " + envName);
 
 const logger = new Logger({
     logLevel: "INFO",
