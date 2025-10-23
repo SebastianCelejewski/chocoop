@@ -24,3 +24,6 @@
 ## Version v0.4.1
 - Data for leaderboards stored in a new DynamoDB table
 - Fixed duplicate description in work request details
+- Added backgrounds to work request template icons
+- Added new work request template
+- Added filtering of work requests (all/not completed)
