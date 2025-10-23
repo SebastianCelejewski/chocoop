@@ -8,7 +8,10 @@ import { Policy, PolicyStatement, Effect } from "aws-cdk-lib/aws-iam";
 import { StartingPosition, EventSourceMapping } from "aws-cdk-lib/aws-lambda";
 import { expStatsUpdateFunction } from "./functions/exp-stats-update-function/resource";
 
-const envName = process.env.AMPLIFY_BRANCH || 'dev';
+const envName = process.env.AMPLIFY_BRANCH || 'unknown';
+
+console.log("process.env.AMPLIFY_BRANCH: " + process.env.AMPLIFY_BRANCH);
+console.log("process.env.AWS_BRANCH: " + process.env.AWS_BRANCH);
 
 const backend = defineBackend({
     auth,

@@ -2,11 +2,12 @@ import type { DynamoDBStreamHandler, DynamoDBStreamEvent } from "aws-lambda";
 import { Logger } from "@aws-lambda-powertools/logger";
 import { SSMClient, GetParameterCommand } from "@aws-sdk/client-ssm";
 import { DynamoDBClient, ScanCommand, PutItemCommand, PutItemCommandInput, PutItemCommandOutput, AttributeValue } from "@aws-sdk/client-dynamodb";
-var uuid = require('uuid');
 
 const ssmClient = new SSMClient();
 const dynamoDbClient = new DynamoDBClient({});
-const envName = process.env.AMPLIFY_BRANCH || 'dev';
+const envName = process.env.AMPLIFY_BRANCH || 'unknown';
+
+console.log("process.env.AMPLIFY_BRANCH: " + process.env.AMPLIFY_BRANCH);
 
 const logger = new Logger({
     logLevel: "INFO",
