@@ -6,15 +6,20 @@ import { Stack } from "aws-cdk-lib";
 import * as cdk from "aws-cdk-lib";
 import { Policy, PolicyStatement, Effect } from "aws-cdk-lib/aws-iam";
 import { StartingPosition, EventSourceMapping } from "aws-cdk-lib/aws-lambda";
-import { myDynamoDBFunction } from "./functions/dynamoDB-function/resource";
+import { expStatsUpdateFunction } from "./functions/exp-stats-update-function/resource";
+
+const envName = process.env.AMPLIFY_BRANCH || 'dev';
 
 const backend = defineBackend({
     auth,
     data,
-    myDynamoDBFunction,
+    expStatsUpdateFunction,
 });
 
 const { cfnUserPool } = backend.auth.resources.cfnResources;
+const activityTable = backend.data.resources.tables["Activity"];
+const expStatsTable = backend.data.resources.tables["ExperienceStatistics"];
+
 cfnUserPool.policies = {
     passwordPolicy: {
         minimumLength: 6,
@@ -26,10 +31,27 @@ cfnUserPool.policies = {
     },
 };
 
-const activityTable = backend.data.resources.tables["Activity"];
-const policy = new Policy(
+const activityTableParam = new cdk.aws_ssm.StringParameter(
     Stack.of(activityTable),
-    "MyDynamoDBFunctionStreamingPolicy",
+    "chocoop-activity-table-name-parameter-" + envName,
+    {
+        parameterName: `/chocoop-activity-table-name-${envName}`,
+        stringValue: activityTable.tableName,
+    }
+);
+
+const expStatsTableParam = new cdk.aws_ssm.StringParameter(
+    Stack.of(activityTable),
+    "chocoop-exp-stats-table-name-parameter-" + envName,
+    {
+        parameterName: `/chocoop-exp-stats-table-name-${envName}`,
+        stringValue: expStatsTable.tableName,
+    }
+);
+
+const dynamodbActivitiesStreamDataPolicy = new Policy(
+    Stack.of(activityTable),
+    "chocoop-dynamodb-stream-data-policy-" + envName,
     {
         statements: [
             new PolicyStatement({
@@ -45,35 +67,10 @@ const policy = new Policy(
         ],
     }
 );
-backend.myDynamoDBFunction.resources.lambda.role?.attachInlinePolicy(policy);
 
-const mapping = new EventSourceMapping(
+const dynamodbActivitiesReadPolicy = new Policy(
     Stack.of(activityTable),
-    "MyDynamoDBFunctionTodoEventStreamMapping",
-    {
-        target: backend.myDynamoDBFunction.resources.lambda,
-        eventSourceArn: activityTable.tableStreamArn,
-        startingPosition: StartingPosition.LATEST,
-    }
-);
-
-mapping.node.addDependency(policy);
-
-/* SSM parameter holding a name of DynamiDB table that can be fetched by the Lambda function */
-
-const envName = process.env.AMPLIFY_BRANCH || 'dev';
-const activityTableParam = new cdk.aws_ssm.StringParameter(
-    Stack.of(activityTable),
-    "ActivityTableName",
-    {
-        parameterName: `/pl.sebcel.chocoop/${envName}/activity-table-name`,
-        stringValue: activityTable.tableName,
-    }
-);
-
-const allowSignLambdaToAccessAccountTablePolicy = new Policy(
-    Stack.of(activityTable),
-    "chocoop-allowSignLambdaToAccessActivityTablePolicy",
+    "chocoop-dynamodb-activities-read-policy-" + envName,
     {
         statements: [
         new PolicyStatement({
@@ -85,7 +82,33 @@ const allowSignLambdaToAccessAccountTablePolicy = new Policy(
                 "dynamodb:Scan",
             ],
             resources: [activityTable.tableArn],
-        }),
+        })
+    ]})
+
+const dynamodbExpStatsReadWritePolicy = new Policy(
+    Stack.of(activityTable),
+    "chocoop-dynamodb-exp-stats-readwrite-policy-" + envName,
+    {
+        statements: [
+        new PolicyStatement({
+            effect: Effect.ALLOW,
+            actions: [
+                "dynamodb:PutItem",
+                "dynamodb:GetItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+            ],
+            resources: [expStatsTable.tableArn],
+        })
+    ]})    
+        
+const parametersReadPolicy = new Policy(
+    Stack.of(activityTable),
+    "chocoop-parameters-read-policy-" + envName,
+    {
+        statements: [
         new PolicyStatement({
             effect: Effect.ALLOW,
             actions: [
@@ -95,10 +118,26 @@ const allowSignLambdaToAccessAccountTablePolicy = new Policy(
             ],
             resources: [
                 activityTableParam.parameterArn,
+                expStatsTableParam.parameterArn
             ],
         }),
         ],
     }
 );
 
-backend.myDynamoDBFunction.resources.lambda.role?.attachInlinePolicy(allowSignLambdaToAccessAccountTablePolicy);
+backend.expStatsUpdateFunction.resources.lambda.role?.attachInlinePolicy(parametersReadPolicy);
+backend.expStatsUpdateFunction.resources.lambda.role?.attachInlinePolicy(dynamodbActivitiesStreamDataPolicy);
+backend.expStatsUpdateFunction.resources.lambda.role?.attachInlinePolicy(dynamodbActivitiesReadPolicy);
+backend.expStatsUpdateFunction.resources.lambda.role?.attachInlinePolicy(dynamodbExpStatsReadWritePolicy);
+
+const mapping = new EventSourceMapping(
+    Stack.of(activityTable),
+    "chocoop-dynamodb-function-stream-mapping-" + envName,
+    {
+        target: backend.expStatsUpdateFunction.resources.lambda,
+        eventSourceArn: activityTable.tableStreamArn,
+        startingPosition: StartingPosition.LATEST,
+    }
+);
+
+mapping.node.addDependency(dynamodbActivitiesStreamDataPolicy);

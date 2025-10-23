@@ -1,7 +1,8 @@
 import type { DynamoDBStreamHandler, DynamoDBStreamEvent } from "aws-lambda";
 import { Logger } from "@aws-lambda-powertools/logger";
 import { SSMClient, GetParameterCommand } from "@aws-sdk/client-ssm";
-import { DynamoDBClient, ScanCommand, AttributeValue } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, ScanCommand, PutItemCommand, PutItemCommandInput, PutItemCommandOutput, AttributeValue } from "@aws-sdk/client-dynamodb";
+var uuid = require('uuid');
 
 const ssmClient = new SSMClient();
 const dynamoDbClient = new DynamoDBClient({});
@@ -9,12 +10,11 @@ const envName = process.env.AMPLIFY_BRANCH || 'dev';
 
 const logger = new Logger({
     logLevel: "INFO",
-    serviceName: "dynamodb-stream-handler",
+    serviceName: "chocoop-exp-stats-update-function",
 });
 
-async function getParameter(name: string): Promise<string> {
-    const paramPath = `/pl.sebcel.chocoop/${envName}/${name}`;
-    const command = new GetParameterCommand({ Name: paramPath });
+async function getParameter(parameterPath: string): Promise<string> {
+    const command = new GetParameterCommand({ Name: parameterPath });
     const response = await ssmClient.send(command);
     return response.Parameter?.Value || '';
 }
@@ -31,10 +31,11 @@ const logDataChange = async (event: DynamoDBStreamEvent) => {
 
 const rebuildStatistics = async () => {
     logger.info("Rebuilding statistics")
-    const tableName = await getParameter('activity-table-name');
+    const activityTableName = await getParameter(`/chocoop-activity-table-name-${envName}`);
+    const expStatsTableName = await getParameter(`/chocoop-exp-stats-table-name-${envName}`);
 
     const params = {
-        TableName: tableName,
+        TableName: activityTableName,
         ExclusiveStartKey: undefined as any
     };
 
@@ -71,14 +72,42 @@ const rebuildStatistics = async () => {
     
     console.log("Data loading completed")
 
-    dailyData.forEach((value: Map<string, number>, key: string) => {
-        console.log("Loaded day: " + key);
-        userNames.forEach((user: unknown) => {
+    console.log("Starting sending data to DynamoDB")
+    for (const [day, value] of dailyData) {
+        console.log("Data for day: " + day);
+
+        for (const user of userNames) {
             if (value.has(user as string)) {
-                console.log("User: " + user + " exp: " + value.get(user as string));
+                console.log("Data for user: " + user + " exp: " + value.get(user as string));
+                const partitionKey = `DAY-${day}-${user}`
+
+                var putItemParams : PutItemCommandInput = {
+                    TableName: expStatsTableName,
+                    Item: {
+                        "id": { S: partitionKey },
+                        "periodType": { S: "DAY" },
+                        "period": { S: day },
+                        "user": { S: user as string },
+                        "exp": { N: String(value.get(user as string)) }
+                    },
+                    ReturnConsumedCapacity: "TOTAL",
+                };
+
+                console.log("Putting item");
+                console.log("Put item params: " + JSON.stringify(putItemParams));
+
+                const putItemRequest = new PutItemCommand(putItemParams);
+                const putItemResponse : PutItemCommandOutput = await dynamoDbClient.send(putItemRequest);
+
+                console.log("Item put");
+
+                console.log("Put item response: " + JSON.stringify(putItemResponse));
             } 
-        });
-    });
+        }
+    }
+
+    logger.info("Sending data to DynamoDB completed")
+
     logger.info("Rebuilding statistics completed")
 }
 
