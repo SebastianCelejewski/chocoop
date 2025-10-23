@@ -13,6 +13,7 @@ import laundry_start from "../assets/images/activities/laundry_start.png?url";
 import laundry_end from "../assets/images/activities/laundry_end.png?url";
 import laundry_sorting from "../assets/images/activities/laundry_sorting.png?url";
 import taking_garbage_out from "../assets/images/activities/taking_garbage_out.png?url";
+import unpacking_frisco from "../assets/images/activities/unpacking_frisco.png?url";
 
 import { fetchUserAttributes } from 'aws-amplify/auth';
 
@@ -338,6 +339,7 @@ function ActivityEdit() {
                     <img src={laundry_end} onClick={() => fillTemplate("wywieszanie prania", 10)} alt="wywieszanie prania"></img>
                     <img src={laundry_sorting} onClick={() => fillTemplate("ściąganie prania", 10)} alt="ściąganie prania"></img>
                     <img src={taking_garbage_out} onClick={() => fillTemplate("wyniesienie śmieci", 10)} alt="wyniesienie śmieci"></img>
+                    <img src={unpacking_frisco} onClick={() => fillTemplate("rozpakowanie zakupów Frisco", 5)} alt="rozpakowanie zakupów Frisco"></img>
                 </div>
 
                 <p className="label">Czynność</p>
