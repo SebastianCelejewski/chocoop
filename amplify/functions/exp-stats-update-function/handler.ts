@@ -7,6 +7,13 @@ const ssmClient = new SSMClient();
 const dynamoDbClient = new DynamoDBClient({});
 const envName = process.env.AWS_BRANCH || 'unknown';
 
+console.log("Environment variables in handler.ts code outside the function handler")
+console.log("AWS_BRANCH: " + process.env.AWS_BRANCH);
+console.log("AMPLIFY_BRANCH: " + process.env.AMPLIFY_BRANCH);
+console.log("Env: " + JSON.stringify(process.env))
+
+console.log("envName: " + envName)
+
 const logger = new Logger({
     logLevel: "INFO",
     serviceName: "chocoop-exp-stats-update-function",
@@ -152,17 +159,16 @@ const rebuildStatistics = async () => {
     logger.info("Sending monthly data to DynamoDB completed")
 
     logger.info("Rebuilding statistics completed")
-
-    
 }
 
 export const handler: DynamoDBStreamHandler = async (event) => {
     logger.info("Entering dynamoDB function handler")
-    console.log("envName: " + envName);
-    console.log("process.env.AWS_BRANCH: " + process.env.AWS_BRANCH);
-    console.log("process.env.AMPLIFY_BRANCH: " + process.env.AMPLIFY_BRANCH);
+
+    console.log("Environment variables in backend.ts code inside the function handler")
+    console.log("AWS_BRANCH: " + process.env.AWS_BRANCH);
+    console.log("AMPLIFY_BRANCH: " + process.env.AMPLIFY_BRANCH);
     console.log("Env: " + JSON.stringify(process.env))
-    
+
     await logDataChange(event)
     await rebuildStatistics()
 
