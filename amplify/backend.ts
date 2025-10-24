@@ -35,20 +35,18 @@ cfnUserPool.policies = {
 
 const activityTableParam = new cdk.aws_ssm.StringParameter(
     Stack.of(activityTable),
-    // "chocoop-activity-table-name-parameter-" + envName,
-    "p1",
+    "chocoop-activity-table-name-param-" + envName,
     {
-        // parameterName: `/chocoop-activity-table-name-${envName}`,
-        parameterName: `/p1`,
+        parameterName: `/chocoop/activity-table-name-${envName}`,
         stringValue: activityTable.tableName,
     }
 );
 
 const expStatsTableParam = new cdk.aws_ssm.StringParameter(
     Stack.of(activityTable),
-    "chocoop-expstats-table-name-parameter-" + envName,
+    "chocoop-expstats-table-name-param-" + envName,
     {
-        parameterName: `/chocoop-exp-stats-table-name-${envName}`,
+        parameterName: `/chocoop/exp-stats-table-name-${envName}`,
         stringValue: expStatsTable.tableName,
     }
 );
