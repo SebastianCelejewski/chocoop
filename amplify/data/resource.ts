@@ -22,7 +22,15 @@ const schema = a.schema({
             completed: a.boolean().required(),
             completedAs: a.string()
         })
-    .authorization((allow) => [allow.publicApiKey()]),
+        .authorization((allow) => [allow.publicApiKey()]),
+    ExperienceStatistics: a
+        .model({
+            periodType: a.string().required(),
+            period: a.string().required(),
+            user: a.string().required(),
+            exp: a.integer().required()
+        })
+        .authorization((allow) => [allow.publicApiKey()]),
 });
 
 export const data = defineData({

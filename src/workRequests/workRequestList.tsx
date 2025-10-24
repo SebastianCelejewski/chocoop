@@ -16,6 +16,7 @@ function sortByDateTime(workRequests: Array<Schema["WorkRequest"]["type"]>) {
 
 function WorkRequestList() {
     const [workRequests, setWorkRequests] = useState<Array<Schema["WorkRequest"]["type"]>>([]);
+    const [showCompletedWorkRequests, setShowCompletedWorkRequests] = useState(false);
     const navigate = useNavigate();
     
     useEffect(() => {
@@ -51,25 +52,32 @@ function WorkRequestList() {
         navigate(navLink)
     } 
 
+    function handleShowCompletedToggled(): void {
+        setShowCompletedWorkRequests(!showCompletedWorkRequests);
+    }
+
     return (
           <>
             <p className="pageTitle" onClick={navigateToActivities}>Lista zleceń do wykonania</p>
+            <p><input type="checkbox" name="showCompleted" id="showCompleted" checked={showCompletedWorkRequests} onChange={handleShowCompletedToggled}/>Pokaż ukończone</p>
             <ul className="entityList">
             {workRequests.map(workRequest => {
-                return <li
-                        className="entityListElement"
-                        onClick={() => showWorkRequest(workRequest.id)}
-                        key={workRequest.id}>
-                        <div>
-                            <p className="entityDateTime">{dateToString(workRequest.createdDateTime)}</p>
-                            <p className="entityPerson">{workRequest.createdBy}</p>
-                            <p className="entityType">{workRequest.type}</p>
-                            <p className="entityExp">{workRequest.exp} xp</p>
-                            <div style={{clear: 'both'}}/>
-                            <p className="workRequestUrgency">Pilność: {workRequest.urgency}</p>
-                            <CompletnessStatus workRequest={workRequest}/>
-                        </div>
-                      </li>
+                if (showCompletedWorkRequests || !workRequest.completed) {
+                    return <li
+                            className="entityListElement"
+                            onClick={() => showWorkRequest(workRequest.id)}
+                            key={workRequest.id}>
+                            <div>
+                                <p className="entityDateTime">{dateToString(workRequest.createdDateTime)}</p>
+                                <p className="entityPerson">{workRequest.createdBy}</p>
+                                <p className="entityType">{workRequest.type}</p>
+                                <p className="entityExp">{workRequest.exp} xp</p>
+                                <div style={{clear: 'both'}}/>
+                                <p className="workRequestUrgency">Pilność: {workRequest.urgency}</p>
+                                <CompletnessStatus workRequest={workRequest}/>
+                            </div>
+                          </li>
+                    }
                 }
             )}
           </ul>

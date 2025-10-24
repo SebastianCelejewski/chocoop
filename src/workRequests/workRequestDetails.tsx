@@ -96,9 +96,6 @@ function WorkRequestDetails() {
                 <p className="label">Instrukcje</p>
                 <p>{workRequest.instructions}</p>
 
-                <p className="label">Instrukcje</p>
-                <p>{workRequest.instructions}</p>
-
                 <div className="verticalFill"/>
             </div>
             <div className="buttonPanel">
