@@ -7,8 +7,6 @@ const ssmClient = new SSMClient();
 const dynamoDbClient = new DynamoDBClient({});
 const envName = process.env.AWS_BRANCH || 'unknown';
 
-console.log("envName: " + envName);
-
 const logger = new Logger({
     logLevel: "INFO",
     serviceName: "chocoop-exp-stats-update-function",
@@ -160,6 +158,11 @@ const rebuildStatistics = async () => {
 
 export const handler: DynamoDBStreamHandler = async (event) => {
     logger.info("Entering dynamoDB function handler")
+    console.log("envName: " + envName);
+    console.log("process.env.AWS_BRANCH: " + process.env.AWS_BRANCH);
+    console.log("process.env.AMPLIFY_BRANCH: " + process.env.AMPLIFY_BRANCH);
+    console.log("Env: " + JSON.stringify(process.env))
+    
     await logDataChange(event)
     await rebuildStatistics()
 
