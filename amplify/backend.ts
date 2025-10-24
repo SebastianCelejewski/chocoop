@@ -120,7 +120,7 @@ const parametersReadPolicy = new Policy(
             ],
             resources: [
                 activityTableParam.parameterArn,
-                expStatsTableParam.parameterArn
+                // expStatsTableParam.parameterArn
             ],
         }),
         ],
