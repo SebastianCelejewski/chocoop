@@ -6,7 +6,7 @@ import { dateToString } from "../utils/dateUtils";
 
 const client = generateClient<Schema>();
 
-class activityQueryResult {
+class ActivityQueryResult {
   items: Array<Schema["Activity"]["type"]> = []
 }
 
@@ -21,7 +21,7 @@ function ActivityList() {
     useEffect(() => {
         if (client.models.Activity !== undefined) {
           client.models.Activity.observeQuery().subscribe({
-              next: (data: activityQueryResult) => { 
+              next: (data: ActivityQueryResult) => { 
                 setActivities(sortByDateTime([...data.items]))
               }
           });
@@ -42,6 +42,13 @@ function ActivityList() {
         const navLink = `/WorkRequestList`
         navigate(navLink)
     } 
+
+    if (activities.length == 0) {
+        return <>
+            <p className="pageTitle" onClick={navigateToWorkRequests}>Lista wykonanych czynności</p>
+            <div className="loadingData">Ładowanie danych</div>
+        </>
+    }
 
     return (
           <>

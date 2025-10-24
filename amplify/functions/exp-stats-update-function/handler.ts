@@ -47,7 +47,9 @@ async function putData(tableName: string, periodType: string, period: string, us
             "periodType": { S: periodType },
             "period": { S: period },
             "user": { S: user as string },
-            "exp": { N: String(exp) }
+            "exp": { N: String(exp) },
+            "createdAt": { S: new Date().toISOString() },
+            "updatedAt": { S: new Date().toISOString() }
         },
         ReturnConsumedCapacity: "TOTAL",
     };

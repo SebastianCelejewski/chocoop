@@ -6,7 +6,7 @@ import { dateToString } from "../utils/dateUtils";
 
 const client = generateClient<Schema>();
 
-class workRequestQueryResult {
+class WorkRequestQueryResult {
   items: Array<Schema["WorkRequest"]["type"]> = []
 }
 
@@ -22,7 +22,7 @@ function WorkRequestList() {
     useEffect(() => {
         if (client.models.WorkRequest !== undefined) {
           client.models.WorkRequest.observeQuery().subscribe({
-              next: (data: workRequestQueryResult) => { 
+              next: (data: WorkRequestQueryResult) => { 
                 setWorkRequests(sortByDateTime([...data.items]))
               }
           });

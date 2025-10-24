@@ -27,3 +27,6 @@
 - Added backgrounds to work request template icons
 - Added new work request template
 - Added filtering of work requests (all/not completed)
+
+## Version v0.4.2
+- Data for leaderboards are displayed on a new page
