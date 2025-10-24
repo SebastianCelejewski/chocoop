@@ -2,11 +2,18 @@ import type { DynamoDBStreamHandler, DynamoDBStreamEvent } from "aws-lambda";
 import { Logger } from "@aws-lambda-powertools/logger";
 import { SSMClient, GetParameterCommand } from "@aws-sdk/client-ssm";
 import { DynamoDBClient, ScanCommand, PutItemCommand, PutItemCommandInput, PutItemCommandOutput, AttributeValue } from "@aws-sdk/client-dynamodb";
-var uuid = require('uuid');
 
 const ssmClient = new SSMClient();
 const dynamoDbClient = new DynamoDBClient({});
-const envName = process.env.AMPLIFY_BRANCH || 'dev';
+const envName = process.env.BRANCH_NAME || 'unknown';
+
+console.log("Environment variables in handler.ts code outside the function handler")
+console.log("BRANCH_NAME: " + process.env.BRANCH_NAME);
+console.log("AWS_BRANCH: " + process.env.AWS_BRANCH);
+console.log("AMPLIFY_BRANCH: " + process.env.AMPLIFY_BRANCH);
+console.log("Env: " + JSON.stringify(process.env))
+
+console.log("envName: " + envName)
 
 const logger = new Logger({
     logLevel: "INFO",
@@ -58,8 +65,8 @@ async function putData(tableName: string, periodType: string, period: string, us
 
 const rebuildStatistics = async () => {
     logger.info("Rebuilding statistics")
-    const activityTableName = await getParameter(`/chocoop-activity-table-name-${envName}`);
-    const expStatsTableName = await getParameter(`/chocoop-exp-stats-table-name-${envName}`);
+    const activityTableName = await getParameter(`/chocoop/activity-table-name-${envName}`,);
+    const expStatsTableName = await getParameter(`/chocoop/exp-stats-table-name-${envName}`);
 
     const params = {
         TableName: activityTableName,
@@ -153,12 +160,19 @@ const rebuildStatistics = async () => {
     logger.info("Sending monthly data to DynamoDB completed")
 
     logger.info("Rebuilding statistics completed")
-
-    
 }
 
 export const handler: DynamoDBStreamHandler = async (event) => {
     logger.info("Entering dynamoDB function handler")
+
+    console.log("Environment variables in backend.ts code inside the function handler")
+    console.log("BRANCH_NAME: " + process.env.BRANCH_NAME);
+    console.log("AWS_BRANCH: " + process.env.AWS_BRANCH);
+    console.log("AMPLIFY_BRANCH: " + process.env.AMPLIFY_BRANCH);
+    console.log("Env: " + JSON.stringify(process.env))
+
+    console.log("envName: " + envName);
+
     await logDataChange(event)
     await rebuildStatistics()
 

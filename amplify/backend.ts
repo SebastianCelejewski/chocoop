@@ -8,7 +8,14 @@ import { Policy, PolicyStatement, Effect } from "aws-cdk-lib/aws-iam";
 import { StartingPosition, EventSourceMapping } from "aws-cdk-lib/aws-lambda";
 import { expStatsUpdateFunction } from "./functions/exp-stats-update-function/resource";
 
-const envName = process.env.AMPLIFY_BRANCH || 'dev';
+const envName = process.env.AWS_BRANCH || 'unknown';
+
+console.log("Environment variables in backend.ts code outside the function handler")
+console.log("AWS_BRANCH: " + process.env.AWS_BRANCH);
+console.log("AMPLIFY_BRANCH: " + process.env.AMPLIFY_BRANCH);
+console.log("Env: " + JSON.stringify(process.env))
+
+console.log("envName: " + envName);
 
 const backend = defineBackend({
     auth,
@@ -33,18 +40,18 @@ cfnUserPool.policies = {
 
 const activityTableParam = new cdk.aws_ssm.StringParameter(
     Stack.of(activityTable),
-    "chocoop-activity-table-name-parameter-" + envName,
+    "chocoop-activity-table-name-param-" + envName,
     {
-        parameterName: `/chocoop-activity-table-name-${envName}`,
+        parameterName: `/chocoop/activity-table-name-${envName}`,
         stringValue: activityTable.tableName,
     }
 );
 
 const expStatsTableParam = new cdk.aws_ssm.StringParameter(
     Stack.of(activityTable),
-    "chocoop-exp-stats-table-name-parameter-" + envName,
+    "chocoop-expstats-table-name-param-" + envName,
     {
-        parameterName: `/chocoop-exp-stats-table-name-${envName}`,
+        parameterName: `/chocoop/exp-stats-table-name-${envName}`,
         stringValue: expStatsTable.tableName,
     }
 );
