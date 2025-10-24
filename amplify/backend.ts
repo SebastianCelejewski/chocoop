@@ -44,14 +44,14 @@ const activityTableParam = new cdk.aws_ssm.StringParameter(
     }
 );
 
-// const expStatsTableParam = new cdk.aws_ssm.StringParameter(
-//     Stack.of(activityTable),
-//     "chocoop-exp-stats-table-name-parameter-" + envName,
-//     {
-//         parameterName: `/chocoop-exp-stats-table-name-${envName}`,
-//         stringValue: expStatsTable.tableName,
-//     }
-// );
+const expStatsTableParam = new cdk.aws_ssm.StringParameter(
+    Stack.of(activityTable),
+    "chocoop-expstats-table-name-parameter-" + envName,
+    {
+        parameterName: `/chocoop-exp-stats-table-name-${envName}`,
+        stringValue: expStatsTable.tableName,
+    }
+);
 
 const dynamodbActivitiesStreamDataPolicy = new Policy(
     Stack.of(activityTable),
@@ -122,7 +122,7 @@ const parametersReadPolicy = new Policy(
             ],
             resources: [
                 activityTableParam.parameterArn,
-                // expStatsTableParam.parameterArn
+                expStatsTableParam.parameterArn
             ],
         }),
         ],
