@@ -302,3 +302,29 @@ td, th {
     font-weight: bold;
     font-size: larger;
 }
+
+
+/* About */
+
+.richText {
+    color: black;
+    overflow: auto;
+    height: 80vh;
+    flex: 1;
+    margin-top: 0px;
+    margin-left: 1px;
+    margin-right: 1px;
+}
+
+.richText .label {
+    margin-left: 8px;
+}
+
+ul.richText {
+    background: white;
+}
+
+.richText ul {
+    border: none;
+    border-radius: 0;
+}

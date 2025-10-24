@@ -10,6 +10,7 @@ import WorkRequestList from "./workRequests/workRequestList.tsx"
 import WorkRequestDetails from "./workRequests/workRequestDetails.tsx"
 import WorkRequestEdit from "./workRequests/workRequestEdit.tsx"
 import ExpStatsSummary from "./expStats/expStatsSummary.tsx"
+import WhatsNew from "./about/whatsNew.tsx"
 
 import appMenuIcon from "./assets/images/menu/appMenu.png?url";
 import userMenuIcon from "./assets/images/menu/userMenu.png?url";
@@ -39,6 +40,7 @@ function App() {
             return <div className="appMenu">
                 <img src={appMenuIcon} alt="menu" onClick={() => setAppMenuExpanded(false)}/>
                 <ul>
+                    <li><a href="/About/WhatsNew">O aplikacji</a></li>
                     <li><a href="/ActivityList">Wykonane czynności</a></li>
                     <li><a href="/WorkRequestList">Zlecenia do wykonania</a></li>
                     <li><a href="/ExpStatsSummary">Statystyki</a></li>
@@ -91,6 +93,7 @@ function App() {
                                 <Route path="/workRequestDetails/:id" element={<WorkRequestDetails />} />
                                 <Route path="/WorkRequestEdit/:operation/:id?" element={<WorkRequestEdit />} />
                                 <Route path="/ExpStatsSummary" element={<ExpStatsSummary />} />
+                                <Route path="/About/WhatsNew" element={<WhatsNew />} />
                             </Routes>
                         </BrowserRouter>
                     </main>
