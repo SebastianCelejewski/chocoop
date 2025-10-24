@@ -35,9 +35,11 @@ cfnUserPool.policies = {
 
 const activityTableParam = new cdk.aws_ssm.StringParameter(
     Stack.of(activityTable),
-    "chocoop-activity-table-name-parameter-" + envName,
+    // "chocoop-activity-table-name-parameter-" + envName,
+    "p1",
     {
-        parameterName: `/chocoop-activity-table-name-${envName}`,
+        // parameterName: `/chocoop-activity-table-name-${envName}`,
+        parameterName: `/p1`,
         stringValue: activityTable.tableName,
     }
 );
