@@ -59,8 +59,8 @@ async function putData(tableName: string, periodType: string, period: string, us
 
 const rebuildStatistics = async () => {
     logger.info("Rebuilding statistics")
-    const activityTableName = await getParameter(`/chocoop-activity-table-name-${envName}`);
-    const expStatsTableName = await getParameter(`/chocoop-exp-stats-table-name-${envName}`);
+    const activityTableName = await getParameter(`/chocoop/activity-table-name-${envName}`,);
+    const expStatsTableName = await getParameter(`/chocoop/exp-stats-table-name-${envName}`);
 
     const params = {
         TableName: activityTableName,
