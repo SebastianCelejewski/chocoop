@@ -15,7 +15,6 @@ function ExpStatsSummary() {
         if (client.models.ExperienceStatistics !== undefined) {
             client.models.ExperienceStatistics.observeQuery().subscribe({
                 next: (data: ExpStatsQueryResult) => { 
-                    console.log("Loaded data: " + JSON.stringify(data))
                     setExpStats([...data.items])
                 }
             });
@@ -36,18 +35,6 @@ function ExpStatsSummary() {
     var latestMonth : string | undefined = undefined;
 
     expStats.forEach((expStat) => {
-        console.log("Processing record " + JSON.stringify(expStat))
-        if (expStat === undefined) {
-            console.log("expStat is undefined")
-            return
-        }
-        if (expStat === null) {
-            console.log("expStat is null")
-            return
-        }
-
-        console.log("Record seems to be OK: " + JSON.stringify(expStat) );
-
         users.add(expStat.user);
         if (expStat.periodType == "DAY") {
             if (earliestDay == undefined || expStat.period < earliestDay) {
@@ -66,32 +53,78 @@ function ExpStatsSummary() {
         }
     })
 
-    console.log("Earliest day: " + earliestDay)
-    console.log("Latest day: " + latestDay)
-    console.log("Earliest month: " + earliestMonth)
-    console.log("Latest month: " + latestMonth)
+    const thisMonth = new Date().toISOString().slice(0, 7);
+    const today = new Date().toISOString().slice(0, 10);
+
+    var totalExpThisMonth = expStats
+            .filter((record) => record.period == thisMonth && record.periodType == "MONTH")
+            .reduce((sum, record) => sum + record.exp, 0)
+
+    var totalExpToday = expStats
+            .filter((record) => record.period == today && record.periodType == "DAY")
+            .reduce((sum, record) => sum + record.exp, 0)
+
+    var monthlyGridData = new Array();
+    users.forEach((user) => {
+        const exp = expStats
+            .filter((record) => record.user == user && record.period == thisMonth && record.periodType == "MONTH")
+            .reduce((sum, record) => sum + record.exp, 0)
+        const expPerCent = 100 * exp / totalExpThisMonth;
+        monthlyGridData.push({user: user, exp: exp, expPerCent: expPerCent});
+    })
+
+    var dailyGridData = new Array();
+    users.forEach((user) => {
+        const exp = expStats
+            .filter((record) => record.user == user && record.period == today && record.periodType == "DAY")
+            .reduce((sum, record) => sum + record.exp, 0)
+        const expPerCent = 100 * exp / totalExpToday;
+        dailyGridData.push({user: user, exp: exp, expPerCent: expPerCent});
+    })
 
     return <>
         <p className="pageTitle">Statystyki doświadczenia</p>
-        <ul className="entityList">
-            {expStats.map(expStat => {
-                if (expStat === undefined || expStat === null) {
 
-                    console.log("Not rendering - null records");
-                    console.log("Data contains " + expStats.length + " records");
-                    return <></>
-                } else {
-                    return <li className="entityListElement" key={expStat.id}>
-                        <div>
-                            <p className="entityPerson">{expStat.periodType}</p>
-                            <p className="entityPerson">{expStat.period}</p>
-                            <p className="entityPerson">{expStat.user}</p>
-                            <p className="entityExp">{expStat.exp} xp</p>
-                            <div style={{clear: 'both'}}/>
-                        </div>
-                    </li>
-                }
-            })}
+        <ul className="entityList">
+            <p className="statsHeader">Ten miesiąc</p>
+            <table className="entityTable">
+                <thead>
+                    <tr>
+                        <th>Użytkownik</th>
+                        <th>Punkty doświadczenia</th>
+                        <th>Udział procentowy</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {monthlyGridData.map((record) => (
+                        <tr key={record.user}>
+                            <td>{record.user}</td>
+                            <td>{record.exp}</td>
+                            <td>{parseFloat(record.expPerCent).toFixed(0)}%</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+    
+            <p className="statsHeader">Dzisiaj</p>
+            <table className="entityTable">
+                <thead>
+                    <tr>
+                        <th>Użytkownik</th>
+                        <th>Punkty doświadczenia</th>
+                        <th>Udział procentowy</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {dailyGridData.map((record) => (
+                        <tr key={record.user}>
+                            <td>{record.user}</td>
+                            <td>{record.exp}</td>
+                            <td>{parseFloat(record.expPerCent).toFixed(0)}%</td>                            
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
         </ul>
     </>
 }
