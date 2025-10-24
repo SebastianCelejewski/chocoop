@@ -5,9 +5,10 @@ import { DynamoDBClient, ScanCommand, PutItemCommand, PutItemCommandInput, PutIt
 
 const ssmClient = new SSMClient();
 const dynamoDbClient = new DynamoDBClient({});
-const envName = process.env.AWS_BRANCH || 'unknown';
+const envName = process.env.BRANCH_NAME || 'unknown';
 
 console.log("Environment variables in handler.ts code outside the function handler")
+console.log("BRANCH_NAME: " + process.env.BRANCH_NAME);
 console.log("AWS_BRANCH: " + process.env.AWS_BRANCH);
 console.log("AMPLIFY_BRANCH: " + process.env.AMPLIFY_BRANCH);
 console.log("Env: " + JSON.stringify(process.env))
@@ -165,9 +166,12 @@ export const handler: DynamoDBStreamHandler = async (event) => {
     logger.info("Entering dynamoDB function handler")
 
     console.log("Environment variables in backend.ts code inside the function handler")
+    console.log("BRANCH_NAME: " + process.env.BRANCH_NAME);
     console.log("AWS_BRANCH: " + process.env.AWS_BRANCH);
     console.log("AMPLIFY_BRANCH: " + process.env.AMPLIFY_BRANCH);
     console.log("Env: " + JSON.stringify(process.env))
+
+    console.log("envName: " + envName);
 
     await logDataChange(event)
     await rebuildStatistics()
