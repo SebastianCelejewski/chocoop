@@ -2,7 +2,7 @@
 	"name": "Chores Cooperative",
 	"short_name": "Chores Cooperative",
 	"display": "standalone",
-	"start_url": "./?utm_source=pwa_install",
+	"start_url": "/ActivityList",
 	"scope": ".",
 	"theme_color": "#000",
 	"background_color": "#000",
