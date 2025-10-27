@@ -1,6 +1,6 @@
 {
 	"name": "Chores Cooperative",
-	"short_name": "ChoCoop",
+	"short_name": "Chores Cooperative",
 	"display": "standalone",
 	"start_url": "./?utm_source=pwa_install",
 	"scope": ".",
