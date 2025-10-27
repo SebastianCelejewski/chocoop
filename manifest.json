@@ -1,0 +1,16 @@
+{
+	"name": "Chores Cooperative",
+	"short_name": "ChoCoop",
+	"display": "standalone",
+	"start_url": "./?utm_source=pwa_install",
+	"scope": ".",
+	"theme_color": "#000",
+	"background_color": "#000",
+	"icons":[
+        {
+            "src": "icons/chocoop-512x512.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        }
+    ]
+}

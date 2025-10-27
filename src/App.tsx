@@ -76,7 +76,7 @@ function App() {
                         <AppMenu/>
                         <UserMenu signoutFunction={signOut}/>
                         <h1>Chores Cooperative</h1>
-                        <p className="versionInfo">Wersja 0.4.2</p>
+                        <p className="versionInfo">Wersja 0.4.3</p>
 
                         <div className="subheader">
                             <p className="userInfo">Witaj, {userNickname}</p>

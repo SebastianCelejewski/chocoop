@@ -30,3 +30,6 @@
 
 ## Version v0.4.2
 - Data for leaderboards are displayed on a new page
+
+## Version v0.4.3
+- Ability to install as a Progressive Web Application (PWA)
