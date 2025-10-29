@@ -6,6 +6,7 @@ import { generateClient } from "aws-amplify/data";
 import { dateToString } from "../utils/dateUtils";
 
 import User from "../model/User";
+import { urgencyList } from "../model/Urgency"
 
 const client = generateClient<Schema>();
 
@@ -93,7 +94,7 @@ function WorkRequestDetails({users}: {users: Map<string, User>}) {
                 <p>{workRequest.exp}</p>
 
                 <p className="label">Pilność</p>
-                <p>{workRequest.urgency}</p>
+                <p>{urgencyList[workRequest.urgency].label}</p>
 
                 <p className="label">Instrukcje</p>
                 <p>{workRequest.instructions}</p>

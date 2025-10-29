@@ -5,6 +5,7 @@ import { generateClient } from "aws-amplify/data";
 import { dateToString } from "../utils/dateUtils";
 
 import User from "../model/User";
+import { urgencyList } from "../model/Urgency"
 
 const client = generateClient<Schema>();
 
@@ -75,7 +76,7 @@ function WorkRequestList({users}: {users: Map<string, User>}) {
                                 <p className="entityType">{workRequest.type}</p>
                                 <p className="entityExp">{workRequest.exp} xp</p>
                                 <div style={{clear: 'both'}}/>
-                                <p className="workRequestUrgency">Pilność: {workRequest.urgency}</p>
+                                <p className="workRequestUrgency">Pilność: {urgencyList[workRequest.urgency]?.label}</p>
                                 <CompletnessStatus workRequest={workRequest}/>
                             </div>
                           </li>

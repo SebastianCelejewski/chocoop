@@ -16,6 +16,7 @@ import taking_garbage_out from "../assets/images/activities/taking_garbage_out.p
 
 import { getCurrentUser, type AuthUser } from 'aws-amplify/auth';
 
+import { urgencyList, Urgency } from "../model/Urgency"
 import User from "../model/User";
 
 const client = generateClient<Schema>();
@@ -266,8 +267,14 @@ function WorkRequestEdit({users}: {users: Map<string, User>}) {
 
                 <p className="label">Pilność</p>
                 { workRequestUrgencyErrorMessage.length > 0 ? (<p className="validationMessage">{workRequestUrgencyErrorMessage}</p>) : (<></>) }
-                <p><input type="text" id="workRequestUrgency" className="newWorkrequestTextArea" onChange={handleWorkRequestUrgencyChange} value={workRequestUrgency}/></p>
-
+                <p><select onChange={handleWorkRequestUrgencyChange} value={workRequestUrgency}>
+                {
+                    urgencyList.map((urgency: Urgency) => {
+                        return <option key={urgency.level} value={urgency.level}>{urgency.label}</option>
+                    })
+                }
+                </select></p>
+                    
                 <p className="label">Instrukcje</p>
                 { workRequestInstructionsErrorMessage.length > 0 ? (<p className="validationMessage">{workRequestInstructionsErrorMessage}</p>) : (<></>) }
                 <p><textarea id="workRequestComment" className="entityTextArea" rows={5} onChange={handleWorkRequestInstructionsChange} value={workRequestInstructions}/></p>
