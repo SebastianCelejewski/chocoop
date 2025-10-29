@@ -13,12 +13,8 @@ class WorkRequestQueryResult {
   items: Array<Schema["WorkRequest"]["type"]> = []
 }
 
-// function sortByDateTime(workRequests: Array<Schema["WorkRequest"]["type"]>) {
-//     return workRequests.sort((a, b) => new Date(b.createdDateTime).getTime() - new Date(a.createdDateTime).getTime());
-// }
-
 function sortByUrgency(workRequests: Array<Schema["WorkRequest"]["type"]>) {
-    return workRequests.sort((a, b) => b.urgency - a.urgency);
+    return workRequests.sort((a, b) => a.urgency - b.urgency);
 }
 
 function WorkRequestList({users}: {users: Map<string, User>}) {
