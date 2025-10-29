@@ -6,7 +6,8 @@ function WhatsNew() {
             <p className="label"><b>Wersja 0.4.5</b></p>
             <ul>
                 <li>Wprowadzenie tekstowych opisów pilności zadań (zamiast liczbowych)</li>
-                <li>Poprawki interfejsu użytkownika</li>
+                <li>Wprowadzenie reakcji na wykonane czynności</li>
+                <li>Drobne poprawki interfejsu użytkownika</li>
             </ul>
 
             <p className="label"><b>Wersja 0.4.4</b></p>
