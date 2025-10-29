@@ -215,7 +215,11 @@ ul {
 }
 
 .verticalFill {
-  min-height: 80px;
+  min-height: 64px;
+}
+
+.commentTextArea {
+  white-space: pre;
 }
 
 /* ActivityAdd */

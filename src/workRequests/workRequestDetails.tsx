@@ -98,10 +98,8 @@ function WorkRequestDetails({users}: {users: Map<string, User>}) {
 
                 <p className="label">Instrukcje</p>
                 <p>{workRequest.instructions}</p>
-
-                <div className="verticalFill"/>
             </div>
-            <div className="buttonPanel">
+            <div>
                 <button type="button" onClick={handleBack}>Wróć</button>
                 <button type="button" onClick={handleEdit}>Edytuj</button>
                 <button type="button" onClick={handleDone} disabled={workRequest.completed}>Zrobione</button>

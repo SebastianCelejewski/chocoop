@@ -89,9 +89,9 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
                 <p>{activity.exp}</p>
 
                 <p className="label">Komentarz</p>
-                <p>{activity.comment}</p>
+                <p className="commentTextArea">{activity.comment}</p>
             </div>
-            <div className="buttonPanel">
+            <div>
                 <button type="button" onClick={handleBack}>Wróć</button>
                 <button type="button" onClick={handleEdit}>Edytuj</button>
                 <button type="button" onClick={handleDelete}>Usuń</button>

@@ -325,13 +325,9 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
 
                 <p className="label">Wykonawca</p>
                 { activityPersonErrorMessage.length > 0 ? (<p className="validationMessage">{activityPersonErrorMessage}</p>) : (<></>) }
-                <p><select id="activityPerson" onChange={handleActivityPersonChange}>
+                <p><select id="activityPerson" onChange={handleActivityPersonChange} value={activityPerson}>
                     { Array.from(users.values()).map((user: User) => {
-                            if (user.id == activityPerson) {
-                                return <option key={user.id} value={user.id} selected>{user.nickname}</option>
-                            } else {
-                                return <option key={user.id} value={user.id}>{user.nickname}</option>
-                            }
+                            return <option key={user.id} value={user.id}>{user.nickname}</option>
                         }
                     )}
                 </select></p>

@@ -3,6 +3,12 @@ function WhatsNew() {
         <p className="pageTitle">O aplikacji</p>
         <ul className="richText">
             <h1>Co nowego w aplikacji</h1>
+            <p className="label"><b>Wersja 0.4.5</b></p>
+            <ul>
+                <li>Wprowadzenie tekstowych opisów pilności zadań (zamiast liczbowych)</li>
+                <li>Poprawki interfejsu użytkownika</li>
+            </ul>
+
             <p className="label"><b>Wersja 0.4.4</b></p>
             <ul>
                 <li>Poprawienie błędu wczytywania się strony startowej</li>

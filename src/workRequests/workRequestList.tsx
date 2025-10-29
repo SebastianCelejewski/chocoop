@@ -59,10 +59,9 @@ function WorkRequestList({users}: {users: Map<string, User>}) {
         setShowCompletedWorkRequests(!showCompletedWorkRequests);
     }
 
-    return (
-          <>
-            <p className="pageTitle" onClick={navigateToActivities}>Lista zleceń do wykonania</p>
-            <p><input type="checkbox" name="showCompleted" id="showCompleted" checked={showCompletedWorkRequests} onChange={handleShowCompletedToggled}/>Pokaż ukończone</p>
+    return <>
+        <p className="pageTitle" onClick={navigateToActivities}>Lista zleceń do wykonania</p>
+        <p><input type="checkbox" name="showCompleted" id="showCompleted" checked={showCompletedWorkRequests} onChange={handleShowCompletedToggled}/>Pokaż ukończone</p>
             <ul className="entityList">
             {workRequests.map(workRequest => {
                 if (showCompletedWorkRequests || !workRequest.completed) {
@@ -88,7 +87,6 @@ function WorkRequestList({users}: {users: Map<string, User>}) {
             <button onClick={createWorkRequest}>Dodaj zlecenie</button>
           </div>
     </>
-  );
 }
 
 export default WorkRequestList;
