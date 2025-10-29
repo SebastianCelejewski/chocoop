@@ -1,11 +1,14 @@
 import type { Schema } from "../../amplify/data/resource";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, useParams, useNavigate } from "react-router";
 import { generateClient } from "aws-amplify/data";
 import { dateToString } from "../utils/dateUtils";
+import { getCurrentUser, type AuthUser } from 'aws-amplify/auth';
 
 import User from "../model/User";
+
+import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 
 const client = generateClient<Schema>();
 
@@ -16,6 +19,14 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
     const activityIdParam = params["id"]
 
     const [activity, setActivity] = useState<Schema["Activity"]["type"]>();
+    const [reactionsPopupVisible, setReactionsPopupVisible] = useState<boolean>(false);
+    const [currentUser, setCurrentUser] = useState(String);
+
+    useEffect(() => {
+        getCurrentUser().then((user : AuthUser) => {
+                setCurrentUser(user.username);
+            })
+    }, []);
 
     function handleBack() {
         navigate("/ActivityList/")
@@ -38,9 +49,55 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
         }
     }
 
-    async function getactivity(activityId: string) {
+    function handleReaction() {
+        if (currentUser !== null && currentUser !== undefined) {
+            setReactionsPopupVisible(!reactionsPopupVisible);
+        }
+    }
+
+    function handleEmojiSelected(emojiData: EmojiClickData) {
+        setReactionsPopupVisible(false);
+        console.log(emojiData.emoji);
+        if (activity === undefined) {
+            return
+        }
+
+        const newReaction = {
+            reaction: emojiData.emoji,
+            user: currentUser,
+            activityId: activity.id
+        }
+
+        console.log("Creating new reaction");
+        client.models.Reaction.create(newReaction).then((result) => {
+            if (result["data"] != undefined) {
+                console.log("Reaction created: " + JSON.stringify(result));
+            }
+        })
+    }
+
+    async function getActivity(activityId: string) {
         return await client.models.Activity.get({ id: activityId });
     }
+
+    function ReactionsPopup() {
+        if (reactionsPopupVisible) {
+            return <>
+                <div className="reactionsPopup">
+                    <EmojiPicker onEmojiClick={handleEmojiSelected} />
+                    {/* <button onClick={() => setReactionsPopupVisible(false)}>X</button>
+                    <div>
+                        <button>😀</button>
+                        <button>😐</button>
+                        <button>😡</button>
+                    </div> */}
+                </div>
+            </>
+        } else {
+            return <></>
+        }
+    }
+
 
     function WorkRequestInfo({ activity }: { activity: Schema["Activity"]["type"]}) {
       if (activity.requestedAs !== undefined && activity.requestedAs != null && activity.requestedAs != "") {
@@ -56,7 +113,7 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
     }
 
     if (activity == undefined && activityIdParam != undefined) {
-        getactivity(activityIdParam).then((result) => {
+        getActivity(activityIdParam).then((result) => {
             if (result["data"] != undefined) {
                 setActivity(result["data"])
             }
@@ -73,6 +130,7 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
         return <>
             <p className="pageTitle">Szczegóły wykonanej czynności</p>
             <div className="entryDetails">
+                <ReactionsPopup/>
                 <p className="label">Data i godzina czynności</p>
                 <p>{dateToString(activity.dateTime)}</p>
 
@@ -95,6 +153,7 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
                 <button type="button" onClick={handleBack}>Wróć</button>
                 <button type="button" onClick={handleEdit}>Edytuj</button>
                 <button type="button" onClick={handleDelete}>Usuń</button>
+                <button type="button" onClick={handleReaction}>Zareaguj</button>
             </div>
         </>
     }

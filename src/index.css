@@ -222,6 +222,13 @@ ul {
   white-space: pre;
 }
 
+.reactionsPopup {
+  z-index: 10;
+  position: fixed;
+  margin: auto;
+  height: 100 vh;
+  width: 100 vw;
+}
 /* ActivityAdd */
 
 .label {

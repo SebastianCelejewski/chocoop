@@ -5,6 +5,7 @@ import { generateClient } from "aws-amplify/data";
 import { dateToString } from "../utils/dateUtils";
 
 import User from "../model/User";
+import { reactions } from "../model/Reaction";
 
 const client = generateClient<Schema>();
 
@@ -71,6 +72,7 @@ function ActivityList({users}: {users: Map<string, User>}) {
                             <p className="entityType">{activity.type}</p>
                             <p className="entityExp">{activity.exp} xp</p>
                             <div style={{clear: 'both'}}/>
+                            <img src={reactions.get("smile")?.image}/>
                         </div>
                       </li>
                 }
