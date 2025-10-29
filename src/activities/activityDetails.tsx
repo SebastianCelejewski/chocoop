@@ -25,7 +25,7 @@ function Reactions({
         reactions
             .filter(reaction => reaction.activityId == activity.id)
             .map(reaction => {
-                return <p>{users.get(reaction.user)?.nickname}: {reaction.reaction}</p>
+                return <p key={reaction.id}>{users.get(reaction.user)?.nickname}: {reaction.reaction}</p>
             })
         }
     </div>
@@ -88,7 +88,6 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
 
     function handleEmojiSelected(emojiData: EmojiClickData) {
         setReactionsPopupVisible(false);
-        console.log(emojiData.emoji);
         if (activity === undefined) {
             return
         }
@@ -99,11 +98,11 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
             activityId: activity.id
         }
 
-        console.log("Creating new reaction");
         client.models.Reaction.create(newReaction).then((result) => {
-            if (result["data"] != undefined) {
-                console.log("Reaction created: " + JSON.stringify(result));
+            if (result["data"] === undefined) {
+                console.log("Failed to create reaction: " + JSON.stringify(result));
             }
+            navigate("/ActivityDetails/" + activityIdParam)
         })
     }
 
