@@ -1,5 +1,4 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
-import { identifyUser } from "aws-amplify/analytics";
 
 const schema = a.schema({
     Activity: a
