@@ -139,7 +139,7 @@ function App() {
                                 <Route path="/WorkRequestList" element={<WorkRequestList users={allUsers}/>} />
                                 <Route path="/workRequestDetails/:id" element={<WorkRequestDetails users={allUsers}/>} />
                                 <Route path="/WorkRequestEdit/:operation/:id?" element={<WorkRequestEdit users={allUsers}/>} />
-                                <Route path="/ExpStatsSummary" element={<ExpStatsSummary/>} />
+                                <Route path="/ExpStatsSummary" element={<ExpStatsSummary users={allUsers}/>} />
                                 <Route path="/About/WhatsNew" element={<WhatsNew />} />
                             </Routes>
                         </BrowserRouter>

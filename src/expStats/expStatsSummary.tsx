@@ -2,13 +2,15 @@ import type { Schema } from "../../amplify/data/resource";
 import { useEffect, useState } from "react";
 import { generateClient } from "aws-amplify/data";
 
+import User from "../model/User";
+
 const client = generateClient<Schema>();
 
 class ExpStatsQueryResult {
   items: Array<Schema["ExperienceStatistics"]["type"]> = []
 }
 
-function ExpStatsSummary() {
+function ExpStatsSummary({users}: {users: Map<string, User>}) {
     const [expStats, setExpStats] = useState<Array<Schema["ExperienceStatistics"]["type"]>>([]);
     
     useEffect(() => {
@@ -28,14 +30,12 @@ function ExpStatsSummary() {
         </>
     }
 
-    var users = new Set<string>();
     var earliestDay : string | undefined = undefined;
     var latestDay : string | undefined = undefined;
     var earliestMonth : string | undefined = undefined;
     var latestMonth : string | undefined = undefined;
 
     expStats.forEach((expStat) => {
-        users.add(expStat.user);
         if (expStat.periodType == "DAY") {
             if (earliestDay == undefined || expStat.period < earliestDay) {
                 earliestDay = expStat.period;
@@ -67,19 +67,19 @@ function ExpStatsSummary() {
     var monthlyGridData = new Array();
     users.forEach((user) => {
         const exp = expStats
-            .filter((record) => record.user == user && record.period == thisMonth && record.periodType == "MONTH")
+            .filter((record) => record.user == user.id && record.period == thisMonth && record.periodType == "MONTH")
             .reduce((sum, record) => sum + record.exp, 0)
         const expPerCent = 100 * exp / totalExpThisMonth;
-        monthlyGridData.push({user: user, exp: exp, expPerCent: expPerCent});
+        monthlyGridData.push({user: user.id, exp: exp, expPerCent: expPerCent});
     })
 
     var dailyGridData = new Array();
     users.forEach((user) => {
         const exp = expStats
-            .filter((record) => record.user == user && record.period == today && record.periodType == "DAY")
+            .filter((record) => record.user == user.id && record.period == today && record.periodType == "DAY")
             .reduce((sum, record) => sum + record.exp, 0)
         const expPerCent = 100 * exp / totalExpToday;
-        dailyGridData.push({user: user, exp: exp, expPerCent: expPerCent});
+        dailyGridData.push({user: user.id, exp: exp, expPerCent: expPerCent});
     })
 
     return <>
@@ -97,8 +97,8 @@ function ExpStatsSummary() {
                 </thead>
                 <tbody>
                     {monthlyGridData.map((record) => (
-                        <tr key={record.user}>
-                            <td>{record.user}</td>
+                        <tr key={users.get(record.user)?.nickname}>
+                            <td>{users.get(record.user)?.nickname}</td>
                             <td>{record.exp}</td>
                             <td>{parseFloat(record.expPerCent).toFixed(0)}%</td>
                         </tr>
@@ -117,8 +117,8 @@ function ExpStatsSummary() {
                 </thead>
                 <tbody>
                     {dailyGridData.map((record) => (
-                        <tr key={record.user}>
-                            <td>{record.user}</td>
+                        <tr key={users.get(record.user)?.nickname}>
+                            <td>{users.get(record.user)?.nickname}</td>
                             <td>{record.exp}</td>
                             <td>{parseFloat(record.expPerCent).toFixed(0)}%</td>                            
                         </tr>
