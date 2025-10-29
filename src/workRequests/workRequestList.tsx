@@ -13,8 +13,12 @@ class WorkRequestQueryResult {
   items: Array<Schema["WorkRequest"]["type"]> = []
 }
 
-function sortByDateTime(workRequests: Array<Schema["WorkRequest"]["type"]>) {
-    return workRequests.sort((a, b) => new Date(b.createdDateTime).getTime() - new Date(a.createdDateTime).getTime());
+// function sortByDateTime(workRequests: Array<Schema["WorkRequest"]["type"]>) {
+//     return workRequests.sort((a, b) => new Date(b.createdDateTime).getTime() - new Date(a.createdDateTime).getTime());
+// }
+
+function sortByUrgency(workRequests: Array<Schema["WorkRequest"]["type"]>) {
+    return workRequests.sort((a, b) => b.urgency - a.urgency);
 }
 
 function WorkRequestList({users}: {users: Map<string, User>}) {
@@ -26,7 +30,7 @@ function WorkRequestList({users}: {users: Map<string, User>}) {
         if (client.models.WorkRequest !== undefined) {
           client.models.WorkRequest.observeQuery().subscribe({
               next: (data: WorkRequestQueryResult) => { 
-                setWorkRequests(sortByDateTime([...data.items]))
+                setWorkRequests(sortByUrgency([...data.items]))
               }
           });
         }
