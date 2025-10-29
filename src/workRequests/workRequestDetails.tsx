@@ -5,9 +5,11 @@ import { NavLink, useParams, useNavigate } from "react-router";
 import { generateClient } from "aws-amplify/data";
 import { dateToString } from "../utils/dateUtils";
 
+import User from "../model/User";
+
 const client = generateClient<Schema>();
 
-function WorkRequestDetails() {
+function WorkRequestDetails({users}: {users: Map<string, User>}) {
     const navigate = useNavigate();
 
     const params = useParams();
@@ -82,7 +84,7 @@ function WorkRequestDetails() {
                 <p>{dateToString(workRequest.createdDateTime)}</p>
 
                 <p className="label">Twórca zlecenia</p>
-                <p>{workRequest.createdBy}</p>
+                <p>{users.get(workRequest.createdBy)?.nickname}</p>
 
                 <p className="label">Rodzaj aktywności</p>
                 <p>{workRequest.type}</p>

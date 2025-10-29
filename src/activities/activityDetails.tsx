@@ -5,9 +5,11 @@ import { NavLink, useParams, useNavigate } from "react-router";
 import { generateClient } from "aws-amplify/data";
 import { dateToString } from "../utils/dateUtils";
 
+import User from "../model/User";
+
 const client = generateClient<Schema>();
 
-function ActivityDetails() {
+function ActivityDetails({users}: {users: Map<string, User>}) {
     const navigate = useNavigate();
 
     const params = useParams();
@@ -78,7 +80,7 @@ function ActivityDetails() {
                 <WorkRequestInfo activity={activity}/>
 
                 <p className="label">Wykonawca</p>
-                <p>{activity.user}</p>
+                <p>{users.get(activity.user)?.nickname}</p>
 
                 <p className="label">Rodzaj aktywności</p>
                 <p>{activity.type}</p>

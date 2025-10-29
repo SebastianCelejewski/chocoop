@@ -15,11 +15,13 @@ import laundry_sorting from "../assets/images/activities/laundry_sorting.png?url
 import taking_garbage_out from "../assets/images/activities/taking_garbage_out.png?url";
 import unpacking_frisco from "../assets/images/activities/unpacking_frisco.png?url";
 
-import { fetchUserAttributes } from 'aws-amplify/auth';
+import { getCurrentUser, type AuthUser } from 'aws-amplify/auth';
+
+import User from "../model/User";
 
 const client = generateClient<Schema>();
 
-function ActivityEdit() {
+function ActivityEdit({users}: {users: Map<string, User>}) {
 
     const navigate = useNavigate();
 
@@ -56,12 +58,10 @@ function ActivityEdit() {
     const [dateTimeSettingInProgress, setDateTimeLoadingInProgress] = useState(false)
 
     function setNewActivityPerson() {
-        fetchUserAttributes().then((attributes) => {
-            if (attributes.nickname !== undefined) {
-                setActivityPerson(attributes.nickname)
-            }
-        })
         setPersonLoadingInProgress(true)
+        getCurrentUser().then((user : AuthUser) => {
+            setActivityPerson(user.username);
+        })
     }
 
     function setNewActivityDateTime() {
@@ -114,7 +114,6 @@ function ActivityEdit() {
                 setActivityDateTime(currentDateTime);
                 setActivityType(result["data"]["type"]);
                 setActivityExp(result["data"]["exp"]);
-                setActivityComment("Utworzone na podstawie zlecenia: " + result["data"]["instructions"] );
             }
         })
     }
@@ -326,7 +325,14 @@ function ActivityEdit() {
 
                 <p className="label">Wykonawca</p>
                 { activityPersonErrorMessage.length > 0 ? (<p className="validationMessage">{activityPersonErrorMessage}</p>) : (<></>) }
-                <p><input id="activityPerson" type="text" onChange={handleActivityPersonChange} value={activityPerson}/></p>
+                <p><select id="activityPerson" onChange={handleActivityPersonChange}>{ Array.from(users.values()).map((user: User) => {
+                    if (user.id == activityPerson) {
+                        return <option key={user.id} value={user.id} selected>{user.nickname}</option>
+                    } else {
+                        return <option key={user.id} value={user.id}>{user.nickname}</option>
+                    }
+                })}
+                </select></p>
 
                 <p className="label">Szablony</p>
                 <div className="templateActivities">

@@ -5,7 +5,17 @@ Application engaging members of families, neighbourhoods, groups of roommates to
 ## Concepts
 
 - users - people who perform common tasks
-- activities - things to do
+- activities - things that have been done
   - type - eg. cooking, vacuuming, shopping, etc.
-  - exp - experience points to gain when activity is done  
+  - exp - experience points to gain after activity was done
+- work requests - things to do
+  - type
+  - exp
+  - priority
+    - 0 - should be done immediately
+    - 1 - should be done in a couple of hours
+    - 2 - should be done in a couple of days
+    - 3 - should be done in a couple of weeks
+    - 4 - should be done in a couple of months
+    - 5 - lowest priority
   

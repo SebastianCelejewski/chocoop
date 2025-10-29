@@ -148,3 +148,19 @@ const mapping = new EventSourceMapping(
 );
 
 mapping.node.addDependency(dynamodbActivitiesStreamDataPolicy);
+
+const cognitoListUsersPolicy = new Policy(
+    Stack.of(backend.auth.resources.userPool),
+    "chocoop-cognito-list-users-policy-" + envName,
+    {
+        statements: [
+            new PolicyStatement({
+                effect: Effect.ALLOW,
+                actions: ["cognito-idp:ListUsers"],
+                resources: [backend.auth.resources.userPool.userPoolArn],
+            }),
+        ],
+    }
+);
+
+backend.auth.resources.authenticatedUserIamRole.attachInlinePolicy(cognitoListUsersPolicy);

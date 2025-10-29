@@ -4,6 +4,8 @@ import { useNavigate } from "react-router";
 import { generateClient } from "aws-amplify/data";
 import { dateToString } from "../utils/dateUtils";
 
+import User from "../model/User";
+
 const client = generateClient<Schema>();
 
 class ActivityQueryResult {
@@ -14,7 +16,8 @@ function sortByDateTime(activities: Array<Schema["Activity"]["type"]>) {
     return activities.sort((a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime());
 }
 
-function ActivityList() {
+function ActivityList({users}: {users: Map<string, User>}) {
+
     const [activities, setActivities] = useState<Array<Schema["Activity"]["type"]>>([]);
     const navigate = useNavigate();
     
@@ -47,6 +50,9 @@ function ActivityList() {
         return <>
             <p className="pageTitle" onClick={navigateToWorkRequests}>Lista wykonanych czynności</p>
             <div className="loadingData">Ładowanie danych</div>
+            <div className="buttonPanel">
+              <button onClick={createActivity}>Dodaj czynność</button>
+            </div>
         </>
     }
 
@@ -61,11 +67,10 @@ function ActivityList() {
                         key={activity.id}>
                         <div>
                             <p className="entityDateTime">{dateToString(activity.dateTime)}</p>
-                            <p className="entityPerson">{activity.user}</p>
+                            <p className="entityPerson">{users.get(activity.user)?.nickname}</p>
                             <p className="entityType">{activity.type}</p>
                             <p className="entityExp">{activity.exp} xp</p>
                             <div style={{clear: 'both'}}/>
-                            <p className="activityComment">{activity.comment}</p>
                         </div>
                       </li>
                 }

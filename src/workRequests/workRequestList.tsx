@@ -4,6 +4,8 @@ import { useNavigate } from "react-router";
 import { generateClient } from "aws-amplify/data";
 import { dateToString } from "../utils/dateUtils";
 
+import User from "../model/User";
+
 const client = generateClient<Schema>();
 
 class WorkRequestQueryResult {
@@ -14,7 +16,7 @@ function sortByDateTime(workRequests: Array<Schema["WorkRequest"]["type"]>) {
     return workRequests.sort((a, b) => new Date(b.createdDateTime).getTime() - new Date(a.createdDateTime).getTime());
 }
 
-function WorkRequestList() {
+function WorkRequestList({users}: {users: Map<string, User>}) {
     const [workRequests, setWorkRequests] = useState<Array<Schema["WorkRequest"]["type"]>>([]);
     const [showCompletedWorkRequests, setShowCompletedWorkRequests] = useState(false);
     const navigate = useNavigate();
@@ -69,7 +71,7 @@ function WorkRequestList() {
                             key={workRequest.id}>
                             <div>
                                 <p className="entityDateTime">{dateToString(workRequest.createdDateTime)}</p>
-                                <p className="entityPerson">{workRequest.createdBy}</p>
+                                <p className="entityPerson">{users.get(workRequest.createdBy)?.nickname}</p>
                                 <p className="entityType">{workRequest.type}</p>
                                 <p className="entityExp">{workRequest.exp} xp</p>
                                 <div style={{clear: 'both'}}/>

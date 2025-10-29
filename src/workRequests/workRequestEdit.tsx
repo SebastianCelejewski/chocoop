@@ -14,11 +14,13 @@ import laundry_end from "../assets/images/activities/laundry_end.png?url";
 import laundry_sorting from "../assets/images/activities/laundry_sorting.png?url";
 import taking_garbage_out from "../assets/images/activities/taking_garbage_out.png?url";
 
-import { fetchUserAttributes } from 'aws-amplify/auth';
+import { getCurrentUser, type AuthUser } from 'aws-amplify/auth';
+
+import User from "../model/User";
 
 const client = generateClient<Schema>();
 
-function WorkRequestEdit() {
+function WorkRequestEdit({users}: {users: Map<string, User>}) {
 
     const navigate = useNavigate();
 
@@ -51,12 +53,10 @@ function WorkRequestEdit() {
     const [dateTimeSettingInProgress, setDateTimeLoadingInProgress] = useState(false)
 
     function setNewWorkRequestPerson() {
-        fetchUserAttributes().then((attributes) => {
-            if (attributes.nickname !== undefined) {
-                setWorkRequestCreatedBy(attributes.nickname)
-            }
-        })
         setPersonLoadingInProgress(true)
+        getCurrentUser().then((user : AuthUser) => {
+            setWorkRequestCreatedBy(user.username);
+        })
     }
 
     function setNewWorkRequestDateTime() {
@@ -234,7 +234,14 @@ function WorkRequestEdit() {
 
                 <p className="label">Zleceniodawca</p>
                 { workRequestCreatedByErrorMessage.length > 0 ? (<p className="validationMessage">{workRequestCreatedByErrorMessage}</p>) : (<></>) }
-                <p><input id="workRequestCreatedBy" type="text" className="newWorkRequestTextArea" onChange={handleWorkRequestCreatedByChange} value={workRequestCreatedBy}/></p>
+                <p><select id="workRequestCreatedBy" onChange={handleWorkRequestCreatedByChange}>{ Array.from(users.values()).map((user: User) => {
+                    if (user.id == workRequestCreatedBy) {
+                        return <option key={user.id} value={user.id} selected>{user.nickname}</option>
+                    } else {
+                        return <option key={user.id} value={user.id}>{user.nickname}</option>
+                    }
+                })}
+                </select></p>
 
                 <p className="label">Szablony</p>
                 <div className="templateWorkRequests">

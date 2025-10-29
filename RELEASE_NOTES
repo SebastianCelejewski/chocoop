@@ -33,3 +33,6 @@
 
 ## Version v0.4.3
 - Ability to install as a Progressive Web Application (PWA)
+
+## Version v0.4.4
+- Fixed navigation to landing page in PWA
