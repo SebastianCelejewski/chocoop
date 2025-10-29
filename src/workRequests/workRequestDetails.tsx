@@ -97,7 +97,7 @@ function WorkRequestDetails({users}: {users: Map<string, User>}) {
                 <p>{urgencyList[workRequest.urgency].label}</p>
 
                 <p className="label">Instrukcje</p>
-                <p>{workRequest.instructions}</p>
+                <p className="commentTextArea">{workRequest.instructions}</p>
             </div>
             <div>
                 <button type="button" onClick={handleBack}>Wróć</button>
