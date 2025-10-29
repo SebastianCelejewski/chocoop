@@ -5,7 +5,6 @@ import { generateClient } from "aws-amplify/data";
 import { dateToString } from "../utils/dateUtils";
 
 import User from "../model/User";
-import { reactions } from "../model/Reaction";
 
 const client = generateClient<Schema>();
 
@@ -17,9 +16,28 @@ function sortByDateTime(activities: Array<Schema["Activity"]["type"]>) {
     return activities.sort((a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime());
 }
 
+function Reactions({
+    activity,
+    reactions
+}: {
+    activity: Schema["Activity"]["type"],
+    reactions: Array<Schema["Reaction"]["type"]>
+}) {
+    return <p> {
+        reactions
+            .filter(reaction => reaction.activityId == activity.id)
+            .map(reaction => {
+                return reaction.reaction
+            })
+        }
+    </p>
+}
+
 function ActivityList({users}: {users: Map<string, User>}) {
 
     const [activities, setActivities] = useState<Array<Schema["Activity"]["type"]>>([]);
+    const [reactions, setReactions] = useState<Array<Schema["Reaction"]["type"]>>([]);
+
     const navigate = useNavigate();
     
     useEffect(() => {
@@ -30,6 +48,12 @@ function ActivityList({users}: {users: Map<string, User>}) {
               }
           });
         }
+
+        client.models.Reaction.observeQuery().subscribe({
+              next: (data: { items: Array<Schema["Reaction"]["type"]> }) => {
+                setReactions(data.items)
+              }
+          });
     }, []);
 
     function createActivity() {
@@ -72,7 +96,7 @@ function ActivityList({users}: {users: Map<string, User>}) {
                             <p className="entityType">{activity.type}</p>
                             <p className="entityExp">{activity.exp} xp</p>
                             <div style={{clear: 'both'}}/>
-                            <img src={reactions.get("smile")?.image}/>
+                            <Reactions activity={activity} reactions={reactions}/>
                         </div>
                       </li>
                 }

@@ -12,6 +12,25 @@ import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 
 const client = generateClient<Schema>();
 
+function Reactions({
+    activity,
+    reactions,
+    users
+}: {
+    activity: Schema["Activity"]["type"],
+    reactions: Array<Schema["Reaction"]["type"]>,
+    users: Map<string, User>
+}) {
+    return <div> {
+        reactions
+            .filter(reaction => reaction.activityId == activity.id)
+            .map(reaction => {
+                return <p>{users.get(reaction.user)?.nickname}: {reaction.reaction}</p>
+            })
+        }
+    </div>
+}
+
 function ActivityDetails({users}: {users: Map<string, User>}) {
     const navigate = useNavigate();
 
@@ -19,6 +38,7 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
     const activityIdParam = params["id"]
 
     const [activity, setActivity] = useState<Schema["Activity"]["type"]>();
+    const [reactions, setReactions] = useState<Array<Schema["Reaction"]["type"]>>([]);
     const [reactionsPopupVisible, setReactionsPopupVisible] = useState<boolean>(false);
     const [currentUser, setCurrentUser] = useState(String);
 
@@ -26,6 +46,17 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
         getCurrentUser().then((user : AuthUser) => {
                 setCurrentUser(user.username);
             })
+        client.models.Reaction.observeQuery({
+            filter: {
+                activityId: {
+                    eq: activityIdParam
+                }
+            }
+        }).subscribe({
+            next: (data: { items: Array<Schema["Reaction"]["type"]> }) => {
+                setReactions(data.items)
+            }
+        });
     }, []);
 
     function handleBack() {
@@ -85,19 +116,12 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
             return <>
                 <div className="reactionsPopup">
                     <EmojiPicker onEmojiClick={handleEmojiSelected} />
-                    {/* <button onClick={() => setReactionsPopupVisible(false)}>X</button>
-                    <div>
-                        <button>😀</button>
-                        <button>😐</button>
-                        <button>😡</button>
-                    </div> */}
                 </div>
             </>
         } else {
             return <></>
         }
     }
-
 
     function WorkRequestInfo({ activity }: { activity: Schema["Activity"]["type"]}) {
       if (activity.requestedAs !== undefined && activity.requestedAs != null && activity.requestedAs != "") {
@@ -148,6 +172,9 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
 
                 <p className="label">Komentarz</p>
                 <p className="commentTextArea">{activity.comment}</p>
+
+                <p className="label">Reakcje</p>
+                <Reactions activity={activity} reactions={reactions} users={users}/>
             </div>
             <div>
                 <button type="button" onClick={handleBack}>Wróć</button>

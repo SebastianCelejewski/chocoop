@@ -10,7 +10,7 @@ const schema = a.schema({
             exp: a.integer().required(),
             comment: a.string().required(),
             requestedAs: a.string(),
-            reactions: a.hasMany("Reaction", "id")
+            reactions: a.hasMany("Reaction", "activityId")
         })
         .authorization((allow) => [allow.publicApiKey()]),
     WorkRequest: a
@@ -37,7 +37,8 @@ const schema = a.schema({
     Reaction: a
         .model({
             id: a.id().required(),
-            activityId: a.belongsTo("Activity", "id"),
+            activityId: a.id().required(),
+            activity: a.belongsTo("Activity", "activityId"),
             user: a.string().required(),
             reaction: a.string().required()
         })
