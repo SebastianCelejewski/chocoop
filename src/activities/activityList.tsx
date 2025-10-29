@@ -23,7 +23,7 @@ function Reactions({
     activity: Schema["Activity"]["type"],
     reactions: Array<Schema["Reaction"]["type"]>
 }) {
-    return <p> {
+    return <p className="reactions"> {
         reactions
             .filter(reaction => reaction.activityId == activity.id)
             .map(reaction => {

@@ -21,7 +21,7 @@ function Reactions({
     reactions: Array<Schema["Reaction"]["type"]>,
     users: Map<string, User>
 }) {
-    return <div> {
+    return <div id="reactionsContainer"> {
         reactions
             .filter(reaction => reaction.activityId == activity.id)
             .map(reaction => {
@@ -102,7 +102,8 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
             if (result["data"] === undefined) {
                 console.log("Failed to create reaction: " + JSON.stringify(result));
             }
-            navigate("/ActivityDetails/" + activityIdParam)
+
+            setActivity(activity);
         })
     }
 
