@@ -36,3 +36,8 @@
 
 ## Version v0.4.4
 - Fixed navigation to landing page in PWA
+
+## Version v0.4.5
+- Initial version of reactions
+- Representing urgency as text labels, not numbers
+- Small bug fixes
