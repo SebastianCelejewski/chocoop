@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { generateClient } from "aws-amplify/data";
 
 import User from "../model/User";
+import { Button } from "@aws-amplify/ui-react";
 
 const client = generateClient<Schema>();
 
@@ -10,8 +11,193 @@ class ExpStatsQueryResult {
   items: Array<Schema["ExperienceStatistics"]["type"]> = []
 }
 
+function MonthsDataTable({users, expStats, onMonthSelected}: {users: Map<string, User>, expStats: Array<Schema["ExperienceStatistics"]["type"]>, onMonthSelected: (month: string) => void} ) {
+    var gridData = new Map<string, Map<string, number>>();
+    var earliestMonth : string = expStats
+        .filter((record) => record.periodType == "MONTH")
+        .reduce((earliest, record) => earliest < record.period ? earliest : record.period, expStats[0].period)
+    var latestMonth : string = expStats
+        .filter((record) => record.periodType == "MONTH")
+        .reduce((latest, record) => latest > record.period ? latest : record.period, expStats[0].period)
+
+    var startDate = new Date(earliestMonth);
+    var endDate = new Date(latestMonth);
+    
+    startDate.setDate(1)
+    endDate.setDate(28)
+
+    var date = startDate;
+
+    while (date <= endDate) {
+        var dateStr = date.toISOString().slice(0, 7);
+
+        var userDataForThisMonth = new Map<string, number>();
+
+        users.forEach((user) => {
+            const exp = expStats
+                .filter((record) => record.user == user.id && record.period == dateStr && record.periodType == "MONTH")
+                .reduce((sum, record) => sum + record.exp, 0)
+            userDataForThisMonth.set(user.id, exp);
+        })
+        gridData.set(dateStr, userDataForThisMonth);
+
+        date.setMonth(date.getMonth() + 1)
+    }
+
+    return <>
+        <p className="statsHeader">Szczegóły dla kolejnych miesięcy</p>
+        <table className="entityTable">
+            <thead>
+                <tr>
+                    <th>Dzień</th>
+                    {Array.from(users.keys()).map((userId) => (
+                        <th key={userId}>{users.get(userId)?.nickname}</th>
+                    ))}
+                </tr>
+            </thead>
+            <tbody>
+                {Array.from(gridData.keys()).map((month) => (
+                    <tr key={month} onClick={() => onMonthSelected(month)}>
+                        <td>{month}</td>
+                        {Array.from(users.keys()).map((userId) => (
+                            <td key={userId}>{gridData.get(month)?.get(userId) || 0}</td>
+                        ))}
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    </>
+}
+
+function DaysDataTable({users, expStats, selectedMonth, onDaySelected }: {users: Map<string, User>, expStats: Array<Schema["ExperienceStatistics"]["type"]>, selectedMonth: string, onDaySelected: (day: string) => void}) {
+    var gridData = new Map<string, Map<string, number>>();
+
+    var startDate = new Date(selectedMonth);
+    var endDate = new Date(selectedMonth);
+    startDate.setDate(1);
+    endDate.setDate(31);
+    var date = startDate;
+
+    while (date <= endDate) {
+        var dateStr = date.toISOString().slice(0, 10);
+
+        var userDataForThisDate = new Map<string, number>();
+
+        users.forEach((user) => {
+            const exp = expStats
+                .filter((record) => record.user == user.id && record.period == dateStr && record.periodType == "DAY")
+                .reduce((sum, record) => sum + record.exp, 0)
+            userDataForThisDate.set(user.id, exp);
+        })
+        gridData.set(dateStr, userDataForThisDate);
+
+        date.setDate(date.getDate() + 1)
+    }
+
+    return <>
+        <p className="statsHeader">Szczegóły dla kolejnych dni</p>
+        <table className="entityTable">
+            <thead>
+                <tr>
+                    <th>Dzień</th>
+                    {Array.from(users.keys()).map((userId) => (
+                        <th key={userId}>{users.get(userId)?.nickname}</th>
+                    ))}
+                </tr>
+            </thead>
+            <tbody>
+                {Array.from(gridData.keys()).map((day) => (
+                    <tr key={day} onClick={() => onDaySelected(day)}>
+                        <td>{day}</td>
+                        {Array.from(users.keys()).map((userId) => (
+                            <td key={userId}>{gridData.get(day)?.get(userId) || 0}</td>
+                        ))}
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    </>
+}
+
+function MonthSummary({users, expStats, selectedMonth}: {users: Map<string, User>, expStats: Array<Schema["ExperienceStatistics"]["type"]>, selectedMonth: string}) {
+    var totalExpThisMonth = expStats
+            .filter((record) => record.period == selectedMonth && record.periodType == "MONTH")
+            .reduce((sum, record) => sum + record.exp, 0)
+
+    var monthlyGridData = new Array();
+    users.forEach((user) => {
+        const exp = expStats
+            .filter((record) => record.user == user.id && record.period == selectedMonth && record.periodType == "MONTH")
+            .reduce((sum, record) => sum + record.exp, 0)
+        const expPerCent = totalExpThisMonth > 0 ? (100 * exp / totalExpThisMonth).toFixed(0) + "%" : "-";
+        monthlyGridData.push({user: user.id, exp: exp, expPerCent: expPerCent});
+    })
+
+    return <>
+            <p className="statsHeader">Podsumowanie: {selectedMonth}</p>
+            <table className="entityTable">
+                <thead>
+                    <tr>
+                        <th>Użytkownik</th>
+                        <th>Punkty doświadczenia</th>
+                        <th>Udział procentowy</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {monthlyGridData.map((record) => (
+                        <tr key={users.get(record.user)?.nickname}>
+                            <td>{users.get(record.user)?.nickname}</td>
+                            <td>{record.exp}</td>
+                            <td>{record.expPerCent}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </>
+}
+
+function DaySummary({users, expStats, selectedDay}: {users: Map<string, User>, expStats: Array<Schema["ExperienceStatistics"]["type"]>, selectedDay: string}) {
+    var totalExpThisMonth = expStats
+            .filter((record) => record.period == selectedDay && record.periodType == "DAY")
+            .reduce((sum, record) => sum + record.exp, 0)
+
+    var monthlyGridData = new Array();
+    users.forEach((user) => {
+        const exp = expStats
+            .filter((record) => record.user == user.id && record.period == selectedDay && record.periodType == "DAY")
+            .reduce((sum, record) => sum + record.exp, 0)
+        const expPerCent = totalExpThisMonth > 0 ? (100 * exp / totalExpThisMonth).toFixed(0) + "%" : "-";
+        monthlyGridData.push({user: user.id, exp: exp, expPerCent: expPerCent});
+    })
+
+    return <>
+            <p className="statsHeader">Podsumowanie: {selectedDay}</p>
+            <table className="entityTable">
+                <thead>
+                    <tr>
+                        <th>Użytkownik</th>
+                        <th>Punkty doświadczenia</th>
+                        <th>Udział procentowy</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {monthlyGridData.map((record) => (
+                        <tr key={users.get(record.user)?.nickname}>
+                            <td>{users.get(record.user)?.nickname}</td>
+                            <td>{record.exp}</td>
+                            <td>{record.expPerCent}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </>
+}
+
 function ExpStatsSummary({users}: {users: Map<string, User>}) {
     const [expStats, setExpStats] = useState<Array<Schema["ExperienceStatistics"]["type"]>>([]);
+    const [viewMode, setViewMode] = useState<string>("MONTHS");
+    const [selectedMonth, setSelectedMonth] = useState<string>("");
+    const [selectedDay, setSelectedDay] = useState<string>("");
     
     useEffect(() => {
         if (client.models.ExperienceStatistics !== undefined) {
@@ -30,103 +216,52 @@ function ExpStatsSummary({users}: {users: Map<string, User>}) {
         </>
     }
 
-    var earliestDay : string | undefined = undefined;
-    var latestDay : string | undefined = undefined;
-    var earliestMonth : string | undefined = undefined;
-    var latestMonth : string | undefined = undefined;
+    function onMonthSelected(month: string) {
+        setSelectedMonth(month)
+        setViewMode("MONTH")
+    }
 
-    expStats.forEach((expStat) => {
-        if (expStat.periodType == "DAY") {
-            if (earliestDay == undefined || expStat.period < earliestDay) {
-                earliestDay = expStat.period;
-            }
-            if (latestDay == undefined || expStat.period > latestDay) {
-                latestDay = expStat.period;
-            }
-        } else if (expStat.periodType == "MONTH") {
-            if (earliestMonth == undefined || expStat.period < earliestMonth) {
-                earliestMonth = expStat.period;
-            }
-            if (latestMonth == undefined || expStat.period > latestMonth) {
-                latestMonth = expStat.period;
-            }
-        }
-    })
+    function onDaySelected(day: string) {
+        setSelectedDay(day)
+        setViewMode("DAY")
+    }
 
-    const thisMonth = new Date().toISOString().slice(0, 7);
-    const today = new Date().toISOString().slice(0, 10);
+    function onBackToAllMonths() {
+        setViewMode("MONTHS")
+    }
 
-    var totalExpThisMonth = expStats
-            .filter((record) => record.period == thisMonth && record.periodType == "MONTH")
-            .reduce((sum, record) => sum + record.exp, 0)
+    function onBackToAllDays() {
+        setViewMode("MONTH")
+    }
 
-    var totalExpToday = expStats
-            .filter((record) => record.period == today && record.periodType == "DAY")
-            .reduce((sum, record) => sum + record.exp, 0)
-
-    var monthlyGridData = new Array();
-    users.forEach((user) => {
-        const exp = expStats
-            .filter((record) => record.user == user.id && record.period == thisMonth && record.periodType == "MONTH")
-            .reduce((sum, record) => sum + record.exp, 0)
-        const expPerCent = 100 * exp / totalExpThisMonth;
-        monthlyGridData.push({user: user.id, exp: exp, expPerCent: expPerCent});
-    })
-
-    var dailyGridData = new Array();
-    users.forEach((user) => {
-        const exp = expStats
-            .filter((record) => record.user == user.id && record.period == today && record.periodType == "DAY")
-            .reduce((sum, record) => sum + record.exp, 0)
-        const expPerCent = 100 * exp / totalExpToday;
-        dailyGridData.push({user: user.id, exp: exp, expPerCent: expPerCent});
-    })
-
-    return <>
-        <p className="pageTitle">Statystyki doświadczenia</p>
-
-        <ul className="entityList">
-            <p className="statsHeader">Ten miesiąc</p>
-            <table className="entityTable">
-                <thead>
-                    <tr>
-                        <th>Użytkownik</th>
-                        <th>Punkty doświadczenia</th>
-                        <th>Udział procentowy</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {monthlyGridData.map((record) => (
-                        <tr key={users.get(record.user)?.nickname}>
-                            <td>{users.get(record.user)?.nickname}</td>
-                            <td>{record.exp}</td>
-                            <td>{parseFloat(record.expPerCent).toFixed(0)}%</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-    
-            <p className="statsHeader">Dzisiaj</p>
-            <table className="entityTable">
-                <thead>
-                    <tr>
-                        <th>Użytkownik</th>
-                        <th>Punkty doświadczenia</th>
-                        <th>Udział procentowy</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {dailyGridData.map((record) => (
-                        <tr key={users.get(record.user)?.nickname}>
-                            <td>{users.get(record.user)?.nickname}</td>
-                            <td>{record.exp}</td>
-                            <td>{parseFloat(record.expPerCent).toFixed(0)}%</td>                            
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </ul>
-    </>
+    if (viewMode == "MONTHS") {
+        return <>
+            <p className="pageTitle">Statystyki doświadczenia</p>
+            <ul className="entityList">
+                <MonthsDataTable users={users} expStats={expStats} onMonthSelected={onMonthSelected}/>
+            </ul>
+        </>
+    } else if (viewMode == "MONTH") {
+        return <>
+            <p className="pageTitle">Statystyki doświadczenia</p>
+            <ul className="entityList">
+                <MonthSummary users={users} expStats={expStats} selectedMonth={selectedMonth}/>
+                <DaysDataTable users={users} expStats={expStats} selectedMonth={selectedMonth} onDaySelected={onDaySelected}/>
+                <Button onClick={() => onBackToAllMonths()}>Powrót</Button>
+            </ul>
+        </>
+    } else if (viewMode == "DAY") {
+        return <>
+            <p className="pageTitle">Statystyki doświadczenia</p>
+            <ul className="entityList">
+                <DaySummary users={users} expStats={expStats} selectedDay={selectedDay}/>
+                <Button onClick={() => onBackToAllDays()}>Powrót</Button>
+            </ul>
+        </>
+    } else{
+        return <>
+        </>
+    }
 }
 
 export default ExpStatsSummary;
