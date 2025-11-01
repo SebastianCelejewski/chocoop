@@ -103,7 +103,7 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
                 console.log("Failed to create reaction: " + JSON.stringify(result));
             }
 
-            setActivity(activity);
+            window.location.reload(true);
         })
     }
 

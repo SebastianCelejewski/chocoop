@@ -7,24 +7,21 @@ import * as cdk from "aws-cdk-lib";
 import { Policy, PolicyStatement, Effect } from "aws-cdk-lib/aws-iam";
 import { StartingPosition, EventSourceMapping } from "aws-cdk-lib/aws-lambda";
 import { expStatsUpdateFunction } from "./functions/exp-stats-update-function/resource";
+import { notificationFunction } from "./functions/notification-function/resource";
 
 const envName = process.env.AWS_BRANCH || 'unknown';
-
-console.log("Environment variables in backend.ts code outside the function handler")
-console.log("AWS_BRANCH: " + process.env.AWS_BRANCH);
-console.log("AMPLIFY_BRANCH: " + process.env.AMPLIFY_BRANCH);
-console.log("Env: " + JSON.stringify(process.env))
-
-console.log("envName: " + envName);
 
 const backend = defineBackend({
     auth,
     data,
     expStatsUpdateFunction,
+    notificationFunction
 });
 
 const { cfnUserPool } = backend.auth.resources.cfnResources;
 const activityTable = backend.data.resources.tables["Activity"];
+const workRequestTable = backend.data.resources.tables["WorkRequest"];
+const reactionTable = backend.data.resources.tables["Reaction"];
 const expStatsTable = backend.data.resources.tables["ExperienceStatistics"];
 
 cfnUserPool.policies = {
@@ -56,7 +53,7 @@ const expStatsTableParam = new cdk.aws_ssm.StringParameter(
     }
 );
 
-const dynamodbActivitiesStreamDataPolicy = new Policy(
+const dynamodbStreamDataPolicy = new Policy(
     Stack.of(activityTable),
     "chocoop-dynamodb-stream-data-policy-" + envName,
     {
@@ -133,13 +130,15 @@ const parametersReadPolicy = new Policy(
 );
 
 backend.expStatsUpdateFunction.resources.lambda.role?.attachInlinePolicy(parametersReadPolicy);
-backend.expStatsUpdateFunction.resources.lambda.role?.attachInlinePolicy(dynamodbActivitiesStreamDataPolicy);
+backend.expStatsUpdateFunction.resources.lambda.role?.attachInlinePolicy(dynamodbStreamDataPolicy);
 backend.expStatsUpdateFunction.resources.lambda.role?.attachInlinePolicy(dynamodbActivitiesReadPolicy);
 backend.expStatsUpdateFunction.resources.lambda.role?.attachInlinePolicy(dynamodbExpStatsReadWritePolicy);
 
-const mapping = new EventSourceMapping(
+backend.notificationFunction.resources.lambda.role?.attachInlinePolicy(dynamodbStreamDataPolicy);
+
+const expStatsUpdateMapping = new EventSourceMapping(
     Stack.of(activityTable),
-    "chocoop-dynamodb-function-stream-mapping-" + envName,
+    "chocoop-dynamodb-stats-update-function-stream-mapping-" + envName,
     {
         target: backend.expStatsUpdateFunction.resources.lambda,
         eventSourceArn: activityTable.tableStreamArn,
@@ -147,7 +146,31 @@ const mapping = new EventSourceMapping(
     }
 );
 
-mapping.node.addDependency(dynamodbActivitiesStreamDataPolicy);
+expStatsUpdateMapping.node.addDependency(dynamodbStreamDataPolicy);
+
+const workRequestsNotificationMapping = new EventSourceMapping(
+    Stack.of(activityTable),
+    "chocoop-dynamodb-work-requests-notification-function-stream-mapping-" + envName,
+    {
+        target: backend.notificationFunction.resources.lambda,
+        eventSourceArn: workRequestTable.tableStreamArn,
+        startingPosition: StartingPosition.LATEST,
+    }
+);
+
+workRequestsNotificationMapping.node.addDependency(dynamodbStreamDataPolicy);
+
+const reactionsNotificationMapping = new EventSourceMapping(
+    Stack.of(activityTable),
+    "chocoop-dynamodb-reactions-notification-function-stream-mapping-" + envName,
+    {
+        target: backend.notificationFunction.resources.lambda,
+        eventSourceArn: reactionTable.tableStreamArn,
+        startingPosition: StartingPosition.LATEST,
+    }
+);
+
+reactionsNotificationMapping.node.addDependency(dynamodbStreamDataPolicy);
 
 const cognitoListUsersPolicy = new Policy(
     Stack.of(backend.auth.resources.userPool),
