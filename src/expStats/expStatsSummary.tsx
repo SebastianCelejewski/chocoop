@@ -12,6 +12,8 @@ class ExpStatsQueryResult {
 }
 
 function MonthsDataTable({users, expStats, onMonthSelected}: {users: Map<string, User>, expStats: Array<Schema["ExperienceStatistics"]["type"]>, onMonthSelected: (month: string) => void} ) {
+    console.log("Calculating months data table")
+
     var gridData = new Map<string, Map<string, number>>();
     var earliestMonth : string = expStats
         .filter((record) => record.periodType == "MONTH")
@@ -44,8 +46,10 @@ function MonthsDataTable({users, expStats, onMonthSelected}: {users: Map<string,
         date.setMonth(date.getMonth() + 1)
     }
 
+    console.log("Rendering months data table")
     return <>
         <p className="statsHeader">Szczegóły dla kolejnych miesięcy</p>
+        <p className="statsHint">Kliknij w wiersz tabeli by przejść do szczegółów miesiąca</p>
         <table className="entityTable">
             <thead>
                 <tr>
@@ -70,6 +74,8 @@ function MonthsDataTable({users, expStats, onMonthSelected}: {users: Map<string,
 }
 
 function DaysDataTable({users, expStats, selectedMonth, onDaySelected }: {users: Map<string, User>, expStats: Array<Schema["ExperienceStatistics"]["type"]>, selectedMonth: string, onDaySelected: (day: string) => void}) {
+    console.log("Calculating days data table")
+    
     var gridData = new Map<string, Map<string, number>>();
 
     var startDate = new Date(selectedMonth);
@@ -94,8 +100,10 @@ function DaysDataTable({users, expStats, selectedMonth, onDaySelected }: {users:
         date.setDate(date.getDate() + 1)
     }
 
+    console.log("Rendering days data table")
     return <>
         <p className="statsHeader">Szczegóły dla kolejnych dni</p>
+        <p className="statsHint">Kliknij wiersz tabeli by przejść do szczegółów dnia</p>
         <table className="entityTable">
             <thead>
                 <tr>
@@ -120,6 +128,8 @@ function DaysDataTable({users, expStats, selectedMonth, onDaySelected }: {users:
 }
 
 function MonthSummary({users, expStats, selectedMonth}: {users: Map<string, User>, expStats: Array<Schema["ExperienceStatistics"]["type"]>, selectedMonth: string}) {
+    console.log("Calculating month summary")
+    
     var totalExpThisMonth = expStats
             .filter((record) => record.period == selectedMonth && record.periodType == "MONTH")
             .reduce((sum, record) => sum + record.exp, 0)
@@ -133,6 +143,7 @@ function MonthSummary({users, expStats, selectedMonth}: {users: Map<string, User
         monthlyGridData.push({user: user.id, exp: exp, expPerCent: expPerCent});
     })
 
+    console.log("Rendering month summary")
     return <>
             <p className="statsHeader">Podsumowanie: {selectedMonth}</p>
             <table className="entityTable">
@@ -157,6 +168,8 @@ function MonthSummary({users, expStats, selectedMonth}: {users: Map<string, User
 }
 
 function DaySummary({users, expStats, selectedDay}: {users: Map<string, User>, expStats: Array<Schema["ExperienceStatistics"]["type"]>, selectedDay: string}) {
+    console.log("Calculating day summary")
+
     var totalExpThisMonth = expStats
             .filter((record) => record.period == selectedDay && record.periodType == "DAY")
             .reduce((sum, record) => sum + record.exp, 0)
@@ -170,6 +183,7 @@ function DaySummary({users, expStats, selectedDay}: {users: Map<string, User>, e
         monthlyGridData.push({user: user.id, exp: exp, expPerCent: expPerCent});
     })
 
+    console.log("Rendering day summary")
     return <>
             <p className="statsHeader">Podsumowanie: {selectedDay}</p>
             <table className="entityTable">
@@ -208,6 +222,8 @@ function ExpStatsSummary({users}: {users: Map<string, User>}) {
             });
         }
     }, []);
+
+    console.log("View mode: " + viewMode + ", selected month: " + selectedMonth + ", selected day: " + selectedDay + ", expStats length: " + expStats.length + ", users length: " + users.size)
 
     if (expStats.length == 0) {
         return <>
