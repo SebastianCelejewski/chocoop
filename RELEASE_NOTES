@@ -41,3 +41,6 @@
 - Initial version of reactions
 - Representing urgency as text labels, not numbers
 - Small bug fixes
+
+## Version v0.4.6
+- Statistics allowing to see data for all months

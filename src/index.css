@@ -318,6 +318,11 @@ td, th {
     font-size: larger;
 }
 
+.backToAllMonths {
+  color: black;
+  margin-left: 4px;
+  margin-right: 4px;
+}
 
 /* About */
 
