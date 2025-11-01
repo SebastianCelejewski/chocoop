@@ -3,17 +3,17 @@ function WhatsNew() {
         <p className="pageTitle">O aplikacji</p>
         <ul className="richText">
             <h1>Co nowego w aplikacji</h1>
+            <p className="label"><b>Wersja 0.4.6</b></p>
+            <ul>
+                <li>Dodanie wyświetlania statystyk miesięcznych, dziennych i dla wybranego dnia</li>
+                <li>Poprawne wyświetlanie wyniku procentowego w przypadku, jeśli w danym dniu nikt nie wykonał żadnej pracy</li>
+            </ul>
+
             <p className="label"><b>Wersja 0.4.5</b></p>
             <ul>
                 <li>Wprowadzenie tekstowych opisów pilności zadań (zamiast liczbowych)</li>
                 <li>Wprowadzenie reakcji na wykonane czynności</li>
                 <li>Drobne poprawki interfejsu użytkownika</li>
-            </ul>
-
-            <p className="label"><b>Wersja 0.4.6</b></p>
-            <ul>
-                <li>Dodanie wyświetlania statystyk miesięcznych, dziennych i dla wybranego dnia</li>
-                <li>Poprawne wyświetlanie wyniku procentowego w przypadku, jeśli w danym dniu nikt nie wykonał żadnej pracy</li>
             </ul>
 
             <p className="label"><b>Wersja 0.4.4</b></p>
