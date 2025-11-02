@@ -193,7 +193,7 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
             return
         }
         
-        if (operationParam == "create" || operationParam == "promoteWorkRequest") {
+        if (operationParam == "create") {
             const newActivity = {
                 dateTime: new Date(activityDateTime).toISOString(),
                 user: activityPerson,

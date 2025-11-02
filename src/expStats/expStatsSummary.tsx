@@ -52,7 +52,7 @@ function MonthsDataTable({users, expStats, onMonthSelected}: {users: Map<string,
                 <tr>
                     <th>Dzień</th>
                     {Array.from(users.keys()).map((userId) => (
-                        <th key={userId}>{users.get(userId)?.nickname}</th>
+                        <th className="rotated90" key={userId}>{users.get(userId)?.nickname}</th>
                     ))}
                 </tr>
             </thead>
@@ -103,7 +103,7 @@ function DaysDataTable({users, expStats, selectedMonth, onDaySelected }: {users:
                 <tr>
                     <th>Dzień</th>
                     {Array.from(users.keys()).map((userId) => (
-                        <th key={userId}>{users.get(userId)?.nickname}</th>
+                        <th className="rotated90" key={userId}>{users.get(userId)?.nickname}</th>
                     ))}
                 </tr>
             </thead>
@@ -136,26 +136,26 @@ function MonthSummary({users, expStats, selectedMonth}: {users: Map<string, User
     })
 
     return <>
-            <p className="statsHeader">Podsumowanie: {selectedMonth}</p>
-            <table className="entityTable">
-                <thead>
-                    <tr>
-                        <th>Użytkownik</th>
-                        <th>Punkty doświadczenia</th>
-                        <th>Udział procentowy</th>
+        <p className="statsHeader">Podsumowanie: {selectedMonth}</p>
+        <table className="entityTable">
+            <thead>
+                <tr>
+                    <th>Użytkownik</th>
+                    <th>Punkty doświadczenia</th>
+                    <th>Udział procentowy</th>
+                </tr>
+            </thead>
+            <tbody>
+                {monthlyGridData.map((record) => (
+                    <tr key={users.get(record.user)?.nickname}>
+                        <td>{users.get(record.user)?.nickname}</td>
+                        <td>{record.exp}</td>
+                        <td>{record.expPerCent}</td>
                     </tr>
-                </thead>
-                <tbody>
-                    {monthlyGridData.map((record) => (
-                        <tr key={users.get(record.user)?.nickname}>
-                            <td>{users.get(record.user)?.nickname}</td>
-                            <td>{record.exp}</td>
-                            <td>{record.expPerCent}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </>
+                ))}
+            </tbody>
+        </table>
+    </>
 }
 
 function DaySummary({users, expStats, selectedDay}: {users: Map<string, User>, expStats: Array<Schema["ExperienceStatistics"]["type"]>, selectedDay: string}) {
@@ -173,26 +173,26 @@ function DaySummary({users, expStats, selectedDay}: {users: Map<string, User>, e
     })
 
     return <>
-            <p className="statsHeader">Podsumowanie: {selectedDay}</p>
-            <table className="entityTable">
-                <thead>
-                    <tr>
-                        <th>Użytkownik</th>
-                        <th>Punkty doświadczenia</th>
-                        <th>Udział procentowy</th>
+        <p className="statsHeader">Podsumowanie: {selectedDay}</p>
+        <table className="entityTable">
+            <thead>
+                <tr>
+                    <th>Użytkownik</th>
+                    <th>Punkty doświadczenia</th>
+                    <th>Udział procentowy</th>
+                </tr>
+            </thead>
+            <tbody>
+                {monthlyGridData.map((record) => (
+                    <tr key={users.get(record.user)?.nickname}>
+                        <td>{users.get(record.user)?.nickname}</td>
+                        <td>{record.exp}</td>
+                        <td>{record.expPerCent}</td>
                     </tr>
-                </thead>
-                <tbody>
-                    {monthlyGridData.map((record) => (
-                        <tr key={users.get(record.user)?.nickname}>
-                            <td>{users.get(record.user)?.nickname}</td>
-                            <td>{record.exp}</td>
-                            <td>{record.expPerCent}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </>
+                ))}
+            </tbody>
+        </table>
+    </>
 }
 
 function ExpStatsSummary({users}: {users: Map<string, User>}) {

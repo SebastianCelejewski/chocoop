@@ -44,3 +44,9 @@
 
 ## Version v0.4.6
 - Statistics allowing to see data for all months
+
+## Version v0.4.7
+- Fixed bug: duplicate activities spawned from work request
+- Small UI adjustments for statistics
+- Fixed bug: inability to set urgency to ,,immediately''
+

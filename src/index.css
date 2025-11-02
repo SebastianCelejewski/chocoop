@@ -324,6 +324,10 @@ td, th {
   margin-right: 4px;
 }
 
+.rotated90 {
+    writing-mode: vertical-lr;
+}
+
 /* About */
 
 .richText {
