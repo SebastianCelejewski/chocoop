@@ -63,7 +63,7 @@ function WhatsNew() {
             <p className="label"><b>Wersja 0.2</b></p>
             <ul>
                 <li>Automatyczne wypełnianie pola "osoba" podczas tworzenia nowej czynności</li>
-                <li>Tworzenie szynności na podstawie szablonów</li>
+                <li>Tworzenie czynności na podstawie szablonów</li>
                 <li>Poprawki interfejsu użytkownika</li>
             </ul>
 

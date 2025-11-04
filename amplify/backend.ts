@@ -10,13 +10,6 @@ import { expStatsUpdateFunction } from "./functions/exp-stats-update-function/re
 
 const envName = process.env.AWS_BRANCH || 'unknown';
 
-console.log("Environment variables in backend.ts code outside the function handler")
-console.log("AWS_BRANCH: " + process.env.AWS_BRANCH);
-console.log("AMPLIFY_BRANCH: " + process.env.AMPLIFY_BRANCH);
-console.log("Env: " + JSON.stringify(process.env))
-
-console.log("envName: " + envName);
-
 const backend = defineBackend({
     auth,
     data,
@@ -90,7 +83,7 @@ const dynamodbActivitiesReadPolicy = new Policy(
             ],
             resources: [activityTable.tableArn],
         })
-    ]})
+    ]});
 
 const dynamodbExpStatsReadWritePolicy = new Policy(
     Stack.of(activityTable),
@@ -109,7 +102,7 @@ const dynamodbExpStatsReadWritePolicy = new Policy(
             ],
             resources: [expStatsTable.tableArn],
         })
-    ]})    
+    ]});
         
 const parametersReadPolicy = new Policy(
     Stack.of(activityTable),

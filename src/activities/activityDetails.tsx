@@ -23,7 +23,7 @@ function Reactions({
 }) {
     return <div id="reactionsContainer"> {
         reactions
-            .filter(reaction => reaction.activityId == activity.id)
+            .filter(reaction => reaction.activityId === activity.id)
             .map(reaction => {
                 return <p key={reaction.id}>{users.get(reaction.user)?.nickname}: {reaction.reaction}</p>
             })
@@ -40,7 +40,7 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
     const [activity, setActivity] = useState<Schema["Activity"]["type"]>();
     const [reactions, setReactions] = useState<Array<Schema["Reaction"]["type"]>>([]);
     const [reactionsPopupVisible, setReactionsPopupVisible] = useState<boolean>(false);
-    const [currentUser, setCurrentUser] = useState(String);
+    const [currentUser, setCurrentUser] = useState("");
 
     useEffect(() => {
         getCurrentUser().then((user : AuthUser) => {
@@ -69,10 +69,10 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
     }
 
     function handleDelete() {
-        if (activityIdParam != undefined && activity !== undefined) {
+        if (activityIdParam !== undefined && activity !== undefined) {
             if (confirm("Usuwanie aktywności\n\n"
                 + activity.dateTime + "\n"
-                + activity.user + " " + activity.type + "\n\nCzy na pewno chcesz usunąć tę aktywność?") == true) {
+                + activity.user + " " + activity.type + "\n\nCzy na pewno chcesz usunąć tę aktywność?")) {
                 client.models.Activity.delete({ id: activityIdParam }).then(() => {
                     navigate("/ActivityList")
                 })

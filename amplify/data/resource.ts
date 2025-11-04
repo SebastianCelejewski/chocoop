@@ -12,7 +12,7 @@ const schema = a.schema({
             requestedAs: a.string(),
             reactions: a.hasMany("Reaction", "activityId")
         })
-        .authorization((allow) => [allow.publicApiKey()]),
+        .authorization((allow) => [allow.authenticated()]),
     WorkRequest: a
         .model({
             id: a.id().required(),
@@ -25,7 +25,7 @@ const schema = a.schema({
             completed: a.boolean().required(),
             completedAs: a.string()
         })
-        .authorization((allow) => [allow.publicApiKey()]),
+        .authorization((allow) => [allow.authenticated()]),
     ExperienceStatistics: a
         .model({
             periodType: a.string().required(),
@@ -33,7 +33,7 @@ const schema = a.schema({
             user: a.string().required(),
             exp: a.integer().required()
         })
-        .authorization((allow) => [allow.publicApiKey()]),
+        .authorization((allow) => [allow.authenticated()]),
     Reaction: a
         .model({
             id: a.id().required(),
@@ -42,7 +42,7 @@ const schema = a.schema({
             user: a.string().required(),
             reaction: a.string().required()
         })
-        .authorization((allow) => [allow.publicApiKey()]),
+        .authorization((allow) => [allow.authenticated()]),
 });
 
 export const data = defineData({
