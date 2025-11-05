@@ -21,6 +21,19 @@ import User from "../model/User";
 
 const client = generateClient<Schema>();
 
+function reportError(message: string, cause?: any) {
+    const errorGuid = crypto.randomUUID();
+    
+    console.log(errorGuid + ": " + message)
+    
+    if (cause !== undefined) {
+        console.log(errorGuid + ": " + cause)
+    }
+    
+    alert("Wystąpił błąd. Powiadom twórcę aplikacji wysyłając mu ten identyfikator błędu: " + errorGuid)
+    return message;
+}
+
 function ActivityEdit({users}: {users: Map<string, User>}) {
 
     const navigate = useNavigate();
@@ -34,20 +47,20 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
     const currentDateTimeLocal = new Date(currentDateTimeUTC.getTime() - timeZoneOffset * 60 * 1000)
     const currentDateTime = currentDateTimeLocal.toISOString().split(".")[0]
 
-    const [activityId, setActivityId] = useState(String || undefined)
-    const [activityDateTime, setActivityDateTime] = useState(String || undefined);
-    const [activityPerson, setActivityPerson] = useState("");
+    const [activityId, setActivityId] = useState<string | undefined>(undefined)
+    const [activityDateTime, setActivityDateTime] = useState<string | undefined>(undefined);
+    const [activityPerson, setActivityPerson] = useState<string | undefined>(undefined)
     const [activityType, setActivityType] = useState("");
-    const [activityExp, setActivityExp] = useState(0);
+    const [activityExp, setActivityExp] = useState("");
     const [activityComment, setActivityComment] = useState("");
 
-    const [workRequestId, setWorkRequestId] = useState(String || undefined)
-    const [workRequestCreatedDateTime, setWorkRequestCreatedDateTime] = useState(String || undefined);
-    const [workRequestCreatedBy, setWorkRequestCreatedBy] = useState("");
-    const [workRequestType, setWorkRequestType] = useState("");
-    const [workRequestExp, setWorkRequestExp] = useState(0);
-    const [workRequestUrgency, setWorkRequestUrgency] = useState(0);
-    const [workRequestInstructions, setWorkRequestInstructions] = useState("");
+    const [workRequestId, setWorkRequestId] = useState<string | undefined>(undefined)
+    const [workRequestCreatedDateTime, setWorkRequestCreatedDateTime] = useState<string | undefined>(undefined);
+    const [workRequestCreatedBy, setWorkRequestCreatedBy] = useState<string | undefined>(undefined)
+    const [workRequestType, setWorkRequestType] = useState("")
+    const [workRequestExp, setWorkRequestExp] = useState("")
+    const [workRequestUrgency, setWorkRequestUrgency] = useState("")
+    const [workRequestInstructions, setWorkRequestInstructions] = useState("")
 
     const [activityPersonErrorMessage, setActivityPersonErrorMessage] = useState("")
     const [activityTypeErrorMessage, setActivityTypeErrorMessage] = useState("");
@@ -55,7 +68,7 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
     const [activityCommentErrorMessage, setActivityCommentErrorMessage] = useState("");    
 
     const [personLoadingInProgress, setPersonLoadingInProgress] = useState(false)
-    const [dateTimeSettingInProgress, setDateTimeLoadingInProgress] = useState(false)
+    const [dateTimeSettingInProgress, setDateTimeSettingInProgress] = useState(false)
 
     function setNewActivityPerson() {
         setPersonLoadingInProgress(true)
@@ -66,7 +79,7 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
 
     function setNewActivityDateTime() {
         setActivityDateTime(currentDateTime)
-        setDateTimeLoadingInProgress(true)
+        setDateTimeSettingInProgress(true)
     }
     
     async function getActivity(activityId: string) {
@@ -77,7 +90,7 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
         return await client.models.WorkRequest.get({ id: workRequestId});
     }
 
-    if (operationParam == "update" && objectIdParam !== undefined && activityId == "") {
+    if (operationParam === "update" && objectIdParam !== undefined && activityId === undefined) {
         getActivity(objectIdParam).then((result) => {
             if (result["data"] != undefined) {
                 const activityDateTimeFromDatabaseAsString = result["data"]["dateTime"]
@@ -89,13 +102,16 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
                 setActivityPerson(result["data"]["user"]);
                 setActivityDateTime(activityDateTimeToSetToDateTimePicker);
                 setActivityType(result["data"]["type"]);
-                setActivityExp(result["data"]["exp"]);
+                setActivityExp(result["data"]["exp"].toString());
                 setActivityComment(result["data"]["comment"]);
             }
         })
+        .catch((error) => {
+            throw new Error(reportError("Error while fetching activity " + objectIdParam + " to be updated: " + error));
+        })
     }
 
-    if (operationParam == "promoteWorkRequest" && objectIdParam !== undefined && workRequestId == "") {
+    if (operationParam == "promoteWorkRequest" && objectIdParam !== undefined && workRequestId === undefined) {
         getWorkRequest(objectIdParam).then((result) => {
             if (result["data"] != undefined) {
                 const workrequestDateTimeFromDatabaseAsString = result["data"]["createdDateTime"]
@@ -107,22 +123,25 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
                 setWorkRequestCreatedBy(result["data"]["createdBy"]);
                 setWorkRequestCreatedDateTime(workrequestDateTimeToSetToDateTimePicker);
                 setWorkRequestType(result["data"]["type"]);
-                setWorkRequestExp(result["data"]["exp"]);
-                setWorkRequestUrgency(result["data"]["urgency"]);
+                setWorkRequestExp(result["data"]["exp"].toString());
+                setWorkRequestUrgency(result["data"]["urgency"].toString());
                 setWorkRequestInstructions(result["data"]["instructions"]);
 
                 setActivityDateTime(currentDateTime);
                 setActivityType(result["data"]["type"]);
-                setActivityExp(result["data"]["exp"]);
+                setActivityExp(result["data"]["exp"].toString());
             }
+        })
+        .catch((error) => {
+            throw new Error(reportError("Error while fetching work request " + objectIdParam + " to be promoted: " + error));
         })
     }
 
-    if ((operationParam == "create" || operationParam == "promoteWorkRequest") && activityPerson === "" && personLoadingInProgress == false) {
+    if ((operationParam == "create" || operationParam == "promoteWorkRequest") && activityPerson === undefined && personLoadingInProgress == false) {
         setNewActivityPerson()                
     }
 
-    if ((operationParam == "create" || operationParam == "promoteWorkRequest") && activityDateTime === "" && dateTimeSettingInProgress == false) {
+    if ((operationParam == "create" || operationParam == "promoteWorkRequest") && activityDateTime === undefined && dateTimeSettingInProgress == false) {
         setNewActivityDateTime()
     }
 
@@ -159,21 +178,21 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
     function validateInputs() {
         var temporaryValidationStatus = true
 
-        if (activityPerson === undefined || activityPerson.length == 0) {
+        if (activityPerson === undefined || activityPerson.length === 0) {
             setActivityPersonErrorMessage("Wpisz wykonawcę czynności")
             temporaryValidationStatus = false
         } else {
             setActivityPersonErrorMessage("")
         }
 
-        if (activityType === undefined || activityType.length == 0) {
+        if (activityType === undefined || activityType.length === 0) {
             setActivityTypeErrorMessage("Wpisz rodzaj czynności")
             temporaryValidationStatus = false
         } else {
             setActivityTypeErrorMessage("")
         }
 
-        if (activityExp === undefined || activityExp == 0 || isNaN(activityExp)) {
+        if (activityExp === undefined || isNaN(Number(activityExp))) {
             setActivityExpErrorMessage("Wpisz zdobyte punkty doświadczenia")
             temporaryValidationStatus = false
         } else {
@@ -185,6 +204,71 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
         return temporaryValidationStatus
     }
 
+    function createActivityObjectFromState() {
+        if (activityDateTime === undefined) {
+            throw new Error(reportError("State activityDateTime is undefined during creation of a new activity object"))
+        }
+        if (activityPerson === undefined) {
+            throw new Error(reportError("State activityPerson is undefined during creation of a new activity object"))
+        }
+        if (activityType === undefined) {
+            throw new Error(reportError("State activityType is undefined during creation of a new activity object"))
+        }
+        if (activityExp === undefined || isNaN(Number(activityExp))) {
+            throw new Error(reportError("State activityExp is undefined during creation of a new activity object"))
+        }
+        if (activityComment === undefined) {
+            throw new Error(reportError("State activityComment is undefined during creation of a new activity object"))
+        }
+        return {
+            id: activityId,
+            dateTime: new Date(activityDateTime).toISOString(),
+            user: activityPerson,
+            type: activityType,
+            exp: Number(activityExp),
+            comment: activityComment,
+            requestedAs: workRequestId
+        }
+    }
+
+    function createWorkRequestObjectFromState(newActivityId : string) {
+        if (newActivityId === undefined) {
+            throw new Error(reportError("Argument newActivityId is undefined during creation of a new work request object"))
+        }
+        if (workRequestId === undefined) {
+            throw new Error(reportError("State workRequestId is undefined during creation of a new work request object"))
+        }
+        if (workRequestCreatedDateTime === undefined) {
+            throw new Error(reportError("State workRequestCreatedDateTime is undefined during creation of a new work request object"))
+        }
+        if (workRequestCreatedBy === undefined) {
+            throw new Error(reportError("State workRequestCreatedBy is undefined during creation of a new work request object"))
+        }
+        if (workRequestType === undefined) {
+            throw new Error(reportError("State workRequestType is undefined during creation of a new work request object"))
+        }
+        if (workRequestExp === undefined || isNaN(Number(workRequestExp))) {
+            throw new Error(reportError("State workRequestExp is undefined during creation of a new work request object"))
+        }
+        if (workRequestUrgency === undefined || isNaN(Number(workRequestUrgency))) {
+            throw new Error(reportError("State workRequestUrgency is undefined during creation of a new work request object"))
+        }
+        if (workRequestInstructions === undefined) {
+            throw new Error(reportError("State workRequestInstructions is undefined during creation of a new work request object"))
+        }
+        return {
+            id: workRequestId,
+            createdDateTime: new Date(workRequestCreatedDateTime).toISOString(),
+            createdBy: workRequestCreatedBy,
+            type: workRequestType,
+            exp: Number(workRequestExp),
+            urgency: Number(workRequestUrgency),
+            instructions: workRequestInstructions,
+            completed: true,
+            completedAs: newActivityId
+        }
+    }
+
     function handleSubmit(e: any) {
         e.preventDefault();
         const validationStatus = validateInputs()
@@ -194,103 +278,75 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
         }
         
         if (operationParam == "create") {
-            const newActivity = {
-                dateTime: new Date(activityDateTime).toISOString(),
-                user: activityPerson,
-                type: activityType,
-                exp: activityExp,
-                comment: activityComment
-            }
+            const newActivity = createActivityObjectFromState();
 
-            const result = client.models.Activity.create(newActivity);
-            result.then((createActivityResponse) => {
-                if (createActivityResponse !== undefined
-                    && createActivityResponse.errors !== undefined
-                    && createActivityResponse.errors.length > 0) {
-                    console.log("Failed to create new activity:");
-                    console.log(JSON.stringify(createActivityResponse.errors))
-                    alert("Nie udało się utworzyć nowej czynności. Powiadom twórcę aplikacji.")
-                    return;
-                }
-                navigate("/ActivityList")
-            })
+            client.models.Activity
+                .create(newActivity)
+                .then((createActivityResponse) => {
+                    if (createActivityResponse?.errors?.length) {
+                        reportError("Failed to create a new activity in the database", createActivityResponse.errors);
+                        return;
+                    }
+                    navigate("/ActivityList")
+                })
+                .catch((error) => {
+                    reportError("Failed to create a new activity in the database", error);
+                })
         }
 
         if (operationParam == "promoteWorkRequest") {
-            const newActivity = {
-                dateTime: new Date(activityDateTime).toISOString(),
-                user: activityPerson,
-                type: activityType,
-                exp: activityExp,
-                comment: activityComment,
-                requestedAs: workRequestId
-            }
+            const newActivity = createActivityObjectFromState();
 
             const createActivityResult = client.models.Activity.create(newActivity);
             createActivityResult.then((createActivityResponse) => {
 
-                if (createActivityResponse !== undefined
-                    && createActivityResponse.errors !== undefined
-                    && createActivityResponse.errors.length > 0) {
-                    console.log("Failed to create new activity:");
-                    console.log(JSON.stringify(createActivityResponse.errors))
-                    alert("Nie udało się utworzyć nowej czynności. Powiadom twórcę aplikacji.")
+                if (createActivityResponse?.errors?.length) {
+                    reportError("Failed to create new activity in the database when promoting a work request", createActivityResponse.errors);
                     return;
                 }
 
-                var newActivityId = "unknown"
-                if (createActivityResponse["data"] !== null) {
-                    newActivityId = createActivityResponse["data"]["id"]
-                }  
-
-                const updatedWorkRequest = {
-                    id: workRequestId,
-                    createdDateTime: new Date(workRequestCreatedDateTime).toISOString(),
-                    createdBy: workRequestCreatedBy,
-                    type: workRequestType,
-                    exp: workRequestExp,
-                    urgency: workRequestUrgency,
-                    instructions: workRequestInstructions,
-                    completed: true,
-                    completedAs: newActivityId
+                if (createActivityResponse["data"] === null || createActivityResponse["data"]["id"] === null) {
+                    reportError("Failed to fetch created activity id from the database")
+                    return;
                 }
 
-                const workRequestUpdateResult = client.models.WorkRequest.update(updatedWorkRequest);
+                const newActivityId = createActivityResponse["data"]["id"]
 
-                workRequestUpdateResult.then((updateWorkRequestResponse) => {
-                    if (updateWorkRequestResponse !== undefined
-                        && updateWorkRequestResponse.errors !== undefined
-                        && updateWorkRequestResponse.errors.length > 0) {
-                        console.log("Failed to update a work request:");
-                        console.log(JSON.stringify(updateWorkRequestResponse.errors))
-                        alert("Nie udało się utworzyć nowej czynności. Powiadom twórcę aplikacji.")
+                const updatedWorkRequest = createWorkRequestObjectFromState(newActivityId);
+
+                client.models.WorkRequest
+                .update(updatedWorkRequest)
+                .then((updateWorkRequestResponse) => {
+                    if (updateWorkRequestResponse?.errors?.length) {
+                        reportError("Failed to update a work request in the database", updateWorkRequestResponse.errors);
                     }
                     navigate("/ActivityList")
+                }).catch((error) => {
+                    reportError("Failed to update a work request in the database", error);
                 })
+            }).catch((error) => {
+                reportError("Failed to create new activity in the database when promoting a work request", error);
             })
         }
 
         if (operationParam == "update") {
-            const updatedActivity = {
-                id: activityId,
-                dateTime: new Date(activityDateTime).toISOString(),
-                user: activityPerson,
-                type: activityType,
-                exp: activityExp,
-                comment: activityComment
+            const updatedActivity = createActivityObjectFromState();
+            if (updatedActivity.id === undefined) {
+                throw new Error(reportError("State activityId is undefined during creation of a new activity object"))
             }
 
-            const result = client.models.Activity.update(updatedActivity);
+            const result = client.models.Activity.update({
+                ...updatedActivity,
+                id: updatedActivity.id
+            });
 
             result.then((updateActivityResponse) => {
-                 if (updateActivityResponse !== undefined
-                    && updateActivityResponse.errors !== undefined
-                    && updateActivityResponse.errors.length > 0) {
-                    console.log("Failed to update an activity:");
-                    console.log(JSON.stringify(updateActivityResponse.errors))
-                    alert("Nie udało się zaktualizować czynności. Powiadom twórcę aplikacji.")
+                 if (updateActivityResponse?.errors?.length) {
+                    reportError("Failed to update an activity in the database", updateActivityResponse.errors);
                 }
                 navigate("/ActivityDetails/" + activityId)
+            }).catch((error) => {
+                reportError("Failed to update an activity in the database", error);
             })
         }
     }
@@ -307,7 +363,7 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
 
     function fillTemplate(type: string, exp: number) {
         setActivityType(type)
-        setActivityExp(exp)
+        setActivityExp(exp.toString())
     }
 
     return <>
@@ -348,11 +404,11 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
 
                 <p className="label">Czynność</p>
                 { activityTypeErrorMessage.length > 0 ? (<p className="validationMessage">{activityTypeErrorMessage}</p>) : (<></>) }
-                <p><input type="text" id="activityComment" className="entityTextArea" onChange={handleActivityTypeChange} value={activityType}/></p>
+                <p><input id="activityType" type="text" className="entityTextArea" onChange={handleActivityTypeChange} value={activityType}/></p>
 
                 <p className="label">Zdobyte punkty doświadczenia</p>
                 { activityExpErrorMessage.length > 0 ? (<p className="validationMessage">{activityExpErrorMessage}</p>) : (<></>) }
-                <p><input type="text" id="activityComment" onChange={handleActivityExpChange} value={activityExp}/></p>
+                <p><input id="activityExp" type="text" onChange={handleActivityExpChange} value={activityExp}/></p>
 
                 <p className="label">Komentarz</p>
                 { activityCommentErrorMessage.length > 0 ? (<p className="validationMessage">{activityCommentErrorMessage}</p>) : (<></>) }

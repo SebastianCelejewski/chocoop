@@ -8,7 +8,10 @@ import { Policy, PolicyStatement, Effect } from "aws-cdk-lib/aws-iam";
 import { StartingPosition, EventSourceMapping } from "aws-cdk-lib/aws-lambda";
 import { expStatsUpdateFunction } from "./functions/exp-stats-update-function/resource";
 
-const envName = process.env.AWS_BRANCH || 'unknown';
+const envName = process.env.AWS_BRANCH;
+if (!envName) {
+    throw new Error('AWS_BRANCH environment variable is required but not set');
+}
 
 const backend = defineBackend({
     auth,
