@@ -1,6 +1,6 @@
 import type { Schema } from "../../amplify/data/resource";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { generateClient } from "aws-amplify/data";
 
@@ -67,31 +67,60 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
     const [activityExpErrorMessage, setActivityExpErrorMessage] = useState("");
     const [activityCommentErrorMessage, setActivityCommentErrorMessage] = useState("");    
 
-    const [personLoadingInProgress, setPersonLoadingInProgress] = useState(false)
-    const [dateTimeSettingInProgress, setDateTimeSettingInProgress] = useState(false)
+    let pageTitle = "";
 
-    function setNewActivityPerson() {
-        setPersonLoadingInProgress(true)
+    console.log("Initializing ActivityEdit component")
+
+    useEffect(() => {
+        console.log("Starting useEffect");
+
+        if (operationParam === "create") {
+            console.log("Preparing component for creation of a new activity");
+
+            pageTitle = "Dodawanie wykonanej czynności";
+            setActivityUser();
+            setActivityDateTimeToCurrentDateTime();
+        }
+        
+        if (operationParam === "update") {
+            console.log("Preparing component for updating an existing activity");
+
+            pageTitle = "Edycja czynności";
+            if (objectIdParam === undefined) {
+                throw new Error(reportError("Error while fetching activity " + objectIdParam + " to be updated: id is undefined"));
+            }
+            loadActivityToUpdate(objectIdParam);
+        }
+
+        if (operationParam == "promoteWorkRequest") {
+            console.log("Preparing component for promoting a web request");
+
+            pageTitle = "Wykonane zlecenie zlecenie";
+            if (objectIdParam === undefined) {
+                throw new Error(reportError("Error while fetching work request " + objectIdParam + " to be promoted: id is undefined"));
+            }
+            setActivityUser();
+            setActivityDateTimeToCurrentDateTime();
+            loadWorkRequestToPromote(objectIdParam);
+        }
+    })
+
+    function setActivityUser() {
         getCurrentUser().then((user : AuthUser) => {
+            console.log("Setting activity user to " + user.username);
             setActivityPerson(user.username);
         })
     }
 
-    function setNewActivityDateTime() {
-        setActivityDateTime(currentDateTime)
-        setDateTimeSettingInProgress(true)
+    function setActivityDateTimeToCurrentDateTime() {
+        console.log("Setting activity time  to " + currentDateTime);
+        setActivityDateTime(currentDateTime);
     }
     
-    async function getActivity(activityId: string) {
-        return await client.models.Activity.get({ id: activityId });
-    }
+    function loadActivityToUpdate(activityIdParam: string) {
+        console.log("Loading activity " + activityIdParam + " from the database to be updated");
 
-    async function getWorkRequest(workRequestId: string) {
-        return await client.models.WorkRequest.get({ id: workRequestId});
-    }
-
-    if (operationParam === "update" && objectIdParam !== undefined && activityId === undefined) {
-        getActivity(objectIdParam).then((result) => {
+        client.models.Activity.get({ id: activityIdParam }).then((result) => {
             if (result["data"] != undefined) {
                 const activityDateTimeFromDatabaseAsString = result["data"]["dateTime"]
                 const activityDateTimeFromDatabaseAsDate = Date.parse(activityDateTimeFromDatabaseAsString)
@@ -111,8 +140,10 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
         })
     }
 
-    if (operationParam == "promoteWorkRequest" && objectIdParam !== undefined && workRequestId === undefined) {
-        getWorkRequest(objectIdParam).then((result) => {
+    function loadWorkRequestToPromote(workRequestIdParam: string) {
+        console.log("Loading work request " + workRequestIdParam + " from the database to be promoted");
+
+        client.models.WorkRequest.get({ id: workRequestIdParam }).then((result) => {
             if (result["data"] != undefined) {
                 const workrequestDateTimeFromDatabaseAsString = result["data"]["createdDateTime"]
                 const workrequestDateTimeFromDatabaseAsDate = Date.parse(workrequestDateTimeFromDatabaseAsString)
@@ -136,25 +167,7 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
             throw new Error(reportError("Error while fetching work request " + objectIdParam + " to be promoted: " + error));
         })
     }
-
-    if ((operationParam == "create" || operationParam == "promoteWorkRequest") && activityPerson === undefined && personLoadingInProgress == false) {
-        setNewActivityPerson()                
-    }
-
-    if ((operationParam == "create" || operationParam == "promoteWorkRequest") && activityDateTime === undefined && dateTimeSettingInProgress == false) {
-        setNewActivityDateTime()
-    }
-
-    var pageTitle = "Dodawanie wykonanej czynności"
-
-    if (operationParam == "update") {
-        pageTitle = "Edycja czynności"
-    }
-
-    if (operationParam == "promoteWorkRequest") {
-        pageTitle = "Wykonane zlecenie zlecenie"
-    }
-
+  
     function handleActivityDateTimeChange(e: any) {
         setActivityDateTime(e.target.value)
     }
@@ -176,32 +189,32 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
     }
 
     function validateInputs() {
-        var temporaryValidationStatus = true
+        var isValid = true
 
         if (activityPerson === undefined || activityPerson.length === 0) {
             setActivityPersonErrorMessage("Wpisz wykonawcę czynności")
-            temporaryValidationStatus = false
+            isValid = false
         } else {
             setActivityPersonErrorMessage("")
         }
 
         if (activityType === undefined || activityType.length === 0) {
             setActivityTypeErrorMessage("Wpisz rodzaj czynności")
-            temporaryValidationStatus = false
+            isValid = false
         } else {
             setActivityTypeErrorMessage("")
         }
 
         if (activityExp === undefined || isNaN(Number(activityExp))) {
             setActivityExpErrorMessage("Wpisz zdobyte punkty doświadczenia")
-            temporaryValidationStatus = false
+            isValid = false
         } else {
             setActivityExpErrorMessage("")
         }
 
         setActivityCommentErrorMessage("")
 
-        return temporaryValidationStatus
+        return isValid
     }
 
     function createActivityObjectFromState() {
@@ -277,7 +290,7 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
             return
         }
         
-        if (operationParam == "create") {
+        if (operationParam === "create") {
             const newActivity = createActivityObjectFromState();
 
             client.models.Activity
@@ -294,7 +307,7 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
                 })
         }
 
-        if (operationParam == "promoteWorkRequest") {
+        if (operationParam === "promoteWorkRequest") {
             const newActivity = createActivityObjectFromState();
 
             const createActivityResult = client.models.Activity.create(newActivity);
@@ -329,7 +342,7 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
             })
         }
 
-        if (operationParam == "update") {
+        if (operationParam === "update") {
             const updatedActivity = createActivityObjectFromState();
             if (updatedActivity.id === undefined) {
                 throw new Error(reportError("State activityId is undefined during creation of a new activity object"))
