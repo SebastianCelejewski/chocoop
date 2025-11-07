@@ -1,7 +1,7 @@
 import type { Schema } from "../../amplify/data/resource";
 import User from "../model/User";
 
-function Reactions({
+function ReactionsByUser({
     reactions,
     users
 }: {
@@ -23,4 +23,21 @@ function Reactions({
     </div>
 }
 
-export default Reactions;
+function ReactionsFromAllUsers({
+    activityId,
+    reactions
+}: {
+    activityId: string,
+    reactions: Array<Schema["Reaction"]["type"]>
+}) {
+    return <p className="reactions"> {
+        reactions
+            .filter(reaction => reaction.activityId == activityId)
+            .map(reaction => {
+                return reaction.reaction
+            })
+        }
+    </p>
+}
+
+export { ReactionsByUser, ReactionsFromAllUsers };

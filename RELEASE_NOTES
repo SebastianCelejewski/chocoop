@@ -50,3 +50,5 @@
 - Small UI adjustments for statistics
 - Fixed bug: inability to set urgency to ,,immediately''
 
+## Version v0.4.8
+- Heavy refactoring

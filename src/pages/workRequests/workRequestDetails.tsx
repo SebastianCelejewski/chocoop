@@ -1,13 +1,13 @@
-import type { Schema } from "../../amplify/data/resource";
+import type { Schema } from "../../../amplify/data/resource";
 
 import { useEffect, useState } from "react";
 import { NavLink, useParams, useNavigate } from "react-router";
 import { generateClient } from "aws-amplify/data";
-import { dateToString } from "../utils/dateUtils";
+import { dateToString } from "../../utils/dateUtils";
 
-import reportError from "../utils/reportError"
-import User from "../model/User";
-import { urgencyList } from "../model/Urgency"
+import reportError from "../../utils/reportError"
+import User from "../../model/User";
+import { urgencyList } from "../../model/Urgency"
 
 const client = generateClient<Schema>();
 

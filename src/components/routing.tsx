@@ -1,13 +1,13 @@
 import { BrowserRouter, Routes, Route } from "react-router";
 
-import ActivityList from "../activities/activityList.tsx"
-import ActivityDetails from "../activities/activityDetails.tsx"
-import ActivityEdit from "../activities/activityEdit.tsx"
-import WorkRequestList from "../workRequests/workRequestList.tsx"
-import WorkRequestDetails from "../workRequests/workRequestDetails.tsx"
-import WorkRequestEdit from "../workRequests/workRequestEdit.tsx"
-import ExpStatsSummary from "../expStats/expStatsSummary.tsx"
-import WhatsNew from "../about/whatsNew.tsx"
+import ActivityList from "../pages/activities/activityList.tsx"
+import ActivityDetails from "../pages/activities/activityDetails.tsx"
+import ActivityEdit from "../pages/activities/activityEdit.tsx"
+import WorkRequestList from "../pages/workRequests/workRequestList.tsx"
+import WorkRequestDetails from "../pages/workRequests/workRequestDetails.tsx"
+import WorkRequestEdit from "../pages/workRequests/workRequestEdit.tsx"
+import ExpStatsSummary from "../pages/expStats/expStatsSummary.tsx"
+import WhatsNew from "../pages/about/whatsNew.tsx"
 
 import User from "../model/User";
 

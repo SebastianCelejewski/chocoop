@@ -1,14 +1,14 @@
-import type { Schema } from "../../amplify/data/resource";
+import type { Schema } from "../../../amplify/data/resource";
 
 import { useState, useEffect } from "react";
 import { NavLink, useParams, useNavigate } from "react-router";
 import { generateClient } from "aws-amplify/data";
-import { dateToString } from "../utils/dateUtils";
+import { dateToString } from "../../utils/dateUtils";
 import { getCurrentUser, type AuthUser } from 'aws-amplify/auth';
 
-import reportError from "../utils/reportError"
-import User from "../model/User";
-import Reactions from "../components/reactions"
+import reportError from "../../utils/reportError"
+import User from "../../model/User";
+import { ReactionsByUser } from "../../components/reactions"
 
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 
@@ -179,7 +179,7 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
                 <p className="commentTextArea">{activity.comment}</p>
 
                 <p className="label">Reakcje</p>
-                <Reactions reactions={reactions} users={users}/>
+                <ReactionsByUser reactions={reactions} users={users}/>
             </div>
             <div>
                 <button type="button" onClick={handleBack}>Wróć</button>

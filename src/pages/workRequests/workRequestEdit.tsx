@@ -3,20 +3,20 @@ import { useNavigate, useParams } from "react-router";
 import { generateClient } from "aws-amplify/data";
 import { getCurrentUser, type AuthUser } from 'aws-amplify/auth';
 
-import type { Schema } from "../../amplify/data/resource";
-import { urgencyList, Urgency } from "../model/Urgency"
-import User from "../model/User";
-import reportError from "../utils/reportError"
+import type { Schema } from "../../../amplify/data/resource";
+import { urgencyList, Urgency } from "../../model/Urgency"
+import User from "../../model/User";
+import reportError from "../../utils/reportError"
 
-import vacuuming from "../assets/images/activities/vacuuming.png?url";
-import dishwashing from "../assets/images/activities/dishwashing.png?url";
-import shopping_local from "../assets/images/activities/shopping_local.png?url";
-import shopping_Auchan from "../assets/images/activities/shopping_Auchan.png?url";
-import cooking from "../assets/images/activities/cooking.png?url";
-import laundry_start from "../assets/images/activities/laundry_start.png?url";
-import laundry_end from "../assets/images/activities/laundry_end.png?url";
-import laundry_sorting from "../assets/images/activities/laundry_sorting.png?url";
-import taking_garbage_out from "../assets/images/activities/taking_garbage_out.png?url";
+import vacuuming from "../../assets/images/activities/vacuuming.png?url";
+import dishwashing from "../../assets/images/activities/dishwashing.png?url";
+import shopping_local from "../../assets/images/activities/shopping_local.png?url";
+import shopping_Auchan from "../../assets/images/activities/shopping_Auchan.png?url";
+import cooking from "../../assets/images/activities/cooking.png?url";
+import laundry_start from "../../assets/images/activities/laundry_start.png?url";
+import laundry_end from "../../assets/images/activities/laundry_end.png?url";
+import laundry_sorting from "../../assets/images/activities/laundry_sorting.png?url";
+import taking_garbage_out from "../../assets/images/activities/taking_garbage_out.png?url";
 
 const client = generateClient<Schema>();
 

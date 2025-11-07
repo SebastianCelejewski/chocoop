@@ -1,8 +1,8 @@
-import type { Schema } from "../../amplify/data/resource";
+import type { Schema } from "../../../amplify/data/resource";
 import { useEffect, useState } from "react";
 import { generateClient } from "aws-amplify/data";
 
-import User from "../model/User";
+import User from "../../model/User";
 import { Button } from "@aws-amplify/ui-react";
 
 const client = generateClient<Schema>();

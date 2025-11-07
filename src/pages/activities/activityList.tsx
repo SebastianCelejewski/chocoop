@@ -1,10 +1,11 @@
-import type { Schema } from "../../amplify/data/resource";
+import type { Schema } from "../../../amplify/data/resource";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { generateClient } from "aws-amplify/data";
-import { dateToString } from "../utils/dateUtils";
+import { dateToString } from "../../utils/dateUtils";
 
-import User from "../model/User";
+import User from "../../model/User";
+import { ReactionsFromAllUsers } from "../../components/reactions";
 
 const client = generateClient<Schema>();
 
@@ -16,23 +17,6 @@ function sortByDateTime(activities: Array<Schema["Activity"]["type"]>) {
     return activities.sort((a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime());
 }
 
-function Reactions({
-    activity,
-    reactions
-}: {
-    activity: Schema["Activity"]["type"],
-    reactions: Array<Schema["Reaction"]["type"]>
-}) {
-    return <p className="reactions"> {
-        reactions
-            .filter(reaction => reaction.activityId == activity.id)
-            .map(reaction => {
-                return reaction.reaction
-            })
-        }
-    </p>
-}
-
 function ActivityList({users}: {users: Map<string, User>}) {
 
     const [activities, setActivities] = useState<Array<Schema["Activity"]["type"]>>([]);
@@ -41,19 +25,22 @@ function ActivityList({users}: {users: Map<string, User>}) {
     const navigate = useNavigate();
     
     useEffect(() => {
-        if (client.models.Activity !== undefined) {
-          client.models.Activity.observeQuery().subscribe({
-              next: (data: ActivityQueryResult) => { 
-                setActivities(sortByDateTime([...data.items]))
-              }
-          });
-        }
+        const activitiesQuery = client.models.Activity.observeQuery().subscribe({
+            next: (data: ActivityQueryResult) => { 
+              setActivities(sortByDateTime([...data.items]))
+            }
+        });
 
-        client.models.Reaction.observeQuery().subscribe({
+        const reactionsQuery = client.models.Reaction.observeQuery().subscribe({
               next: (data: { items: Array<Schema["Reaction"]["type"]> }) => {
                 setReactions(data.items)
               }
           });
+
+        return (() => {
+            activitiesQuery.unsubscribe();
+            reactionsQuery.unsubscribe();
+        })
     }, []);
 
     function createActivity() {
@@ -82,7 +69,7 @@ function ActivityList({users}: {users: Map<string, User>}) {
     }
 
     return (
-          <>
+        <>
             <p className="pageTitle" onClick={navigateToWorkRequests}>Lista wykonanych czynności</p>
             <ul className="entityList">
             {activities.map(activity => {
@@ -96,17 +83,17 @@ function ActivityList({users}: {users: Map<string, User>}) {
                             <p className="entityType">{activity.type}</p>
                             <p className="entityExp">{activity.exp} xp</p>
                             <div style={{clear: 'both'}}/>
-                            <Reactions activity={activity} reactions={reactions}/>
+                            <ReactionsFromAllUsers activityId={activity.id} reactions={reactions}/>
                         </div>
                       </li>
                 }
             )}
-          </ul>
-          <div className="buttonPanel">
-            <button onClick={createActivity}>Dodaj czynność</button>
-          </div>
-    </>
-  );
+            </ul>
+            <div className="buttonPanel">
+                <button onClick={createActivity}>Dodaj czynność</button>
+            </div>
+        </>
+    );
 }
 
 export default ActivityList;
