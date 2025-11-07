@@ -1,8 +1,12 @@
-import type { Schema } from "../../amplify/data/resource";
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { generateClient } from "aws-amplify/data";
+import { getCurrentUser, type AuthUser } from 'aws-amplify/auth';
+
+import type { Schema } from "../../amplify/data/resource";
+import { urgencyList, Urgency } from "../model/Urgency"
+import User from "../model/User";
+import reportError from "../utils/reportError"
 
 import vacuuming from "../assets/images/activities/vacuuming.png?url";
 import dishwashing from "../assets/images/activities/dishwashing.png?url";
@@ -13,11 +17,6 @@ import laundry_start from "../assets/images/activities/laundry_start.png?url";
 import laundry_end from "../assets/images/activities/laundry_end.png?url";
 import laundry_sorting from "../assets/images/activities/laundry_sorting.png?url";
 import taking_garbage_out from "../assets/images/activities/taking_garbage_out.png?url";
-
-import { getCurrentUser, type AuthUser } from 'aws-amplify/auth';
-
-import { urgencyList, Urgency } from "../model/Urgency"
-import User from "../model/User";
 
 const client = generateClient<Schema>();
 
@@ -34,15 +33,15 @@ function WorkRequestEdit({users}: {users: Map<string, User>}) {
     const currentDateTimeLocal = new Date(currentDateTimeUTC.getTime() - timeZoneOffset * 60 * 1000)
     const currentDateTime = currentDateTimeLocal.toISOString().split(".")[0]
 
-    const [workRequestId, setWorkRequestId] = useState(String || undefined)
-    const [workRequestCreatedDateTime, setWorkRequestCreatedDateTime] = useState(String || undefined);
-    const [workRequestCreatedBy, setWorkRequestCreatedBy] = useState("");
+    const [workRequestId, setWorkRequestId] = useState<string | undefined>(undefined);
+    const [workRequestCreatedDateTime, setWorkRequestCreatedDateTime] = useState<string | undefined>(undefined)
+    const [workRequestCreatedBy, setWorkRequestCreatedBy] = useState<string | undefined>(undefined)
     const [workRequestType, setWorkRequestType] = useState("");
-    const [workRequestExp, setWorkRequestExp] = useState(0);
-    const [workRequestUrgency, setWorkRequestUrgency] = useState(0);
+    const [workRequestExp, setWorkRequestExp] = useState("");
+    const [workRequestUrgency, setWorkRequestUrgency] = useState("");
     const [workRequestInstructions, setWorkRequestInstructions] = useState("");
     const [workRequestCompleted, setWorkRequestCompleted] = useState(false);
-    const [workRequestCompletedAs, setWorkRequestCompletedAs] = useState(String || null);
+    const [workRequestCompletedAs, setWorkRequestCompletedAs] = useState<string | undefined>(undefined)
 
     const [workRequestCreatedByErrorMessage, setWorkRequestCreatedByErrorMessage] = useState("")
     const [workRequestTypeErrorMessage, setWorkRequestTypeErrorMessage] = useState("");
@@ -50,52 +49,59 @@ function WorkRequestEdit({users}: {users: Map<string, User>}) {
     const [workRequestUrgencyErrorMessage, setWorkRequestUrgencyErrorMessage] = useState("");
     const [workRequestInstructionsErrorMessage, setWorkRequestInstructionsErrorMessage] = useState("");    
 
-    const [personLoadingInProgress, setPersonLoadingInProgress] = useState(false)
-    const [dateTimeSettingInProgress, setDateTimeLoadingInProgress] = useState(false)
+    useEffect(() => {
+        if (operationParam === "create") {
+            console.log("Preparing component for creation of a new work request");
+
+            setNewWorkRequestPerson();
+            setNewWorkRequestDateTime();
+        }
+
+        if (operationParam === "update") {
+            console.log("Preparing component for updating an existing work request");
+
+            if (workrequestIdParam === undefined) {
+                throw new Error(reportError("Error while fetching work request " + workrequestIdParam + " to be updated: id is undefined"));
+            }
+
+            loadWorkRequestToBeUpdated(workrequestIdParam);
+        }
+    },[operationParam, workrequestIdParam])
 
     function setNewWorkRequestPerson() {
-        setPersonLoadingInProgress(true)
         getCurrentUser().then((user : AuthUser) => {
             setWorkRequestCreatedBy(user.username);
         })
     }
 
     function setNewWorkRequestDateTime() {
-        setWorkRequestCreatedDateTime(currentDateTime)
-        setDateTimeLoadingInProgress(true)
+        setWorkRequestCreatedDateTime(currentDateTime);
     }
     
-    async function getWorkRequest(workrequestId: string) {
-        return await client.models.WorkRequest.get({ id: workrequestId });
-    }
+    function loadWorkRequestToBeUpdated(workRequestId: string) {
+        client.models.WorkRequest
+            .get({ id: workRequestId })
+            .then((result) => {
+                if (result["data"] != undefined) {
+                    const workrequestDateTimeFromDatabaseAsString = result["data"]["createdDateTime"]
+                    const workrequestDateTimeFromDatabaseAsDate = Date.parse(workrequestDateTimeFromDatabaseAsString)
+                    const workrequestDateTimeLocal = new Date(workrequestDateTimeFromDatabaseAsDate - timeZoneOffset * 60 * 1000)
+                    const workrequestDateTimeToSetToDateTimePicker = workrequestDateTimeLocal.toISOString().split(".")[0]
 
-    if (operationParam == "update" && workrequestIdParam !== undefined && workRequestId == "") {
-        getWorkRequest(workrequestIdParam).then((result) => {
-            if (result["data"] != undefined) {
-                const workrequestDateTimeFromDatabaseAsString = result["data"]["createdDateTime"]
-                const workrequestDateTimeFromDatabaseAsDate = Date.parse(workrequestDateTimeFromDatabaseAsString)
-                const workrequestDateTimeLocal = new Date(workrequestDateTimeFromDatabaseAsDate - timeZoneOffset * 60 * 1000)
-                const workrequestDateTimeToSetToDateTimePicker = workrequestDateTimeLocal.toISOString().split(".")[0]
-
-                setWorkRequestId(result["data"]["id"]);
-                setWorkRequestCreatedBy(result["data"]["createdBy"]);
-                setWorkRequestCreatedDateTime(workrequestDateTimeToSetToDateTimePicker);
-                setWorkRequestType(result["data"]["type"]);
-                setWorkRequestExp(result["data"]["exp"]);
-                setWorkRequestUrgency(result["data"]["urgency"]);
-                setWorkRequestInstructions(result["data"]["instructions"]);
-                setWorkRequestCompleted(result["data"]["completed"]);
-                setWorkRequestCompletedAs(result["data"]["completedAs"] || "");
-            }
-        })
-    }
-
-    if (operationParam == "create" && workRequestCreatedBy === "" && personLoadingInProgress == false) {
-        setNewWorkRequestPerson()                
-    }
-
-    if (operationParam == "create" && workRequestCreatedDateTime === "" && dateTimeSettingInProgress == false) {
-        setNewWorkRequestDateTime()
+                    setWorkRequestId(result["data"]["id"]);
+                    setWorkRequestCreatedBy(result["data"]["createdBy"]);
+                    setWorkRequestCreatedDateTime(workrequestDateTimeToSetToDateTimePicker);
+                    setWorkRequestType(result["data"]["type"]);
+                    setWorkRequestExp(result["data"]["exp"].toString());
+                    setWorkRequestUrgency(result["data"]["urgency"].toString());
+                    setWorkRequestInstructions(result["data"]["instructions"]);
+                    setWorkRequestCompleted(result["data"]["completed"]);
+                    setWorkRequestCompletedAs(result["data"]["completedAs"] || "");
+                }
+            })
+            .catch((error) => {
+                throw new Error(reportError("Error while fetching work request " + workrequestIdParam + " to be updated: " + error));
+            })
     }
 
     function handleWorkRequestCreatedDateTimeChange(e: any) {
@@ -123,39 +129,73 @@ function WorkRequestEdit({users}: {users: Map<string, User>}) {
     }
 
     function validateInputs() {
-        var temporaryValidationStatus = true
+        var isValid = true
 
         if (workRequestCreatedBy === undefined || workRequestCreatedBy.length == 0) {
             setWorkRequestCreatedByErrorMessage("Wpisz zleceniodawcę")
-            temporaryValidationStatus = false
+            isValid = false
         } else {
             setWorkRequestCreatedByErrorMessage("")
         }
 
         if (workRequestType === undefined || workRequestType.length == 0) {
             setWorkRequestTypeErrorMessage("Wpisz rodzaj czynności")
-            temporaryValidationStatus = false
+            isValid = false
         } else {
             setWorkRequestTypeErrorMessage("")
         }
 
-        if (workRequestExp === undefined || workRequestExp == 0 || isNaN(workRequestExp)) {
+        if (isNaN(Number(workRequestExp))) {
             setWorkRequestExpErrorMessage("Wpisz punkty doświadczenia do zdobycia")
-            temporaryValidationStatus = false
+            isValid = false
         } else {
             setWorkRequestExpErrorMessage("")
         }
 
-        if (workRequestUrgency === undefined || workRequestUrgency == 0 || isNaN(workRequestUrgency)) {
+        if (isNaN(Number(workRequestUrgency))) {
             setWorkRequestUrgencyErrorMessage("Wpisz pilność")
-            temporaryValidationStatus = false
+            isValid = false
         } else {
             setWorkRequestUrgencyErrorMessage("")
         }
 
         setWorkRequestInstructionsErrorMessage("")
 
-        return temporaryValidationStatus
+        return isValid
+    }
+
+    function createWorkRequestObjectFromState() {
+        if (workRequestCreatedBy === undefined) {
+            throw new Error(reportError("State workRequestCreatedBy is undefined during creation of a new work request object"))
+        }
+
+        if (workRequestCreatedDateTime === undefined) {
+            throw new Error(reportError("State workRequestCreatedDateTime is undefined during creation of a new work request object"))
+        }
+        
+        if (workRequestType === undefined) {
+            throw new Error(reportError("State workRequestType is undefined during creation of a new work request object"))
+        }
+
+        if (isNaN(Number(workRequestExp))) {
+            throw new Error(reportError("State workRequestExp is not a number during creation of a new work request object"))
+        }
+
+        if (isNaN(Number(workRequestUrgency))) {
+            throw new Error(reportError("State workRequestUrgency is not a number during creation of a new work request object"))
+        }
+
+        return {
+            id: workRequestId,
+            createdDateTime: new Date(workRequestCreatedDateTime).toISOString(),
+            createdBy: workRequestCreatedBy,
+            type: workRequestType,
+            exp: Number(workRequestExp),
+            urgency: Number(workRequestUrgency),
+            instructions: workRequestInstructions,
+            completed: workRequestCompleted,
+            completedAs: workRequestCompletedAs
+        }
     }
 
     function handleSubmit(e: any) {
@@ -167,40 +207,36 @@ function WorkRequestEdit({users}: {users: Map<string, User>}) {
         }
         
         if (operationParam == "create") {
-            const newWorkRequest = {
-                createdDateTime: new Date(workRequestCreatedDateTime).toISOString(),
-                createdBy: workRequestCreatedBy,
-                type: workRequestType,
-                exp: workRequestExp,
-                urgency: workRequestUrgency,
-                instructions: workRequestInstructions,
-                completed: false
-            }
-
-            const result = client.models.WorkRequest.create(newWorkRequest);
-            result.then(() => {
-                navigate("/WorkRequestList")
-            })
+            const newWorkRequest = createWorkRequestObjectFromState();
+            client.models.WorkRequest
+                .create(newWorkRequest)
+                .then((createdWorkRequestResponse) => {
+                    if (createdWorkRequestResponse?.errors?.length) {
+                        reportError("Failed to create a work request in the database", createdWorkRequestResponse.errors);
+                    }
+                    navigate("/WorkRequestList")
+                }).catch((error) => {
+                    reportError("Failed to create a new work request in the database", error);
+                })
         }
 
         if (operationParam == "update") {
-            const updatedWorkRequest = {
-                id: workRequestId,
-                createdDateTime: new Date(workRequestCreatedDateTime).toISOString(),
-                createdBy: workRequestCreatedBy,
-                type: workRequestType,
-                exp: workRequestExp,
-                urgency: workRequestUrgency,
-                instructions: workRequestInstructions,
-                completed: workRequestCompleted,
-                completedAs: workRequestCompletedAs
+            const updatedWorkRequest = createWorkRequestObjectFromState();
+            if (updatedWorkRequest.id === undefined) {
+                throw new Error(reportError("State workRequestId is undefined during creation of a new work request object"))
             }
 
-            const result = client.models.WorkRequest.update(updatedWorkRequest);
-
-            result.then(() => {
-                navigate("/WorkRequestDetails/" + workRequestId)
-            })
+            client.models.WorkRequest
+                .update({...updatedWorkRequest,id: updatedWorkRequest.id})
+                .then((updatedWorkRequestResponse) => {
+                    if (updatedWorkRequestResponse?.errors?.length) {
+                        reportError("Failed to update a work request in the database", updatedWorkRequestResponse.errors);
+                    }
+                    navigate("/WorkRequestDetails/" + workRequestId)
+                })
+                .catch((error) => {
+                    reportError("Failed to update a work request in the database", error);
+                })
         }
     }
 
@@ -214,7 +250,7 @@ function WorkRequestEdit({users}: {users: Map<string, User>}) {
 
     function fillTemplate(type: string, exp: number) {
         setWorkRequestType(type)
-        setWorkRequestExp(exp)
+        setWorkRequestExp(exp.toString())
     }
 
     return <>

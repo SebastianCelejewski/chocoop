@@ -3,6 +3,10 @@ import type { Schema } from "../../amplify/data/resource";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { generateClient } from "aws-amplify/data";
+import { getCurrentUser, type AuthUser } from 'aws-amplify/auth';
+
+import User from "../model/User";
+import reportError from "../utils/reportError"
 
 import vacuuming from "../assets/images/activities/vacuuming.png?url";
 import dishwashing from "../assets/images/activities/dishwashing.png?url";
@@ -15,24 +19,7 @@ import laundry_sorting from "../assets/images/activities/laundry_sorting.png?url
 import taking_garbage_out from "../assets/images/activities/taking_garbage_out.png?url";
 import unpacking_frisco from "../assets/images/activities/unpacking_frisco.png?url";
 
-import { getCurrentUser, type AuthUser } from 'aws-amplify/auth';
-
-import User from "../model/User";
-
 const client = generateClient<Schema>();
-
-function reportError(message: string, cause?: any) {
-    const errorGuid = crypto.randomUUID();
-    
-    console.log(errorGuid + ": " + message)
-    
-    if (cause !== undefined) {
-        console.log(errorGuid + ": " + cause)
-    }
-    
-    alert("Wystąpił błąd. Powiadom twórcę aplikacji wysyłając mu ten identyfikator błędu: " + errorGuid)
-    return message;
-}
 
 function ActivityEdit({users}: {users: Map<string, User>}) {
 
@@ -120,52 +107,56 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
     function loadActivityToUpdate(activityIdParam: string) {
         console.log("Loading activity " + activityIdParam + " from the database to be updated");
 
-        client.models.Activity.get({ id: activityIdParam }).then((result) => {
-            if (result["data"] != undefined) {
-                const activityDateTimeFromDatabaseAsString = result["data"]["dateTime"]
-                const activityDateTimeFromDatabaseAsDate = Date.parse(activityDateTimeFromDatabaseAsString)
-                const activityDateTimeLocal = new Date(activityDateTimeFromDatabaseAsDate - timeZoneOffset * 60 * 1000)
-                const activityDateTimeToSetToDateTimePicker = activityDateTimeLocal.toISOString().split(".")[0]
+        client.models.Activity
+            .get({ id: activityIdParam })
+            .then((result) => {
+                if (result["data"] != undefined) {
+                    const activityDateTimeFromDatabaseAsString = result["data"]["dateTime"]
+                    const activityDateTimeFromDatabaseAsDate = Date.parse(activityDateTimeFromDatabaseAsString)
+                    const activityDateTimeLocal = new Date(activityDateTimeFromDatabaseAsDate - timeZoneOffset * 60 * 1000)
+                    const activityDateTimeToSetToDateTimePicker = activityDateTimeLocal.toISOString().split(".")[0]
 
-                setActivityId(result["data"]["id"]);
-                setActivityPerson(result["data"]["user"]);
-                setActivityDateTime(activityDateTimeToSetToDateTimePicker);
-                setActivityType(result["data"]["type"]);
-                setActivityExp(result["data"]["exp"].toString());
-                setActivityComment(result["data"]["comment"]);
-            }
-        })
-        .catch((error) => {
-            throw new Error(reportError("Error while fetching activity " + objectIdParam + " to be updated: " + error));
-        })
+                    setActivityId(result["data"]["id"]);
+                    setActivityPerson(result["data"]["user"]);
+                    setActivityDateTime(activityDateTimeToSetToDateTimePicker);
+                    setActivityType(result["data"]["type"]);
+                    setActivityExp(result["data"]["exp"].toString());
+                    setActivityComment(result["data"]["comment"]);
+                }
+            })
+            .catch((error) => {
+                throw new Error(reportError("Error while fetching activity " + objectIdParam + " to be updated: " + error));
+            })
     }
 
     function loadWorkRequestToPromote(workRequestIdParam: string) {
         console.log("Loading work request " + workRequestIdParam + " from the database to be promoted");
 
-        client.models.WorkRequest.get({ id: workRequestIdParam }).then((result) => {
-            if (result["data"] != undefined) {
-                const workrequestDateTimeFromDatabaseAsString = result["data"]["createdDateTime"]
-                const workrequestDateTimeFromDatabaseAsDate = Date.parse(workrequestDateTimeFromDatabaseAsString)
-                const workrequestDateTimeLocal = new Date(workrequestDateTimeFromDatabaseAsDate - timeZoneOffset * 60 * 1000)
-                const workrequestDateTimeToSetToDateTimePicker = workrequestDateTimeLocal.toISOString().split(".")[0]
+        client.models.WorkRequest
+            .get({ id: workRequestIdParam })
+            .then((result) => {
+                if (result["data"] != undefined) {
+                    const workrequestDateTimeFromDatabaseAsString = result["data"]["createdDateTime"]
+                    const workrequestDateTimeFromDatabaseAsDate = Date.parse(workrequestDateTimeFromDatabaseAsString)
+                    const workrequestDateTimeLocal = new Date(workrequestDateTimeFromDatabaseAsDate - timeZoneOffset * 60 * 1000)
+                    const workrequestDateTimeToSetToDateTimePicker = workrequestDateTimeLocal.toISOString().split(".")[0]
 
-                setWorkRequestId(result["data"]["id"]);
-                setWorkRequestCreatedBy(result["data"]["createdBy"]);
-                setWorkRequestCreatedDateTime(workrequestDateTimeToSetToDateTimePicker);
-                setWorkRequestType(result["data"]["type"]);
-                setWorkRequestExp(result["data"]["exp"].toString());
-                setWorkRequestUrgency(result["data"]["urgency"].toString());
-                setWorkRequestInstructions(result["data"]["instructions"]);
+                    setWorkRequestId(result["data"]["id"]);
+                    setWorkRequestCreatedBy(result["data"]["createdBy"]);
+                    setWorkRequestCreatedDateTime(workrequestDateTimeToSetToDateTimePicker);
+                    setWorkRequestType(result["data"]["type"]);
+                    setWorkRequestExp(result["data"]["exp"].toString());
+                    setWorkRequestUrgency(result["data"]["urgency"].toString());
+                    setWorkRequestInstructions(result["data"]["instructions"]);
 
-                setActivityDateTime(currentDateTime);
-                setActivityType(result["data"]["type"]);
-                setActivityExp(result["data"]["exp"].toString());
-            }
-        })
-        .catch((error) => {
-            throw new Error(reportError("Error while fetching work request " + objectIdParam + " to be promoted: " + error));
-        })
+                    setActivityDateTime(currentDateTime);
+                    setActivityType(result["data"]["type"]);
+                    setActivityExp(result["data"]["exp"].toString());
+                }
+            })
+            .catch((error) => {
+                throw new Error(reportError("Error while fetching work request " + objectIdParam + " to be promoted: " + error));
+            })
     }
   
     function handleActivityDateTimeChange(e: any) {
@@ -307,36 +298,38 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
         if (operationParam === "promoteWorkRequest") {
             const newActivity = createActivityObjectFromState();
 
-            const createActivityResult = client.models.Activity.create(newActivity);
-            createActivityResult.then((createActivityResponse) => {
-
-                if (createActivityResponse?.errors?.length) {
-                    reportError("Failed to create new activity in the database when promoting a work request", createActivityResponse.errors);
-                    return;
-                }
-
-                if (createActivityResponse["data"] === null || createActivityResponse["data"]["id"] === null) {
-                    reportError("Failed to fetch created activity id from the database")
-                    return;
-                }
-
-                const newActivityId = createActivityResponse["data"]["id"]
-
-                const updatedWorkRequest = createWorkRequestObjectFromState(newActivityId);
-
-                client.models.WorkRequest
-                .update(updatedWorkRequest)
-                .then((updateWorkRequestResponse) => {
-                    if (updateWorkRequestResponse?.errors?.length) {
-                        reportError("Failed to update a work request in the database", updateWorkRequestResponse.errors);
+            client.models.Activity
+                .create(newActivity)
+                .then((createActivityResponse) => {
+                    if (createActivityResponse?.errors?.length) {
+                        reportError("Failed to create new activity in the database when promoting a work request", createActivityResponse.errors);
+                        return;
                     }
-                    navigate("/ActivityList")
-                }).catch((error) => {
-                    reportError("Failed to update a work request in the database", error);
+
+                    if (createActivityResponse["data"] === null || createActivityResponse["data"]["id"] === null) {
+                        reportError("Failed to fetch created activity id from the database")
+                        return;
+                    }
+
+                    const newActivityId = createActivityResponse["data"]["id"]
+
+                    const updatedWorkRequest = createWorkRequestObjectFromState(newActivityId);
+
+                    client.models.WorkRequest
+                    .update(updatedWorkRequest)
+                    .then((updateWorkRequestResponse) => {
+                        if (updateWorkRequestResponse?.errors?.length) {
+                            reportError("Failed to update a work request in the database", updateWorkRequestResponse.errors);
+                        }
+                        navigate("/ActivityList")
+                    })
+                    .catch((error) => {
+                        reportError("Failed to update a work request in the database", error);
+                    })
                 })
-            }).catch((error) => {
-                reportError("Failed to create new activity in the database when promoting a work request", error);
-            })
+                .catch((error) => {
+                    reportError("Failed to create new activity in the database when promoting a work request", error);
+                })
         }
 
         if (operationParam === "update") {
@@ -345,19 +338,17 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
                 throw new Error(reportError("State activityId is undefined during creation of a new activity object"))
             }
 
-            const result = client.models.Activity.update({
-                ...updatedActivity,
-                id: updatedActivity.id
-            });
-
-            result.then((updateActivityResponse) => {
-                 if (updateActivityResponse?.errors?.length) {
-                    reportError("Failed to update an activity in the database", updateActivityResponse.errors);
-                }
-                navigate("/ActivityDetails/" + activityId)
-            }).catch((error) => {
-                reportError("Failed to update an activity in the database", error);
-            })
+            client.models.Activity
+                .update({...updatedActivity, id: updatedActivity.id})
+                .then((updateActivityResponse) => {
+                    if (updateActivityResponse?.errors?.length) {
+                        reportError("Failed to update an activity in the database", updateActivityResponse.errors);
+                    }
+                    navigate("/ActivityDetails/" + activityId)
+                })
+                .catch((error) => {
+                    reportError("Failed to update an activity in the database", error);
+                })
         }
     }
 
