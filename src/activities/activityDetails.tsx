@@ -6,30 +6,13 @@ import { generateClient } from "aws-amplify/data";
 import { dateToString } from "../utils/dateUtils";
 import { getCurrentUser, type AuthUser } from 'aws-amplify/auth';
 
+import reportError from "../utils/reportError"
 import User from "../model/User";
+import Reactions from "../components/reactions"
 
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 
 const client = generateClient<Schema>();
-
-function Reactions({
-    activity,
-    reactions,
-    users
-}: {
-    activity: Schema["Activity"]["type"],
-    reactions: Array<Schema["Reaction"]["type"]>,
-    users: Map<string, User>
-}) {
-    return <div id="reactionsContainer"> {
-        reactions
-            .filter(reaction => reaction.activityId === activity.id)
-            .map(reaction => {
-                return <p key={reaction.id}>{users.get(reaction.user)?.nickname}: {reaction.reaction}</p>
-            })
-        }
-    </div>
-}
 
 function ActivityDetails({users}: {users: Map<string, User>}) {
     const navigate = useNavigate();
@@ -43,10 +26,29 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
     const [currentUser, setCurrentUser] = useState("");
 
     useEffect(() => {
-        getCurrentUser().then((user : AuthUser) => {
+        if (activityIdParam === undefined) {    
+            throw new Error(reportError("Error while fetching activity to be displayed: id is undefined"));
+        }
+
+        getCurrentUser()
+            .then((user : AuthUser) => {
+                console.log("Setting current user to " + user.username);
                 setCurrentUser(user.username);
             })
-        client.models.Reaction.observeQuery({
+
+        client.models.Activity
+            .get({ id: activityIdParam })
+            .then((result) => {
+                console.log("Loading activity data from the database")
+                if (result["data"] !== undefined && result["data"] !== null) {
+                    setActivity(result["data"])
+                }
+            })
+            .catch((error) => {
+                throw new Error(reportError("Error while fetching activity to be displayed: " + error));
+            })
+    
+        var reactionsQuery = client.models.Reaction.observeQuery({
             filter: {
                 activityId: {
                     eq: activityIdParam
@@ -54,10 +56,15 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
             }
         }).subscribe({
             next: (data: { items: Array<Schema["Reaction"]["type"]> }) => {
+                console.log("Loading reactions data from the database")
                 setReactions(data.items)
             }
         });
-    }, []);
+
+        return (() => {
+            reactionsQuery.unsubscribe()
+        })
+    }, [activityIdParam]);
 
     function handleBack() {
         navigate("/ActivityList/")
@@ -98,17 +105,16 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
             activityId: activity.id
         }
 
-        client.models.Reaction.create(newReaction).then((result) => {
-            if (result["data"] === undefined) {
-                console.log("Failed to create reaction: " + JSON.stringify(result));
-            }
-
-            setActivity(activity);
-        })
-    }
-
-    async function getActivity(activityId: string) {
-        return await client.models.Activity.get({ id: activityId });
+        client.models.Reaction
+            .create(newReaction)
+            .then((result) => {
+                if (result["data"] === undefined) {
+                    reportError("Failed to create reaction: " + JSON.stringify(result));
+                }
+            })
+            .catch((error) => {
+                throw new Error(reportError("Error while creating reaction: " + error));
+            })
     }
 
     function ReactionsPopup() {
@@ -136,15 +142,7 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
       }
     }
 
-    if (activity == undefined && activityIdParam != undefined) {
-        getActivity(activityIdParam).then((result) => {
-            if (result["data"] != undefined) {
-                setActivity(result["data"])
-            }
-        })
-    }
-
-    if (activity == undefined) {
+    if (activity === undefined) {
         return <>
             <nav>
                   <NavLink to="/ActivityList" end>Powrót na listę czynności</NavLink>
