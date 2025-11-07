@@ -2,11 +2,11 @@ import type { Schema } from "../../../amplify/data/resource";
 import User from "../../model/User";
 
 function DaySummary({users, expStats, selectedDay}: {users: Map<string, User>, expStats: Array<Schema["ExperienceStatistics"]["type"]>, selectedDay: string}) {
-    var totalExpThisMonth = expStats
+    const totalExpThisMonth = expStats
             .filter((record) => record.period == selectedDay && record.periodType == "DAY")
             .reduce((sum, record) => sum + record.exp, 0)
 
-    var monthlyGridData = new Array();
+    const monthlyGridData = new Array();
     users.forEach((user) => {
         const exp = expStats
             .filter((record) => record.user == user.id && record.period == selectedDay && record.periodType == "DAY")
@@ -27,7 +27,7 @@ function DaySummary({users, expStats, selectedDay}: {users: Map<string, User>, e
             </thead>
             <tbody>
                 {monthlyGridData.map((record) => (
-                    <tr key={users.get(record.user)?.nickname}>
+                    <tr key={record.user}>
                         <td>{users.get(record.user)?.nickname}</td>
                         <td>{record.exp}</td>
                         <td>{record.expPerCent}</td>

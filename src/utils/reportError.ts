@@ -4,7 +4,7 @@ function reportError(message: string, cause?: any) {
     console.log(errorGuid + ": " + message)
     
     if (cause !== undefined) {
-        console.log(errorGuid + ": " + cause)
+        console.log(errorGuid + ": " + JSON.stringify(cause))
     }
     
     alert("Wystąpił błąd. Powiadom twórcę aplikacji wysyłając mu ten identyfikator błędu: " + errorGuid)

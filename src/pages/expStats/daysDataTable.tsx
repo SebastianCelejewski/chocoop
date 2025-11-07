@@ -2,18 +2,19 @@ import type { Schema } from "../../../amplify/data/resource";
 import User from "../../model/User";
 
 function DaysDataTable({users, expStats, selectedMonth, onDaySelected }: {users: Map<string, User>, expStats: Array<Schema["ExperienceStatistics"]["type"]>, selectedMonth: string, onDaySelected: (day: string) => void}) {
-    var gridData = new Map<string, Map<string, number>>();
+    const gridData = new Map<string, Map<string, number>>();
+    const startDate = new Date(selectedMonth);
+    const endDate = new Date(selectedMonth);
 
-    var startDate = new Date(selectedMonth);
-    var endDate = new Date(selectedMonth);
     startDate.setDate(1);
     endDate.setDate(31);
-    var date = startDate;
+    
+    let date = startDate;
 
     while (date <= endDate) {
-        var dateStr = date.toISOString().slice(0, 10);
+        const dateStr = date.toISOString().slice(0, 10);
 
-        var userDataForThisDate = new Map<string, number>();
+        const userDataForThisDate = new Map<string, number>();
 
         users.forEach((user) => {
             const exp = expStats

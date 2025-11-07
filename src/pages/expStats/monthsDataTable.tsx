@@ -2,26 +2,26 @@ import type { Schema } from "../../../amplify/data/resource";
 import User from "../../model/User";
 
 function MonthsDataTable({users, expStats, onMonthSelected}: {users: Map<string, User>, expStats: Array<Schema["ExperienceStatistics"]["type"]>, onMonthSelected: (month: string) => void} ) {
-    var gridData = new Map<string, Map<string, number>>();
-    var earliestMonth : string = expStats
+    const gridData = new Map<string, Map<string, number>>();
+    const earliestMonth : string = expStats
         .filter((record) => record.periodType == "MONTH")
         .reduce((earliest, record) => earliest < record.period ? earliest : record.period, expStats[0].period)
-    var latestMonth : string = expStats
+    const latestMonth : string = expStats
         .filter((record) => record.periodType == "MONTH")
         .reduce((latest, record) => latest > record.period ? latest : record.period, expStats[0].period)
 
-    var startDate = new Date(earliestMonth);
-    var endDate = new Date(latestMonth);
+    const startDate = new Date(earliestMonth);
+    const endDate = new Date(latestMonth);
     
     startDate.setDate(1)
     endDate.setDate(28)
 
-    var date = startDate;
+    let date = startDate;
 
     while (date <= endDate) {
-        var dateStr = date.toISOString().slice(0, 7);
+        const dateStr = date.toISOString().slice(0, 7);
 
-        var userDataForThisMonth = new Map<string, number>();
+        const userDataForThisMonth = new Map<string, number>();
 
         users.forEach((user) => {
             const exp = expStats
