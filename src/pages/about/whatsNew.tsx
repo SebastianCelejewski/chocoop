@@ -3,6 +3,11 @@ function WhatsNew() {
         <p className="pageTitle">O aplikacji</p>
         <ul className="richText">
             <h1>Co nowego w aplikacji</h1>
+            <p className="label"><b>Wersja 0.4.8</b></p>
+            <ul>
+                <li>Reakcje są widoczne na stronie aktywności natychmiast po ich dodaniu</li>
+            </ul>
+
             <p className="label"><b>Wersja 0.4.7</b></p>
             <ul>
                 <li>Usunięty błąd polegający na tworzeniu duplikatu wykonanej czynności ze zlecenia</li>
