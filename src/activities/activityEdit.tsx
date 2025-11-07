@@ -103,7 +103,7 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
             setActivityDateTimeToCurrentDateTime();
             loadWorkRequestToPromote(objectIdParam);
         }
-    })
+    }, [operationParam, objectIdParam])
 
     function setActivityUser() {
         getCurrentUser().then((user : AuthUser) => {
@@ -229,9 +229,6 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
         }
         if (activityExp === undefined || isNaN(Number(activityExp))) {
             throw new Error(reportError("State activityExp is undefined during creation of a new activity object"))
-        }
-        if (activityComment === undefined) {
-            throw new Error(reportError("State activityComment is undefined during creation of a new activity object"))
         }
         return {
             id: activityId,
