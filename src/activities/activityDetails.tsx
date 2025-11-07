@@ -24,6 +24,7 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
     const [reactions, setReactions] = useState<Array<Schema["Reaction"]["type"]>>([]);
     const [reactionsPopupVisible, setReactionsPopupVisible] = useState<boolean>(false);
     const [currentUser, setCurrentUser] = useState("");
+    const [dummyState, setDummyState] = useState(0);
 
     useEffect(() => {
         if (activityIdParam === undefined) {    
@@ -58,6 +59,7 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
             next: (data: { items: Array<Schema["Reaction"]["type"]> }) => {
                 console.log("Loading reactions data from the database")
                 setReactions(data.items)
+                refreshPage()
             }
         });
 
@@ -65,6 +67,10 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
             reactionsQuery.unsubscribe()
         })
     }, [activityIdParam]);
+
+    function refreshPage() {
+        setDummyState(dummyState + 1)
+    }
 
     function handleBack() {
         navigate("/ActivityList/")
@@ -111,6 +117,7 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
                 if (result["data"] === undefined) {
                     reportError("Failed to create reaction: " + JSON.stringify(result));
                 }
+                refreshPage();
             })
             .catch((error) => {
                 throw new Error(reportError("Error while creating reaction: " + error));
@@ -172,7 +179,7 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
                 <p className="commentTextArea">{activity.comment}</p>
 
                 <p className="label">Reakcje</p>
-                <Reactions activity={activity} reactions={reactions} users={users}/>
+                <Reactions reactions={reactions} users={users}/>
             </div>
             <div>
                 <button type="button" onClick={handleBack}>Wróć</button>

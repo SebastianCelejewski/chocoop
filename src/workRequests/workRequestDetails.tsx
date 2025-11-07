@@ -1,10 +1,11 @@
 import type { Schema } from "../../amplify/data/resource";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useParams, useNavigate } from "react-router";
 import { generateClient } from "aws-amplify/data";
 import { dateToString } from "../utils/dateUtils";
 
+import reportError from "../utils/reportError"
 import User from "../model/User";
 import { urgencyList } from "../model/Urgency"
 
@@ -17,6 +18,23 @@ function WorkRequestDetails({users}: {users: Map<string, User>}) {
     const workRequestIdParam = params["id"]
 
     const [workRequest, setWorkRequest] = useState<Schema["WorkRequest"]["type"]>();
+
+    useEffect(() => {
+        if (workRequestIdParam === undefined) {    
+            throw new Error(reportError("Error while fetching work request to be displayed: id is undefined"));
+        }
+     
+        client.models.WorkRequest
+        .get({ id: workRequestIdParam })
+        .then((result) => {
+            if (result["data"] != undefined) {
+                setWorkRequest(result["data"])
+            }
+        })
+        .catch((error) => {
+            throw new Error(reportError("Error while fetching work request to be displayed: " + error));
+        })
+    },[workRequestIdParam])
 
     function handleBack() {
         navigate("/WorkRequestList")
@@ -31,10 +49,17 @@ function WorkRequestDetails({users}: {users: Map<string, User>}) {
         if (workRequestIdParam != undefined && workRequest !== undefined) {
             if (confirm("Usuwanie aktywności\n\n"
                 + workRequest.createdDateTime + "\n"
-                + workRequest.createdBy + " " + workRequest.type + "\n\nCzy na pewno chcesz usunąć to zlecenie?") == true) {
-                client.models.WorkRequest.delete({ id: workRequestIdParam }).then(() => {
-                    navigate("/WorkRequestList")
-                })
+                + workRequest.createdBy + " "
+                + workRequest.type + "\n\n"
+                + "Czy na pewno chcesz usunąć to zlecenie?") == true) {
+                    client.models.WorkRequest
+                    .delete({ id: workRequestIdParam })
+                    .then(() => {
+                        navigate("/WorkRequestList")
+                    })
+                    .catch((error) => {
+                        throw new Error(reportError("Error while deleting work request: " + error));
+                    })
             } 
         }
     }
@@ -56,19 +81,7 @@ function WorkRequestDetails({users}: {users: Map<string, User>}) {
       }
     }
 
-    async function getWorkRequest(workRequestId: string) {
-        return await client.models.WorkRequest.get({ id: workRequestId });
-    }
-
-    if (workRequest == undefined && workRequestIdParam != undefined) {
-        getWorkRequest(workRequestIdParam).then((result) => {
-            if (result["data"] != undefined) {
-                setWorkRequest(result["data"])
-            }
-        })
-    }
-
-    if (workRequest == undefined) {
+    if (workRequest === undefined) {
         return <>
             <nav>
                 <NavLink to="/WorkRequestList" end>Powrót na listę zleceń</NavLink>
