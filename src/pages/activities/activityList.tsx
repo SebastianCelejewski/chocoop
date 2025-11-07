@@ -27,15 +27,15 @@ function ActivityList({users}: {users: Map<string, User>}) {
     useEffect(() => {
         const activitiesQuery = client.models.Activity.observeQuery().subscribe({
             next: (data: ActivityQueryResult) => { 
-              setActivities(sortByDateTime([...data.items]))
+                setActivities(sortByDateTime([...data.items]))
             }
         });
 
         const reactionsQuery = client.models.Reaction.observeQuery().subscribe({
-              next: (data: { items: Array<Schema["Reaction"]["type"]> }) => {
+            next: (data: { items: Array<Schema["Reaction"]["type"]> }) => {
                 setReactions(data.items)
-              }
-          });
+            }
+        });
 
         return (() => {
             activitiesQuery.unsubscribe();
