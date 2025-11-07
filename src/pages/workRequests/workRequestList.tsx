@@ -10,7 +10,7 @@ import { urgencyList } from "../../model/Urgency"
 const client = generateClient<Schema>();
 
 class WorkRequestQueryResult {
-  items: Array<Schema["WorkRequest"]["type"]> = []
+    items: Array<Schema["WorkRequest"]["type"]> = []
 }
 
 function sortByUrgency(workRequests: Array<Schema["WorkRequest"]["type"]>) {
@@ -23,12 +23,13 @@ function WorkRequestList({users}: {users: Map<string, User>}) {
     const navigate = useNavigate();
     
     useEffect(() => {
-        if (client.models.WorkRequest !== undefined) {
-          client.models.WorkRequest.observeQuery().subscribe({
-              next: (data: WorkRequestQueryResult) => { 
+        const workRequestsQuery = client.models.WorkRequest.observeQuery().subscribe({
+            next: (data: WorkRequestQueryResult) => { 
                 setWorkRequests(sortByUrgency([...data.items]))
-              }
-          });
+            }
+        });
+        return () => {
+            workRequestsQuery.unsubscribe();
         }
     }, []);
 
@@ -66,25 +67,25 @@ function WorkRequestList({users}: {users: Map<string, User>}) {
             {workRequests.map(workRequest => {
                 if (showCompletedWorkRequests || !workRequest.completed) {
                     return <li
-                            className="entityListElement"
-                            onClick={() => showWorkRequest(workRequest.id)}
-                            key={workRequest.id}>
-                            <div>
-                                <p className="entityDateTime">{dateToString(workRequest.createdDateTime)}</p>
-                                <p className="entityPerson">{users.get(workRequest.createdBy)?.nickname}</p>
-                                <p className="entityType">{workRequest.type}</p>
-                                <p className="entityExp">{workRequest.exp} xp</p>
-                                <div style={{clear: 'both'}}/>
-                                <p className="workRequestUrgency">Pilność: {urgencyList[workRequest.urgency]?.label}</p>
-                                <CompletnessStatus workRequest={workRequest}/>
-                            </div>
-                          </li>
+                        className="entityListElement"
+                        onClick={() => showWorkRequest(workRequest.id)}
+                        key={workRequest.id}>
+                        <div>
+                            <p className="entityDateTime">{dateToString(workRequest.createdDateTime)}</p>
+                            <p className="entityPerson">{users.get(workRequest.createdBy)?.nickname}</p>
+                            <p className="entityType">{workRequest.type}</p>
+                            <p className="entityExp">{workRequest.exp} xp</p>
+                            <div style={{clear: 'both'}}/>
+                            <p className="workRequestUrgency">Pilność: {urgencyList[workRequest.urgency]?.label}</p>
+                            <CompletnessStatus workRequest={workRequest}/>
+                        </div>
+                        </li>
                     }
                 }
             )}
           </ul>
           <div className="buttonPanel">
-            <button onClick={createWorkRequest}>Dodaj zlecenie</button>
+              <button onClick={createWorkRequest}>Dodaj zlecenie</button>
           </div>
     </>
 }
