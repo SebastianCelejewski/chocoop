@@ -6,6 +6,10 @@ import { Stack } from "aws-cdk-lib";
 import * as cdk from "aws-cdk-lib";
 import { Policy, PolicyStatement, Effect } from "aws-cdk-lib/aws-iam";
 import { StartingPosition, EventSourceMapping } from "aws-cdk-lib/aws-lambda";
+import { BackupPlan, BackupPlanRule, BackupResource, BackupVault } from "aws-cdk-lib/aws-backup";
+import { Schedule } from "aws-cdk-lib/aws-events";
+import { Duration } from "aws-cdk-lib/core";
+
 import { expStatsUpdateFunction } from "./functions/exp-stats-update-function/resource";
 
 console.log("AWS_BRANCH: " + process.env.AWS_BRANCH);
@@ -161,3 +165,40 @@ const cognitoListUsersPolicy = new Policy(
 );
 
 backend.auth.resources.authenticatedUserIamRole.attachInlinePolicy(cognitoListUsersPolicy);
+
+const { amplifyDynamoDbTables } = backend.data.resources.cfnResources;
+
+for (const table of Object.values(amplifyDynamoDbTables)) {
+    table.pointInTimeRecoveryEnabled = true;
+}
+
+const backupStack = backend.createStack("chocoop-backup-stack-" + envName);
+const myTables = Object.values(backend.data.resources.tables);
+
+const vault = new BackupVault(backupStack, "chocoop-backup-vault-" + envName, {
+    backupVaultName: "chocoop-backup-vault-" + envName,
+});
+
+const plan = new BackupPlan(backupStack, "chocoop-backup-plan-" + envName, {
+    backupPlanName: "chocoop-backup-plan-" + envName,
+    backupVault: vault,
+});
+
+plan.addRule(
+    new BackupPlanRule({
+        deleteAfter: Duration.days(60),
+        ruleName: "chocoop-backup-plan-rule-" + envName,
+        scheduleExpression: Schedule.cron({
+            minute: "0",
+            hour: "0",
+            day: "*",
+            month: "*",
+            year: "*",
+        }),
+    })
+);
+
+plan.addSelection("chocoop-backup-plan-selection-" + envName, {
+    resources: myTables.map((table) => BackupResource.fromDynamoDbTable(table)),
+    allowRestores: true,
+});
