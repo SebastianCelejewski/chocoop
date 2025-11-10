@@ -143,8 +143,10 @@ ul {
 
 .entityListElement {
   border-radius: 8px;
-  margin: 5px;
-  padding: 2px;
+  margin-top: 2px;
+  margin-left: 2px;
+  margin-right: 2px;
+  padding: 1px;
   color: black;
   border: none;
   background-color: #e0e0e0;
