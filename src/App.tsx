@@ -36,7 +36,7 @@ function App() {
                         <AppMenu/>
                         <UserMenu signoutFunction={signOut}/>
                         <h1>Chores Cooperative</h1>
-                        <p className="versionInfo">Wersja 0.4.8</p>
+                        <p className="versionInfo">Wersja 0.4.9</p>
 
                         <div className="subheader">
                             <p className="userInfo">Witaj, {userNickname}</p>

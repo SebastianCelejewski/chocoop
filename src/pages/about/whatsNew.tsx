@@ -3,6 +3,12 @@ function WhatsNew() {
         <p className="pageTitle">O aplikacji</p>
         <ul className="richText">
             <h1>Co nowego w aplikacji</h1>
+            <p className="label"><b>Wersja 0.4.9</b></p>
+            <ul>
+                <li>Zwiększenie bezpieczeństwa danych poprzez wprowadzenie automatycznego tworzenia kopii zapasowych</li>
+                <li>Zwiększenie szybkości działania aplikacji na liście czynności i liście zleceń</li>
+            </ul>
+
             <p className="label"><b>Wersja 0.4.8</b></p>
             <ul>
                 <li>Reakcje są widoczne na stronie aktywności natychmiast po ich dodaniu</li>

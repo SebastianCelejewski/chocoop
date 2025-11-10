@@ -53,3 +53,7 @@
 ## Version v0.4.8
 - Heavy refactoring
 - Reactions are visible on activity details right after they were added
+
+## Version v0.4.9
+- Added point-in-time recovery for data stored in DynamoDB to improve the data security
+- Activity list and work request list are now rendered using virtualized lists to improve the performance
