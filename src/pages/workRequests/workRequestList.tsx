@@ -3,11 +3,17 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { generateClient } from "aws-amplify/data";
 import { dateToString } from "../../utils/dateUtils";
+import { List, AutoSizer, CellMeasurer, CellMeasurerCache } from 'react-virtualized';
 
 import User from "../../model/User";
 import { urgencyList } from "../../model/Urgency"
 
 const client = generateClient<Schema>();
+
+const cache = new CellMeasurerCache({
+    fixedWidth: true,
+    defaultHeight: 100
+});
 
 class WorkRequestQueryResult {
     items: Array<Schema["WorkRequest"]["type"]> = []
@@ -21,7 +27,9 @@ function WorkRequestList({users}: {users: Map<string, User>}) {
     const [workRequests, setWorkRequests] = useState<Array<Schema["WorkRequest"]["type"]>>([]);
     const [showCompletedWorkRequests, setShowCompletedWorkRequests] = useState(false);
     const navigate = useNavigate();
-    
+
+    let visibleWorkRequests = workRequests.filter((workRequest) => !workRequest.completed || showCompletedWorkRequests)
+
     useEffect(() => {
         const workRequestsQuery = client.models.WorkRequest.observeQuery().subscribe({
             next: (data: WorkRequestQueryResult) => { 
@@ -60,13 +68,18 @@ function WorkRequestList({users}: {users: Map<string, User>}) {
         setShowCompletedWorkRequests(!showCompletedWorkRequests);
     }
 
-    return <>
-        <p className="pageTitle" onClick={navigateToActivities}>Lista zleceń do wykonania</p>
-        <p><input type="checkbox" name="showCompleted" id="showCompleted" checked={showCompletedWorkRequests} onChange={handleShowCompletedToggled}/>Pokaż ukończone</p>
-            <ul className="entityList">
-            {workRequests.map(workRequest => {
-                if (showCompletedWorkRequests || !workRequest.completed) {
-                    return <li
+    function renderRow({ index, key, style, parent }: { index: number, key: string, style: React.CSSProperties, parent: any}) {
+        const workRequest = visibleWorkRequests[index];
+        return (
+            <CellMeasurer
+                key={key}
+                cache={cache}
+                parent={parent}
+                columnIndex={0}
+                rowIndex={index}>
+                {({registerChild}) => (
+                    <div style={style} className="row" ref={registerChild}>
+                        <li
                         className="entityListElement"
                         onClick={() => showWorkRequest(workRequest.id)}
                         key={workRequest.id}>
@@ -80,9 +93,31 @@ function WorkRequestList({users}: {users: Map<string, User>}) {
                             <CompletnessStatus workRequest={workRequest}/>
                         </div>
                         </li>
-                    }
+                    </div>
+                )}
+            </CellMeasurer>
+        );
+    }
+
+    cache.clearAll()
+
+    return <>
+        <p className="pageTitle" onClick={navigateToActivities}>Lista zleceń do wykonania</p>
+        <p><input type="checkbox" name="showCompleted" id="showCompleted" checked={showCompletedWorkRequests} onChange={handleShowCompletedToggled}/>Pokaż ukończone</p>
+            <ul className="entityList">
+                <AutoSizer>
+                {
+                    ({ width, height }) => (<List
+                        width={width}
+                        height={height}
+                        deferredMeasurementCache={cache}
+                        rowHeight={cache.rowHeight}
+                        rowRenderer={renderRow}
+                        rowCount={visibleWorkRequests.length}
+                        overscanRowCount={3} />
+                    )
                 }
-            )}
+                </AutoSizer>
           </ul>
           <div className="buttonPanel">
               <button onClick={createWorkRequest}>Dodaj zlecenie</button>
