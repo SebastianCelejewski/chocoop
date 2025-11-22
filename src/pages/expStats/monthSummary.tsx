@@ -16,7 +16,6 @@ function MonthSummary({users, expStats, selectedMonth}: {users: Map<string, User
     })
 
     return <>
-        <p className="statsHeader">Podsumowanie: {selectedMonth}</p>
         <table className="entityTable">
             <thead>
                 <tr>

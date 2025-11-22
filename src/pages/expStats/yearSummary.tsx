@@ -1,18 +1,18 @@
 import type { Schema } from "../../../amplify/data/resource";
 import User from "../../model/User";
 
-function DaySummary({users, expStats, selectedDay}: {users: Map<string, User>, expStats: Array<Schema["ExperienceStatistics"]["type"]>, selectedDay: string}) {
-    const totalExpThisMonth = expStats
-            .filter((record) => record.period == selectedDay && record.periodType == "DAY")
+function YearSummary({users, expStats, selectedYear}: {users: Map<string, User>, expStats: Array<Schema["ExperienceStatistics"]["type"]>, selectedYear: string}) {
+    const totalExpThisYear = expStats
+            .filter((record) => record.period == selectedYear && record.periodType == "YEAR")
             .reduce((sum, record) => sum + record.exp, 0)
 
-    const monthlyGridData = new Array();
+    const annualGridData = new Array();
     users.forEach((user) => {
         const exp = expStats
-            .filter((record) => record.user == user.id && record.period == selectedDay && record.periodType == "DAY")
+            .filter((record) => record.user == user.id && record.period == selectedYear && record.periodType == "YEAR")
             .reduce((sum, record) => sum + record.exp, 0)
-        const expPerCent = totalExpThisMonth > 0 ? (100 * exp / totalExpThisMonth).toFixed(0) + "%" : "-";
-        monthlyGridData.push({user: user.id, exp: exp, expPerCent: expPerCent});
+        const expPerCent = totalExpThisYear > 0 ? (100 * exp / totalExpThisYear).toFixed(0) + "%" : "-";
+        annualGridData.push({user: user.id, exp: exp, expPerCent: expPerCent});
     })
 
     return <>
@@ -25,7 +25,7 @@ function DaySummary({users, expStats, selectedDay}: {users: Map<string, User>, e
                 </tr>
             </thead>
             <tbody>
-                {monthlyGridData.map((record) => (
+                {annualGridData.map((record) => (
                     <tr key={record.user}>
                         <td>{users.get(record.user)?.nickname}</td>
                         <td>{record.exp}</td>
@@ -37,4 +37,4 @@ function DaySummary({users, expStats, selectedDay}: {users: Map<string, User>, e
     </>
 }
 
-export default DaySummary;
+export default YearSummary;

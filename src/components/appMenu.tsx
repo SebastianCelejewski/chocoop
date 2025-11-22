@@ -12,7 +12,7 @@ function AppMenu() {
                 <li><a href="/About/WhatsNew">O aplikacji</a></li>
                 <li><a href="/ActivityList">Wykonane czynności</a></li>
                 <li><a href="/WorkRequestList">Zlecenia do wykonania</a></li>
-                <li><a href="/ExpStatsSummary">Statystyki</a></li>
+                <li><a href="/ExpStats">Statystyki</a></li>
             </ul>
         </div>
     } else {

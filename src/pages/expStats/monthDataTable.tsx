@@ -28,8 +28,7 @@ function DaysDataTable({users, expStats, selectedMonth, onDaySelected }: {users:
     }
 
     return <>
-        <p className="statsHeader">Szczegóły dla kolejnych dni</p>
-        <p className="statsHint">Kliknij wiersz tabeli by przejść do szczegółów dnia</p>
+        <p className="statsHint">Kliknij w wiersz tabeli, aby zobaczyć szczegóły</p>
         <table className="entityTable">
             <thead>
                 <tr>

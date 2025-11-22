@@ -1,7 +1,7 @@
 import type { DynamoDBStreamHandler } from "aws-lambda";
 import { Logger } from "@aws-lambda-powertools/logger";
 import { SSMClient, GetParameterCommand } from "@aws-sdk/client-ssm";
-import { DynamoDBClient, ScanCommand, PutItemCommand, PutItemCommandInput, PutItemCommandOutput, AttributeValue } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, ScanCommand, DeleteItemCommand, PutItemCommand, PutItemCommandInput, PutItemCommandOutput, AttributeValue } from "@aws-sdk/client-dynamodb";
 
 const ssmClient = new SSMClient();
 const dynamoDbClient = new DynamoDBClient({});
@@ -39,7 +39,35 @@ async function putData(tableName: string, periodType: string, period: string, us
     const putItemResponse: PutItemCommandOutput = await dynamoDbClient.send(putItemRequest);
 }
 
+const clearStatistics = async () => {
+    console.log("Clearing the experience statistics table")
+    const expStatsTableName = await getParameter(`/chocoop/exp-stats-table-name-${envName}`);
+    const params = {
+        TableName: expStatsTableName,
+        ExclusiveStartKey: undefined as any
+    };
+
+    const request = new ScanCommand(params);
+    const response = await dynamoDbClient.send(request);
+    response.Items?.forEach((item: Record<string, AttributeValue>) => {
+        const id = item["id"]["S"];
+        if (id) {
+            const deleteParams = {
+                TableName: expStatsTableName,
+                Key: {
+                    "id": { S: id }
+                }
+            };
+            const deleteRequest = new DeleteItemCommand(deleteParams);
+            dynamoDbClient.send(deleteRequest);
+        }
+    });
+
+    console.log("The experience statistics table is cleared")
+}
+
 const rebuildStatistics = async () => {
+    console.log("Rebuilding the experience statistics table")
     const activityTableName = await getParameter(`/chocoop/activity-table-name-${envName}`,);
     const expStatsTableName = await getParameter(`/chocoop/exp-stats-table-name-${envName}`);
 
@@ -51,6 +79,10 @@ const rebuildStatistics = async () => {
     var userNames = new Set<string>();
     var dailyData = new Map<string, Map<string, number>>();
     var monthlyData = new Map<string, Map<string, number>>();
+    var annualData = new Map<string, Map<string, number>>();
+    var totalData = new Map<string, number>();
+
+    console.log("Starting processing of the activities data")
 
     let response;
     do {
@@ -68,6 +100,7 @@ const rebuildStatistics = async () => {
 
             const day = dateTime.substring(0,10);
             const month = dateTime.substring(0, 7);
+            const year = dateTime.substring(0, 4);
 
             if (!(dailyData.has(day))) {
                 dailyData.set(day, new Map<string, number>());
@@ -84,6 +117,18 @@ const rebuildStatistics = async () => {
             if (!(monthlyMap.has(user))) {
                 monthlyMap.set(user, 0);
             }
+            
+            if (!(annualData.has(year))) {
+                annualData.set(year, new Map());
+            } 
+            const annualMap = annualData.get(year) || new Map<string, number>();
+            if (!(annualMap.has(user))) {
+                annualMap.set(user, 0);
+            }
+
+            if (!(totalData.has(user))) {
+                totalData.set(user, 0);
+            }
 
             dailyMap.set(user, (dailyMap.get(user) || 0) + parseInt(exp || "0"));
             dailyData.set(day, dailyMap);
@@ -91,11 +136,18 @@ const rebuildStatistics = async () => {
             monthlyMap.set(user, (monthlyMap.get(user) || 0) + parseInt(exp || "0"));
             monthlyData.set(month, monthlyMap);
 
+            annualMap.set(user, (annualMap.get(user) || 0) + parseInt(exp || "0"));
+            annualData.set(year, annualMap);
+
+            totalData.set(user, (totalData.get(user) || 0) + parseInt(exp || "0"));
+
             userNames.add(user);
         });
         params.ExclusiveStartKey = response.LastEvaluatedKey;
     } while (typeof response.LastEvaluatedKey !== "undefined");
     
+    console.log("Processing of the activities data completed")
+
     for (const [day, value] of dailyData) {
         for (const user of userNames) {
             if (value.has(user)) {
@@ -104,6 +156,7 @@ const rebuildStatistics = async () => {
             } 
         }
     }
+
     for (const [month, value] of monthlyData) {
         for (const user of userNames) {
             if (value.has(user)) {
@@ -112,9 +165,28 @@ const rebuildStatistics = async () => {
             } 
         }
     }
+
+    for (const [year, value] of annualData) {
+        for (const user of userNames) {
+            if (value.has(user)) {
+                const exp = value.get(user as string) || 0
+                await putData(expStatsTableName, "YEAR", year, user, exp);
+            } 
+        }
+    }    
+
+    for (const user of userNames) {
+        if (totalData.has(user)) {
+            const exp = totalData.get(user as string) || 0
+            await putData(expStatsTableName, "TOTAL", "", user, exp);
+        } 
+    }
+    
+    console.log("The experience statistics table is rebuilt")
 }
 
 export const handler: DynamoDBStreamHandler = async (event) => {
+    await clearStatistics()
     await rebuildStatistics()
 
     return {

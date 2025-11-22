@@ -324,6 +324,7 @@ td, th {
   color: black;
   margin-left: 4px;
   margin-right: 4px;
+  margin-top: 12px;
 }
 
 .rotated90 {
@@ -354,3 +355,4 @@ ul.richText {
     border: none;
     border-radius: 0;
 }
+

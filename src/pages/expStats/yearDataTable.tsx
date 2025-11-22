@@ -1,7 +1,7 @@
 import type { Schema } from "../../../amplify/data/resource";
 import User from "../../model/User";
 
-function MonthsDataTable({users, expStats, onMonthSelected}: {users: Map<string, User>, expStats: Array<Schema["ExperienceStatistics"]["type"]>, onMonthSelected: (month: string) => void} ) {
+function YearDataTable({users, expStats, onMonthSelected}: {users: Map<string, User>, expStats: Array<Schema["ExperienceStatistics"]["type"]>, onMonthSelected: (month: string) => void} ) {
     const gridData = new Map<string, Map<string, number>>();
     const earliestMonth : string = expStats
         .filter((record) => record.periodType == "MONTH")
@@ -35,8 +35,7 @@ function MonthsDataTable({users, expStats, onMonthSelected}: {users: Map<string,
     }
 
     return <>
-        <p className="statsHeader">Szczegóły dla kolejnych miesięcy</p>
-        <p className="statsHint">Kliknij w wiersz tabeli by przejść do szczegółów miesiąca</p>
+        <p className="statsHint">Kliknij w wiersz tabeli, aby zobaczyć szczegóły</p>
         <table className="entityTable">
             <thead>
                 <tr>
@@ -60,4 +59,4 @@ function MonthsDataTable({users, expStats, onMonthSelected}: {users: Map<string,
     </>
 }
 
-export default MonthsDataTable;
+export default YearDataTable;
