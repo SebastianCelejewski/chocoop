@@ -354,6 +354,10 @@ td, th {
   margin-right: auto;
 }
 
+.headingCell {
+  background-color: #e0e0e0
+}
+
 /* About */
 
 .richText {

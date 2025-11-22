@@ -3,11 +3,9 @@ import { useEffect, useState } from "react";
 import { generateClient } from "aws-amplify/data";
 
 import User from "../../model/User";
-import MonthDataTable from "./monthDataTable";
-import YearDataTable from "./yearDataTable";
-import TotalDataTable from "./totalDataTable";
 
 import PeriodSummary from "./periodSummary";
+import PeriodDetails from "./periodDetails";
 
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -92,15 +90,15 @@ function ExpStats({users}: {users: Map<string, User>}) {
             </Box>
             <CustomTabPanel value={value} index={0}>
                 <PeriodSummary users={users} expStats={expStats} periodType="TOTAL" selectedPeriod="TOTAL"/>
-                <TotalDataTable users={users} expStats={expStats} onYearSelected={onYearSelected}/>
+                <PeriodDetails users={users} expStats={expStats} onPeriodSelected={onYearSelected} periodType="TOTAL" subPeriodType="YEAR" selectedPeriod="TOTAL"/>
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
                 <PeriodSummary users={users} expStats={expStats} periodType="YEAR" selectedPeriod={selectedYear}/>
-                <YearDataTable users={users} expStats={expStats} selectedYear={selectedYear} onMonthSelected={onMonthSelected}/>
+                <PeriodDetails users={users} expStats={expStats} onPeriodSelected={onMonthSelected} periodType="YEAR" subPeriodType="MONTH" selectedPeriod={selectedYear}/>
             </CustomTabPanel>
             <CustomTabPanel value={value} index={2}>
                 <PeriodSummary users={users} expStats={expStats} periodType="MONTH" selectedPeriod={selectedMonth}/>
-                <MonthDataTable users={users} expStats={expStats} selectedMonth={selectedMonth} onDaySelected={onDaySelected}/>
+                <PeriodDetails users={users} expStats={expStats} onPeriodSelected={onDaySelected} periodType="MONTH" subPeriodType="DAY" selectedPeriod={selectedMonth}/>
             </CustomTabPanel>
             <CustomTabPanel value={value} index={3}>
                 <PeriodSummary users={users} expStats={expStats} periodType="DAY" selectedPeriod={selectedDay}/>

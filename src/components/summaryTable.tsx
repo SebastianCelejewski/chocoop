@@ -11,7 +11,7 @@ function SummaryTable({users, data}: {users: Map<string, User>, data: SummaryDat
     return (
         <table className="summaryTable">
             <thead>
-                <tr style={{backgroundColor: "#e0e0e0"}}>
+                <tr className="headingCell">
                     <th>Użytkownik</th>
                     <th>Punkty doświadczenia</th>
                     <th>Udział procentowy</th>

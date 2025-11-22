@@ -9,7 +9,7 @@ import {
   Legend,
 } from 'chart.js';
 import { Line } from "react-chartjs-2";
-import backgroundColors from "../utils/userColours";
+import userColors from "../utils/userColours";
 
 ChartJS.register(
   CategoryScale,
@@ -33,7 +33,7 @@ function BasicExpChart({periodType, labels, chartData}: {periodType: string,labe
         return {
             label: labels[index],
             data: data,
-            borderColor: backgroundColors[index],
+            borderColor: userColors[index],
             fill: false,
             stepped: true,
             radius: chartData[0].length > 1 ? 0 : 3
