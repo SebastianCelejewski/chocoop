@@ -19,6 +19,10 @@ function SummaryChart({description, labels, chartData}: {description: string, la
         plugins: {
             legend: {
                 display: false
+            },
+            title: {
+                display: true,
+                text: 'Udział procentowy',
             }
         }
     }

@@ -96,7 +96,7 @@ function ExpStats({users}: {users: Map<string, User>}) {
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
                 <PeriodSummary users={users} expStats={expStats} periodType="YEAR" selectedPeriod={selectedYear}/>
-                <YearDataTable users={users} expStats={expStats} onMonthSelected={onMonthSelected}/>
+                <YearDataTable users={users} expStats={expStats} selectedYear={selectedYear} onMonthSelected={onMonthSelected}/>
             </CustomTabPanel>
             <CustomTabPanel value={value} index={2}>
                 <PeriodSummary users={users} expStats={expStats} periodType="MONTH" selectedPeriod={selectedMonth}/>

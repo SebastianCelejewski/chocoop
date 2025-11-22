@@ -1,43 +1,59 @@
 import type { Schema } from "../../../amplify/data/resource";
 import User from "../../model/User";
+import AccumulatedExpChart from "../../components/accumulatedExpChart"
+import BasicExpChart from "../../components/basicExpChart"
 
 function TotalDataTable({users, expStats, onYearSelected}: {users: Map<string, User>, expStats: Array<Schema["ExperienceStatistics"]["type"]>, onYearSelected: (month: string) => void} ) {
     const gridData = new Map<string, Map<string, number>>();
-    const earliestYear : string = expStats
-        .filter((record) => record.periodType == "YEAR")
-        .reduce((earliest, record) => earliest < record.period ? earliest : record.period, expStats[0].period)
-    const latestYear : string = expStats
-        .filter((record) => record.periodType == "YEAR")
-        .reduce((latest, record) => latest > record.period ? latest : record.period, expStats[0].period)
+    const chartLabels = Array<string>();
+    const chartData: Array<Array<number>> = Array.from({length: users.size}, () => []);
+    const summarizedChartData: Array<Array<number>> = Array.from({length: users.size}, () => []);
 
-    const startDate = new Date(earliestYear);
-    const endDate = new Date(latestYear);
+    const expStatsForPeriodType = expStats
+        .filter((record) => record.periodType == "YEAR")
+
+    const earliestYear : string = expStatsForPeriodType
+        .reduce((earliest, record) => earliest < record.period ? earliest : record.period, expStatsForPeriodType[0].period)
+    const latestYear : string = expStatsForPeriodType
+        .reduce((latest, record) => latest > record.period ? latest : record.period, expStatsForPeriodType[0].period)
+
+    const startYear = Number.parseInt(earliestYear);
+    const endYear = Number.parseInt(latestYear);
     
-    startDate.setMonth(0)
-    startDate.setDate(1)
+    let year = startYear;
+    let dateIdx = 0;
 
-    endDate.setMonth(11)
-    endDate.setDate(31)
-
-    let date = startDate;
-
-    while (date <= endDate) {
-        const dateStr = date.toISOString().slice(0, 4);
+    while (year <= endYear) {
+        const dateStr = year.toString()
 
         const userDataForThisYear = new Map<string, number>();
 
+        let idx = 0;
         users.forEach((user) => {
             const exp = expStats
                 .filter((record) => record.user == user.id && record.period == dateStr && record.periodType == "YEAR")
                 .reduce((sum, record) => sum + record.exp, 0)
             userDataForThisYear.set(user.id, exp);
+            chartData[idx].push(exp);
+            if (dateIdx == 0) {
+                summarizedChartData[idx].push(exp);
+            } else {
+                summarizedChartData[idx].push(summarizedChartData[idx][dateIdx - 1] + exp)
+            }
+            
+            idx++;
         })
+        
         gridData.set(dateStr, userDataForThisYear);
-
-        date.setFullYear(date.getFullYear() + 1)
+        chartLabels.push(dateStr);
+        year++;
+        
+        dateIdx++;
     }
 
     return <>
+        <BasicExpChart periodType="TOTAL" labels={chartLabels} chartData={chartData}/>
+        <AccumulatedExpChart periodType="TOTAL" labels={chartLabels} chartData={summarizedChartData}/>
         <p className="statsHint">Kliknij w wiersz tabeli, aby zobaczyć szczegóły</p>
         <table className="entityTable">
             <thead>
