@@ -178,7 +178,7 @@ const rebuildStatistics = async () => {
     for (const user of userNames) {
         if (totalData.has(user)) {
             const exp = totalData.get(user as string) || 0
-            await putData(expStatsTableName, "TOTAL", "", user, exp);
+            await putData(expStatsTableName, "TOTAL", "TOTAL", user, exp);
         } 
     }
     

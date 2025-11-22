@@ -7,10 +7,7 @@ import MonthDataTable from "./monthDataTable";
 import YearDataTable from "./yearDataTable";
 import TotalDataTable from "./totalDataTable";
 
-import DaySummary from "./daySummary";
-import MonthSummary from "./monthSummary";
-import YearSummary from "./yearSummary";
-import TotalSummary from "./totalSummary";
+import PeriodSummary from "./periodSummary";
 
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -94,19 +91,19 @@ function ExpStats({users}: {users: Map<string, User>}) {
                 </Tabs>
             </Box>
             <CustomTabPanel value={value} index={0}>
-                <TotalSummary users={users} expStats={expStats}/>
+                <PeriodSummary users={users} expStats={expStats} periodType="TOTAL" selectedPeriod="TOTAL"/>
                 <TotalDataTable users={users} expStats={expStats} onYearSelected={onYearSelected}/>
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
-                <YearSummary users={users} expStats={expStats} selectedYear={selectedYear}/>
+                <PeriodSummary users={users} expStats={expStats} periodType="YEAR" selectedPeriod={selectedYear}/>
                 <YearDataTable users={users} expStats={expStats} onMonthSelected={onMonthSelected}/>
             </CustomTabPanel>
             <CustomTabPanel value={value} index={2}>
-                <MonthSummary users={users} expStats={expStats} selectedMonth={selectedMonth}/>
+                <PeriodSummary users={users} expStats={expStats} periodType="MONTH" selectedPeriod={selectedMonth}/>
                 <MonthDataTable users={users} expStats={expStats} selectedMonth={selectedMonth} onDaySelected={onDaySelected}/>
             </CustomTabPanel>
             <CustomTabPanel value={value} index={3}>
-                <DaySummary users={users} expStats={expStats} selectedDay={selectedDay}/>
+                <PeriodSummary users={users} expStats={expStats} periodType="DAY" selectedPeriod={selectedDay}/>
             </CustomTabPanel>
             </Box>
         </ul>
