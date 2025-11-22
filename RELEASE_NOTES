@@ -59,4 +59,5 @@
 - Activity list and work request list are now rendered using virtualized lists to improve the performance
 
 ## Version v0.4.10
+- Added charts for experience statistics
 - GUI improvements for experience statistics

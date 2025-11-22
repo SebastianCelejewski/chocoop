@@ -25,7 +25,7 @@ function PeriodSummary({users, expStats, periodType, selectedPeriod}: {users: Ma
 
     return <>
         <SummaryTable users={users} data={gridData}/>
-        <SummaryChart description="TOTAL" labels={chartLabels} chartData={chartData}/>
+        <SummaryChart description={selectedPeriod} labels={chartLabels} chartData={chartData}/>
     </>
 }
 

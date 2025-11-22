@@ -15,7 +15,8 @@ const headerLabels = new Map<string, string>([
 ])
 
 function ExpDataTable({periodType, users, gridData, onRowSelected}: ExpDataTableProps) {
-    return (
+    return <>
+        <p className="statsHint">Kliknij w wiersz tabeli, aby zobaczyć szczegóły</p>
         <table className="entityTable">
             <thead>
                 <tr>
@@ -36,7 +37,7 @@ function ExpDataTable({periodType, users, gridData, onRowSelected}: ExpDataTable
                 ))}
             </tbody>
         </table>
-    );
+    </>;
 }
 
 export default ExpDataTable;
