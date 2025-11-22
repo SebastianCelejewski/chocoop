@@ -302,6 +302,11 @@ table {
     border-collapse: collapse;
 }
 
+.summaryTable {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
 th, tr, td {
     border: 1px solid black;
 }
@@ -329,6 +334,12 @@ td, th {
 
 .rotated90 {
     writing-mode: vertical-lr;
+}
+
+.expSummaryChart {
+  width: 75%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* About */
