@@ -61,3 +61,6 @@
 ## Version v0.4.10
 - Added charts for experience statistics
 - GUI improvements for experience statistics
+
+## Version v0.4.11
+- Fixed exp stats processing problem by increasing Lambda function timeout from 3 to 10 seconds

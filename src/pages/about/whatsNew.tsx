@@ -3,6 +3,11 @@ function WhatsNew() {
         <p className="pageTitle">O aplikacji</p>
         <ul className="richText">
             <h1>Co nowego w aplikacji</h1>
+            <p className="label"><b>Wersja 0.4.11</b></p>
+            <ul>
+                <li>Naprawienie błędu statystyk, które coraz częściej się nie pokazywały</li>
+            </ul>
+
             <p className="label"><b>Wersja 0.4.10</b></p>
             <ul>
                 <li>Dodanie wykresów na stronie statystyk doświadczenia</li>
