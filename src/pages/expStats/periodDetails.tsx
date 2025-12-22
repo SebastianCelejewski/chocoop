@@ -33,6 +33,12 @@ function PeriodDetails({periodType, subPeriodType, selectedPeriod, users, expSta
     const expStatsForPeriodType = expStats
         .filter((record) => record.periodType == subPeriodType)
 
+    if (expStatsForPeriodType.length == 0) {
+        return <>
+            <p>No data available for period type ${subPeriodType}</p>
+        </>
+    }
+
     const earliestYear : string = expStatsForPeriodType
         .reduce((earliest, record) => earliest < record.period ? earliest : record.period, expStatsForPeriodType[0].period)
     const latestYear : string = expStatsForPeriodType

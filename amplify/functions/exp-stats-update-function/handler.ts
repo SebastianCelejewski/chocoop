@@ -42,6 +42,7 @@ async function putData(tableName: string, periodType: string, period: string, us
 const clearStatistics = async () => {
     console.log("Clearing the experience statistics table")
     const expStatsTableName = await getParameter(`/chocoop/exp-stats-table-name-${envName}`);
+
     const params = {
         TableName: expStatsTableName,
         ExclusiveStartKey: undefined as any
@@ -59,7 +60,7 @@ const clearStatistics = async () => {
                 }
             };
             const deleteRequest = new DeleteItemCommand(deleteParams);
-            dynamoDbClient.send(deleteRequest);
+            dynamoDbClient.send(deleteRequest)
         }
     });
 
@@ -88,6 +89,7 @@ const rebuildStatistics = async () => {
     do {
         const request = new ScanCommand(params);
         response = await dynamoDbClient.send(request);
+        console.log("Received " + response.Items?.length + " items from the database")
         response.Items?.forEach((item: Record<string, AttributeValue>) => {
             const dateTime = item["dateTime"]["S"];
             const user = item["user"]["S"];
@@ -147,6 +149,10 @@ const rebuildStatistics = async () => {
     } while (typeof response.LastEvaluatedKey !== "undefined");
     
     console.log("Processing of the activities data completed")
+    console.log("DailyData contains " + dailyData.size + " entries")
+    console.log("MonthlyData contains " + monthlyData.size + " entries")
+    console.log("AnnualData contains " + annualData.size + " entries")
+    console.log("TotalData contains " + totalData.size + " entries")
 
     for (const [day, value] of dailyData) {
         for (const user of userNames) {
