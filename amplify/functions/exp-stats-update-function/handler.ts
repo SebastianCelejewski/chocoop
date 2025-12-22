@@ -36,7 +36,7 @@ async function putData(tableName: string, periodType: string, period: string, us
     };
 
     const putItemRequest = new PutItemCommand(putItemParams);
-    const putItemResponse: PutItemCommandOutput = await dynamoDbClient.send(putItemRequest);
+    await dynamoDbClient.send(putItemRequest);
 }
 
 const clearStatistics = async () => {
@@ -149,10 +149,6 @@ const rebuildStatistics = async () => {
     } while (typeof response.LastEvaluatedKey !== "undefined");
     
     console.log("Processing of the activities data completed")
-    console.log("DailyData contains " + dailyData.size + " entries")
-    console.log("MonthlyData contains " + monthlyData.size + " entries")
-    console.log("AnnualData contains " + annualData.size + " entries")
-    console.log("TotalData contains " + totalData.size + " entries")
 
     for (const [day, value] of dailyData) {
         for (const user of userNames) {
