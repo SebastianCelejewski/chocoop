@@ -1,15 +1,15 @@
-import type { Schema } from "../../amplify/data/resource";
 import User from "../model/User";
+import { UIReaction } from "../hooks/useActivityReactions"
 
 function ReactionsByUser({
     reactions,
     users
 }: {
-    reactions: Array<Schema["Reaction"]["type"]>,
+    reactions: Array<UIReaction>,
     users: Map<string, User>
 }) {
 
-    const reactionsByUser = reactions.reduce((acc, reaction) => acc.set(reaction.user, [...(acc.get(reaction.user) || []), reaction]), new Map<string, Array<Schema["Reaction"]["type"]>>());
+    const reactionsByUser = reactions.reduce((acc, reaction) => acc.set(reaction.user, [...(acc.get(reaction.user) || []), reaction]), new Map<string, UIReaction[]>());
 
     return <div id="reactionsContainer"> {
         reactionsByUser.size === 0 ? <></> : Array.from(reactionsByUser.keys()).map(user => {
@@ -28,7 +28,7 @@ function ReactionsFromAllUsers({
     reactions
 }: {
     activityId: string,
-    reactions: Array<Schema["Reaction"]["type"]>
+    reactions: Array<UIReaction>
 }) {
     return <p className="reactions"> {
         reactions
