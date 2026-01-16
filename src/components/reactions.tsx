@@ -1,5 +1,5 @@
 import User from "../model/User";
-import { UIReaction } from "../hooks/useActivityReactions"
+import { UIReaction } from "../pages/activities/hooks/useActivityReactions"
 
 function ReactionsByUser({
     reactions,

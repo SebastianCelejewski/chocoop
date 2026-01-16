@@ -1,12 +1,12 @@
 import type { Schema } from "../../../amplify/data/resource";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
 import { generateClient } from "aws-amplify/data";
 import { dateToString } from "../../utils/dateUtils";
 import { List, AutoSizer, CellMeasurer, CellMeasurerCache } from 'react-virtualized';
 
 import User from "../../model/User";
 import { ReactionsFromAllUsers } from "../../components/reactions";
+import { useActivityListActions } from "./hooks/useActivityListActions";
 
 const client = generateClient<Schema>();
 
@@ -27,8 +27,7 @@ function ActivityList({users}: {users: Map<string, User>}) {
 
     const [activities, setActivities] = useState<Array<Schema["Activity"]["type"]>>([]);
     const [reactions, setReactions] = useState<Array<Schema["Reaction"]["type"]>>([]);
-
-    const navigate = useNavigate();
+    const {createActivity, showActivity, navigateToWorkRequests} = useActivityListActions();
 
     cache.clearAll()
     
@@ -51,20 +50,6 @@ function ActivityList({users}: {users: Map<string, User>}) {
         })
     }, []);
 
-    function createActivity() {
-        const navLink = `/ActivityEdit/create`
-        navigate(navLink)
-    }
-
-    function showActivity(id: string) {
-        const navLink = `/ActivityDetails/${id}`
-        navigate(navLink)
-    }
-
-    function navigateToWorkRequests() {
-        const navLink = `/WorkRequestList`
-        navigate(navLink)
-    } 
 
     if (activities.length == 0) {
         return <>
