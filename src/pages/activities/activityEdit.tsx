@@ -358,20 +358,23 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
         <form onSubmit={handleSubmit}>
             <div className="entryDetails">
                 <p className="label">Data wykonania czynności</p>
-                <button type="button" onClick={() => setActivityDate(yesterdayDate)}>Wczoraj</button>
-                <button type="button" onClick={() => setActivityDate(currentDate)}>Dziś</button>
+                <div>
+                    <button type="button" className="entityButton" onClick={() => setActivityDate(yesterdayDate)}>Wczoraj</button>
+                    <button type="button" className="entityButton" onClick={() => setActivityDate(currentDate)}>Dziś</button>
 
-                <input
-                    id="activityDate"
-                    aria-label="Date"
-                    type="date"
-                    value={activityDate}
-                    onChange={handleActivityDateChange}
-                />
+                    <input
+                        id="activityDate"
+                        aria-label="Date"
+                        type="date"
+                        value={activityDate}
+                        className="entityDatePicker"
+                        onChange={handleActivityDateChange}
+                    />
+                </div>
 
                 <p className="label">Wykonawca</p>
                 {activityPersonErrorMessage.length > 0 ? (<p className="validationMessage">{activityPersonErrorMessage}</p>) : (<></>)}
-                <p><select id="activityPerson" onChange={handleActivityPersonChange} value={activityPerson}>
+                <p><select id="activityPerson" className="entityText" onChange={handleActivityPersonChange} value={activityPerson}>
                     {Array.from(users.values()).map((user: User) => {
                         return <option key={user.id} value={user.id}>{user.nickname}</option>
                     }
@@ -398,7 +401,7 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
 
                 <p className="label">Zdobyte punkty doświadczenia</p>
                 {activityExpErrorMessage.length > 0 ? (<p className="validationMessage">{activityExpErrorMessage}</p>) : (<></>)}
-                <p><input id="activityExp" type="text" onChange={handleActivityExpChange} value={activityExp} /></p>
+                <p><input id="activityExp" type="text" className="entityText" onChange={handleActivityExpChange} value={activityExp} /></p>
 
                 <p className="label">Komentarz</p>
                 {activityCommentErrorMessage.length > 0 ? (<p className="validationMessage">{activityCommentErrorMessage}</p>) : (<></>)}
