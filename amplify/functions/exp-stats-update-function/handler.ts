@@ -91,18 +91,18 @@ const rebuildStatistics = async () => {
         response = await dynamoDbClient.send(request);
         console.log("Received " + response.Items?.length + " items from the database")
         response.Items?.forEach((item: Record<string, AttributeValue>) => {
-            const dateTime = item["dateTime"]["S"];
+            const date = item["date"]["S"];
             const user = item["user"]["S"];
             const exp = item["exp"]["N"];
             
-            if (dateTime === undefined || user === undefined || exp === undefined) {
-                console.log("Invalid data fetched from the database. Check dateTime, user and exp");
+            if (date === undefined || user === undefined || exp === undefined) {
+                console.log("Invalid data fetched from the database. Check date, user and exp");
                 return
             }
 
-            const day = dateTime.substring(0,10);
-            const month = dateTime.substring(0, 7);
-            const year = dateTime.substring(0, 4);
+            const day = date.substring(0,10);
+            const month = date.substring(0, 7);
+            const year = date.substring(0, 4);
 
             if (!(dailyData.has(day))) {
                 dailyData.set(day, new Map<string, number>());

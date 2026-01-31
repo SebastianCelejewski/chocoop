@@ -17,7 +17,8 @@ async function fetchAllUsers() {
     const response = await client.send(command)
     const convertedUsers = response.Users?.map((user: UserType) => convertToLocalUser(user)) || [];
     const usersAsKeyValues = convertedUsers.map((user: User) => [user.id, user] as [string, User])
-    return new Map<string, User>(usersAsKeyValues)
+    const sortedUsers = usersAsKeyValues.sort((a, b) => a[1].nickname.localeCompare(b[1].nickname))
+    return new Map<string, User>(sortedUsers)
 }
 
 function convertToLocalUser(userType: UserType) : User {

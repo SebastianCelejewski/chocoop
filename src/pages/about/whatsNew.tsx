@@ -7,6 +7,7 @@ function WhatsNew() {
             <ul>
                 <li>Rezygnacja z zapisywania czasu wykonania czynności, zostaje sama data</li>
                 <li>Dodanie przycisków ,,Wczoraj'' i ,,Dzisiaj'' dla szybszego wprowadzania wykonanych czynności</li>
+                <li>Nowe ikony czynności (v2)</li>
             </ul>
 
             <p className="label"><b>Wersja 0.4.11</b></p>

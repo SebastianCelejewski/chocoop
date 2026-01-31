@@ -69,3 +69,5 @@
 - Refactoring
 - Changed type of activity completion field from datetime to date
 - Added "Today" and "Yesterday" buttons to add activities quicker
+- New activity icons (v2)
+- Users fetched from Cognito are sorted by nickname
