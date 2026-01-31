@@ -23,7 +23,7 @@ function sortByUrgency(workRequests: Array<Schema["WorkRequest"]["type"]>) {
     return workRequests.sort((a, b) => a.urgency - b.urgency);
 }
 
-function WorkRequestList({users}: {users: Map<string, User>}) {
+function WorkRequestList({ users }: { users: Map<string, User> }) {
     const [workRequests, setWorkRequests] = useState<Array<Schema["WorkRequest"]["type"]>>([]);
     const [showCompletedWorkRequests, setShowCompletedWorkRequests] = useState(false);
     const navigate = useNavigate();
@@ -32,7 +32,7 @@ function WorkRequestList({users}: {users: Map<string, User>}) {
 
     useEffect(() => {
         const workRequestsQuery = client.models.WorkRequest.observeQuery().subscribe({
-            next: (data: WorkRequestQueryResult) => { 
+            next: (data: WorkRequestQueryResult) => {
                 setWorkRequests(sortByUrgency([...data.items]))
             }
         });
@@ -51,24 +51,24 @@ function WorkRequestList({users}: {users: Map<string, User>}) {
         navigate(navLink)
     }
 
-    function CompletnessStatus({ workRequest }: { workRequest: Schema["WorkRequest"]["type"]}) {
-      if (workRequest.completed) {
-        return <p className="workItemCompletness">Zlecenie wykonane</p>
-      } else {
-        return <></>
-      }
+    function CompletnessStatus({ workRequest }: { workRequest: Schema["WorkRequest"]["type"] }) {
+        if (workRequest.completed) {
+            return <p className="workItemCompletness">Zlecenie wykonane</p>
+        } else {
+            return <></>
+        }
     }
 
     function navigateToActivities() {
         const navLink = `/ActivityList`
         navigate(navLink)
-    } 
+    }
 
     function handleShowCompletedToggled(): void {
         setShowCompletedWorkRequests(!showCompletedWorkRequests);
     }
 
-    function renderRow({ index, key, style, parent }: { index: number, key: string, style: React.CSSProperties, parent: any}) {
+    function renderRow({ index, key, style, parent }: { index: number, key: string, style: React.CSSProperties, parent: any }) {
         const workRequest = visibleWorkRequests[index];
         return (
             <CellMeasurer
@@ -77,21 +77,21 @@ function WorkRequestList({users}: {users: Map<string, User>}) {
                 parent={parent}
                 columnIndex={0}
                 rowIndex={index}>
-                {({registerChild}) => (
+                {({ registerChild }) => (
                     <div style={style} className="row" ref={registerChild}>
                         <li
-                        className="entityListElement"
-                        onClick={() => showWorkRequest(workRequest.id)}
-                        key={workRequest.id}>
-                        <div>
-                            <p className="entityDateTime">{dateTimeToString(workRequest.createdDateTime)}</p>
-                            <p className="entityPerson">{users.get(workRequest.createdBy)?.nickname}</p>
-                            <p className="entityType">{workRequest.type}</p>
-                            <p className="entityExp">{workRequest.exp} xp</p>
-                            <div style={{clear: 'both'}}/>
-                            <p className="workRequestUrgency">Pilność: {urgencyList[workRequest.urgency]?.label}</p>
-                            <CompletnessStatus workRequest={workRequest}/>
-                        </div>
+                            className="entityListElement"
+                            onClick={() => showWorkRequest(workRequest.id)}
+                            key={workRequest.id}>
+                            <div>
+                                <p className="entityDateTime">{dateTimeToString(workRequest.createdDateTime)}</p>
+                                <p className="entityPerson">{users.get(workRequest.createdBy)?.nickname}</p>
+                                <p className="entityType">{workRequest.type}</p>
+                                <p className="entityExp">{workRequest.exp} xp</p>
+                                <div style={{ clear: 'both' }} />
+                                <p className="workRequestUrgency">Pilność: {urgencyList[workRequest.urgency]?.label}</p>
+                                <CompletnessStatus workRequest={workRequest} />
+                            </div>
                         </li>
                     </div>
                 )}
@@ -103,9 +103,9 @@ function WorkRequestList({users}: {users: Map<string, User>}) {
 
     return <>
         <p className="pageTitle" onClick={navigateToActivities}>Lista zleceń do wykonania</p>
-        <p><input type="checkbox" name="showCompleted" id="showCompleted" checked={showCompletedWorkRequests} onChange={handleShowCompletedToggled}/>Pokaż ukończone</p>
-            <ul className="entityList">
-                <AutoSizer>
+        <p><input type="checkbox" name="showCompleted" id="showCompleted" checked={showCompletedWorkRequests} onChange={handleShowCompletedToggled} />Pokaż ukończone</p>
+        <ul className="entityList">
+            <AutoSizer>
                 {
                     ({ width, height }) => (<List
                         width={width}
@@ -117,11 +117,11 @@ function WorkRequestList({users}: {users: Map<string, User>}) {
                         overscanRowCount={3} />
                     )
                 }
-                </AutoSizer>
-          </ul>
-          <div className="buttonPanel">
-              <button onClick={createWorkRequest}>Dodaj zlecenie</button>
-          </div>
+            </AutoSizer>
+        </ul>
+        <div className="buttonPanel">
+            <button onClick={createWorkRequest}>Dodaj zlecenie</button>
+        </div>
     </>
 }
 

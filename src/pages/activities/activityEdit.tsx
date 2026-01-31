@@ -8,20 +8,20 @@ import { getCurrentUser, type AuthUser } from 'aws-amplify/auth';
 import User from "../../model/User";
 import reportError from "../../utils/reportError"
 
-import vacuuming from "../../assets/images/activities/vacuuming.png?url";
-import dishwashing from "../../assets/images/activities/dishwashing.png?url";
-import shopping_local from "../../assets/images/activities/shopping_local.png?url";
-import shopping_Auchan from "../../assets/images/activities/shopping_Auchan.png?url";
-import cooking from "../../assets/images/activities/cooking.png?url";
-import laundry_start from "../../assets/images/activities/laundry_start.png?url";
-import laundry_end from "../../assets/images/activities/laundry_end.png?url";
-import laundry_sorting from "../../assets/images/activities/laundry_sorting.png?url";
-import taking_garbage_out from "../../assets/images/activities/taking_garbage_out.png?url";
-import unpacking_frisco from "../../assets/images/activities/unpacking_frisco.png?url";
+import vacuuming from "../../assets/images/activities/v2/vacuuming_64x64.png?url";
+import dishwashing from "../../assets/images/activities/v2/dishwashing_64x64.png?url";
+import shopping_local from "../../assets/images/activities/v2/shopping_local_64x64.png?url";
+import shopping_Auchan from "../../assets/images/activities/v2/shopping_Auchan_64x64.png?url";
+import cooking from "../../assets/images/activities/v2/cooking_64x64.png?url";
+import laundry_start from "../../assets/images/activities/v2/laundry_start_64x64.png?url";
+import laundry_end from "../../assets/images/activities/v2/laundry_end_64x64.png?url";
+import laundry_sorting from "../../assets/images/activities/v2/laundry_sorting_64x64.png?url";
+import taking_garbage_out from "../../assets/images/activities/v2/taking_garbage_out_64x64.png?url";
+import unpacking_frisco from "../../assets/images/activities/v2/unpacking_frisco_64x64.png?url";
 
 const client = generateClient<Schema>();
 
-function ActivityEdit({users}: {users: Map<string, User>}) {
+function ActivityEdit({ users }: { users: Map<string, User> }) {
 
     const navigate = useNavigate();
 
@@ -54,24 +54,18 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
     const [activityPersonErrorMessage, setActivityPersonErrorMessage] = useState("")
     const [activityTypeErrorMessage, setActivityTypeErrorMessage] = useState("");
     const [activityExpErrorMessage, setActivityExpErrorMessage] = useState("");
-    const [activityCommentErrorMessage, setActivityCommentErrorMessage] = useState("");    
+    const [activityCommentErrorMessage, setActivityCommentErrorMessage] = useState("");
 
     let pageTitle = "";
 
     useEffect(() => {
-        console.log("Starting useEffect");
-
         if (operationParam === "create") {
-            console.log("Preparing component for creation of a new activity");
-
             pageTitle = "Dodawanie wykonanej czynności";
             setActivityUser();
             setActivityDateToCurrentDate();
         }
-        
-        if (operationParam === "update") {
-            console.log("Preparing component for updating an existing activity");
 
+        if (operationParam === "update") {
             pageTitle = "Edycja czynności";
             if (objectIdParam === undefined) {
                 throw new Error(reportError("Error while fetching activity " + objectIdParam + " to be updated: id is undefined"));
@@ -80,8 +74,6 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
         }
 
         if (operationParam == "promoteWorkRequest") {
-            console.log("Preparing component for promoting a web request");
-
             pageTitle = "Wykonane zlecenie zlecenie";
             if (objectIdParam === undefined) {
                 throw new Error(reportError("Error while fetching work request " + objectIdParam + " to be promoted: id is undefined"));
@@ -93,20 +85,16 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
     }, [operationParam, objectIdParam])
 
     function setActivityUser() {
-        getCurrentUser().then((user : AuthUser) => {
-            console.log("Setting activity user to " + user.username);
+        getCurrentUser().then((user: AuthUser) => {
             setActivityPerson(user.username);
         })
     }
 
     function setActivityDateToCurrentDate() {
-        console.log("Setting activity date to " + currentDate);
         setActivityDate(currentDate);
     }
-    
-    function loadActivityToUpdate(activityIdParam: string) {
-        console.log("Loading activity " + activityIdParam + " from the database to be updated");
 
+    function loadActivityToUpdate(activityIdParam: string) {
         client.models.Activity
             .get({ id: activityIdParam })
             .then((result) => {
@@ -130,8 +118,6 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
     }
 
     function loadWorkRequestToPromote(workRequestIdParam: string) {
-        console.log("Loading work request " + workRequestIdParam + " from the database to be promoted");
-
         client.models.WorkRequest
             .get({ id: workRequestIdParam })
             .then((result) => {
@@ -158,7 +144,7 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
                 throw new Error(reportError("Error while fetching work request " + objectIdParam + " to be promoted: " + error));
             })
     }
-  
+
     function handleActivityDateChange(e: any) {
         setActivityDate(e.target.value)
     }
@@ -232,7 +218,7 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
         }
     }
 
-    function createWorkRequestObjectFromState(newActivityId : string) {
+    function createWorkRequestObjectFromState(newActivityId: string) {
         if (newActivityId === undefined) {
             throw new Error(reportError("Argument newActivityId is undefined during creation of a new work request object"))
         }
@@ -277,7 +263,7 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
         if (validationStatus == false) {
             return
         }
-        
+
         if (operationParam === "create") {
             const newActivity = createActivityObjectFromState();
 
@@ -316,16 +302,16 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
                     const updatedWorkRequest = createWorkRequestObjectFromState(newActivityId);
 
                     client.models.WorkRequest
-                    .update(updatedWorkRequest)
-                    .then((updateWorkRequestResponse) => {
-                        if (updateWorkRequestResponse?.errors?.length) {
-                            reportError("Failed to update a work request in the database", updateWorkRequestResponse.errors);
-                        }
-                        navigate("/ActivityList")
-                    })
-                    .catch((error) => {
-                        reportError("Failed to update a work request in the database", error);
-                    })
+                        .update(updatedWorkRequest)
+                        .then((updateWorkRequestResponse) => {
+                            if (updateWorkRequestResponse?.errors?.length) {
+                                reportError("Failed to update a work request in the database", updateWorkRequestResponse.errors);
+                            }
+                            navigate("/ActivityList")
+                        })
+                        .catch((error) => {
+                            reportError("Failed to update a work request in the database", error);
+                        })
                 })
                 .catch((error) => {
                     reportError("Failed to create new activity in the database when promoting a work request", error);
@@ -339,7 +325,7 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
             }
 
             client.models.Activity
-                .update({...updatedActivity, id: updatedActivity.id})
+                .update({ ...updatedActivity, id: updatedActivity.id })
                 .then((updateActivityResponse) => {
                     if (updateActivityResponse?.errors?.length) {
                         reportError("Failed to update an activity in the database", updateActivityResponse.errors);
@@ -384,11 +370,11 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
                 />
 
                 <p className="label">Wykonawca</p>
-                { activityPersonErrorMessage.length > 0 ? (<p className="validationMessage">{activityPersonErrorMessage}</p>) : (<></>) }
+                {activityPersonErrorMessage.length > 0 ? (<p className="validationMessage">{activityPersonErrorMessage}</p>) : (<></>)}
                 <p><select id="activityPerson" onChange={handleActivityPersonChange} value={activityPerson}>
-                    { Array.from(users.values()).map((user: User) => {
-                            return <option key={user.id} value={user.id}>{user.nickname}</option>
-                        }
+                    {Array.from(users.values()).map((user: User) => {
+                        return <option key={user.id} value={user.id}>{user.nickname}</option>
+                    }
                     )}
                 </select></p>
 
@@ -407,16 +393,16 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
                 </div>
 
                 <p className="label">Czynność</p>
-                { activityTypeErrorMessage.length > 0 ? (<p className="validationMessage">{activityTypeErrorMessage}</p>) : (<></>) }
-                <p><input id="activityType" type="text" className="entityTextArea" onChange={handleActivityTypeChange} value={activityType}/></p>
+                {activityTypeErrorMessage.length > 0 ? (<p className="validationMessage">{activityTypeErrorMessage}</p>) : (<></>)}
+                <p><input id="activityType" type="text" className="entityTextArea" onChange={handleActivityTypeChange} value={activityType} /></p>
 
                 <p className="label">Zdobyte punkty doświadczenia</p>
-                { activityExpErrorMessage.length > 0 ? (<p className="validationMessage">{activityExpErrorMessage}</p>) : (<></>) }
-                <p><input id="activityExp" type="text" onChange={handleActivityExpChange} value={activityExp}/></p>
+                {activityExpErrorMessage.length > 0 ? (<p className="validationMessage">{activityExpErrorMessage}</p>) : (<></>)}
+                <p><input id="activityExp" type="text" onChange={handleActivityExpChange} value={activityExp} /></p>
 
                 <p className="label">Komentarz</p>
-                { activityCommentErrorMessage.length > 0 ? (<p className="validationMessage">{activityCommentErrorMessage}</p>) : (<></>) }
-                <p><textarea id="activityComment" className="entityTextArea" rows={5} onChange={handleActivityCommentChange} value={activityComment}/></p>
+                {activityCommentErrorMessage.length > 0 ? (<p className="validationMessage">{activityCommentErrorMessage}</p>) : (<></>)}
+                <p><textarea id="activityComment" className="entityTextArea" rows={5} onChange={handleActivityCommentChange} value={activityComment} /></p>
             </div>
             <div>
                 <button type="submit">Zatwierdź</button>

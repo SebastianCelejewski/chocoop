@@ -12,11 +12,7 @@ import { Duration } from "aws-cdk-lib/core";
 
 import { expStatsUpdateFunction } from "./functions/exp-stats-update-function/resource";
 
-console.log("AWS_BRANCH: " + process.env.AWS_BRANCH);
-console.log("AMPLIFY_BRANCH: " + process.env.AMPLIFY_BRANCH);
-
 const envName = process.env.AWS_BRANCH || "unknown";
-console.log("Environment name: " + envName)
 
 const backend = defineBackend({
     auth,

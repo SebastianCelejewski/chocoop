@@ -8,15 +8,15 @@ import { urgencyList, Urgency } from "../../model/Urgency"
 import User from "../../model/User";
 import reportError from "../../utils/reportError"
 
-import vacuuming from "../../assets/images/activities/vacuuming.png?url";
-import dishwashing from "../../assets/images/activities/dishwashing.png?url";
-import shopping_local from "../../assets/images/activities/shopping_local.png?url";
-import shopping_Auchan from "../../assets/images/activities/shopping_Auchan.png?url";
-import cooking from "../../assets/images/activities/cooking.png?url";
-import laundry_start from "../../assets/images/activities/laundry_start.png?url";
-import laundry_end from "../../assets/images/activities/laundry_end.png?url";
-import laundry_sorting from "../../assets/images/activities/laundry_sorting.png?url";
-import taking_garbage_out from "../../assets/images/activities/taking_garbage_out.png?url";
+import vacuuming from "../../assets/images/activities/v2/vacuuming_64x64.png?url";
+import dishwashing from "../../assets/images/activities/v2/dishwashing_64x64.png?url";
+import shopping_local from "../../assets/images/activities/v2/shopping_local_64x64.png?url";
+import shopping_Auchan from "../../assets/images/activities/v2/shopping_Auchan_64x64.png?url";
+import cooking from "../../assets/images/activities/v2/cooking_64x64.png?url";
+import laundry_start from "../../assets/images/activities/v2/laundry_start_64x64.png?url";
+import laundry_end from "../../assets/images/activities/v2/laundry_end_64x64.png?url";
+import laundry_sorting from "../../assets/images/activities/v2/laundry_sorting_64x64.png?url";
+import taking_garbage_out from "../../assets/images/activities/v2/taking_garbage_out_64x64.png?url";
 
 const client = generateClient<Schema>();
 
@@ -51,15 +51,11 @@ function WorkRequestEdit({users}: {users: Map<string, User>}) {
 
     useEffect(() => {
         if (operationParam === "create") {
-            console.log("Preparing component for creation of a new work request");
-
             setNewWorkRequestPerson();
             setNewWorkRequestDateTime();
         }
 
         if (operationParam === "update") {
-            console.log("Preparing component for updating an existing work request");
-
             if (workrequestIdParam === undefined) {
                 throw new Error(reportError("Error while fetching work request " + workrequestIdParam + " to be updated: id is undefined"));
             }

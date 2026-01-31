@@ -257,6 +257,7 @@ p {
   background-color: lightgrey;
   border-radius: 6px;
   margin-right: 2px;
+  width: 32px;
 }
 
 .entityTextArea {

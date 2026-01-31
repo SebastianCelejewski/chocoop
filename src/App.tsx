@@ -20,7 +20,6 @@ function App() {
             });
         fetchUserAttributes()
             .then((attributes) => {
-                console.log
                 if (attributes.nickname !== undefined) {
                     setUserNickname(attributes.nickname)
                 }
