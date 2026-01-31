@@ -1,13 +1,7 @@
-export type UIReaction = {
-  id: string;
-  reaction: string;
-  user: string;
-  activityId: string;
-};
-
 import { useEffect, useState } from "react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../../../amplify/data/resource";
+import type { UIReaction } from "../../../model/UIReaction";
 
 const client = generateClient<Schema>();
 

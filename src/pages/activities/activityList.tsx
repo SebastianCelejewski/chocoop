@@ -1,55 +1,22 @@
-import type { Schema } from "../../../amplify/data/resource";
-import React, { useEffect, useState } from "react";
-import { generateClient } from "aws-amplify/data";
 import { dateToString } from "../../utils/dateUtils";
 import { List, AutoSizer, CellMeasurer, CellMeasurerCache } from 'react-virtualized';
 
 import User from "../../model/User";
 import { ReactionsFromAllUsers } from "../../components/reactions";
 import { useActivityListActions } from "./hooks/useActivityListActions";
-
-const client = generateClient<Schema>();
+import { useActivityListDetails } from "./hooks/useActivityListDetails";    
 
 const cache = new CellMeasurerCache({
     fixedWidth: true,
     defaultHeight: 100
 });
 
-class ActivityQueryResult {
-  items: Array<Schema["Activity"]["type"]> = []
-}
-
-function sortByDateTime(activities: Array<Schema["Activity"]["type"]>) {
-    return activities.sort((a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime());
-}
-
 function ActivityList({users}: {users: Map<string, User>}) {
 
-    const [activities, setActivities] = useState<Array<Schema["Activity"]["type"]>>([]);
-    const [reactions, setReactions] = useState<Array<Schema["Reaction"]["type"]>>([]);
     const {createActivity, showActivity, navigateToWorkRequests} = useActivityListActions();
+    const {activities, reactions } = useActivityListDetails();
 
     cache.clearAll()
-    
-    useEffect(() => {
-        const activitiesQuery = client.models.Activity.observeQuery().subscribe({
-            next: (data: ActivityQueryResult) => { 
-                setActivities(sortByDateTime([...data.items]))
-            }
-        });
-
-        const reactionsQuery = client.models.Reaction.observeQuery().subscribe({
-            next: (data: { items: Array<Schema["Reaction"]["type"]> }) => {
-                setReactions(data.items)
-            }
-        });
-
-        return (() => {
-            activitiesQuery.unsubscribe();
-            reactionsQuery.unsubscribe();
-        })
-    }, []);
-
 
     if (activities.length == 0) {
         return <>

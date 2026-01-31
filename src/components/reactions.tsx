@@ -1,14 +1,7 @@
 import User from "../model/User";
-import { UIReaction } from "../pages/activities/hooks/useActivityReactions"
+import { UIReaction } from "../model/UIReaction"
 
-function ReactionsByUser({
-    reactions,
-    users
-}: {
-    reactions: Array<UIReaction>,
-    users: Map<string, User>
-}) {
-
+function ReactionsByUser({ reactions, users }: { reactions: Array<UIReaction>, users: Map<string, User>}) {
     const reactionsByUser = reactions.reduce((acc, reaction) => acc.set(reaction.user, [...(acc.get(reaction.user) || []), reaction]), new Map<string, UIReaction[]>());
 
     return <div id="reactionsContainer"> {
@@ -23,13 +16,7 @@ function ReactionsByUser({
     </div>
 }
 
-function ReactionsFromAllUsers({
-    activityId,
-    reactions
-}: {
-    activityId: string,
-    reactions: Array<UIReaction>
-}) {
+function ReactionsFromAllUsers({ activityId, reactions }: { activityId: string, reactions: Array<UIReaction>}) {
     return <p className="reactions"> {
         reactions
             .filter(reaction => reaction.activityId == activityId)

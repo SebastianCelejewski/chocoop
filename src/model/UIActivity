@@ -1,0 +1,10 @@
+export type UIActivity = {
+  id: string;
+  user: string;
+  dateTime: string;
+  type: string;
+  exp: number;
+  comment: string;
+  requestedAs: string
+  reactions: string;
+};
