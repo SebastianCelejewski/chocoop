@@ -43,7 +43,7 @@ function ActivityList({users}: {users: Map<string, User>}) {
                             className="entityListElement"
                             onClick={() => showActivity(activity.id)}
                             key={activity.id}>
-                            <p className="entityDateTime">{dateToString(activity.dateTime)}</p>
+                            <p className="entityDate">{dateToString(activity.date)}</p>
                             <p className="entityPerson">{users.get(activity.user)?.nickname}</p>
                             <p className="entityType">{activity.type}</p>
                             <p className="entityExp">{activity.exp} xp</p>

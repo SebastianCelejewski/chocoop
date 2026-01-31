@@ -3,7 +3,7 @@ import type { Schema } from "../../../amplify/data/resource";
 import { useEffect, useState } from "react";
 import { NavLink, useParams, useNavigate } from "react-router";
 import { generateClient } from "aws-amplify/data";
-import { dateToString } from "../../utils/dateUtils";
+import { dateTimeToString } from "../../utils/dateUtils";
 
 import reportError from "../../utils/reportError"
 import User from "../../model/User";
@@ -95,7 +95,7 @@ function WorkRequestDetails({users}: {users: Map<string, User>}) {
                 <WorkRequestCompletness workRequest={workRequest}/>
 
                 <p className="label">Data i godzina utworzenia zlecenia</p>
-                <p>{dateToString(workRequest.createdDateTime)}</p>
+                <p>{dateTimeToString(workRequest.createdDateTime)}</p>
 
                 <p className="label">Twórca zlecenia</p>
                 <p>{users.get(workRequest.createdBy)?.nickname}</p>

@@ -32,10 +32,12 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
     const currentDateTimeUTC = new Date()
     const timeZoneOffset = currentDateTimeUTC.getTimezoneOffset()
     const currentDateTimeLocal = new Date(currentDateTimeUTC.getTime() - timeZoneOffset * 60 * 1000)
-    const currentDateTime = currentDateTimeLocal.toISOString().split(".")[0]
+    const currentDate = currentDateTimeLocal.toISOString().split("T")[0]
+    const yesterdayDateTimeLocal = new Date(currentDateTimeLocal.getTime() - 24 * 60 * 60 * 1000);
+    const yesterdayDate = yesterdayDateTimeLocal.toISOString().split("T")[0]
 
     const [activityId, setActivityId] = useState<string | undefined>(undefined)
-    const [activityDateTime, setActivityDateTime] = useState<string | undefined>(undefined);
+    const [activityDate, setActivityDate] = useState<string>("");
     const [activityPerson, setActivityPerson] = useState<string | undefined>(undefined)
     const [activityType, setActivityType] = useState("");
     const [activityExp, setActivityExp] = useState("");
@@ -56,8 +58,6 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
 
     let pageTitle = "";
 
-    console.log("Initializing ActivityEdit component")
-
     useEffect(() => {
         console.log("Starting useEffect");
 
@@ -66,7 +66,7 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
 
             pageTitle = "Dodawanie wykonanej czynności";
             setActivityUser();
-            setActivityDateTimeToCurrentDateTime();
+            setActivityDateToCurrentDate();
         }
         
         if (operationParam === "update") {
@@ -87,7 +87,7 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
                 throw new Error(reportError("Error while fetching work request " + objectIdParam + " to be promoted: id is undefined"));
             }
             setActivityUser();
-            setActivityDateTimeToCurrentDateTime();
+            setActivityDateToCurrentDate();
             loadWorkRequestToPromote(objectIdParam);
         }
     }, [operationParam, objectIdParam])
@@ -99,9 +99,9 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
         })
     }
 
-    function setActivityDateTimeToCurrentDateTime() {
-        console.log("Setting activity time  to " + currentDateTime);
-        setActivityDateTime(currentDateTime);
+    function setActivityDateToCurrentDate() {
+        console.log("Setting activity date to " + currentDate);
+        setActivityDate(currentDate);
     }
     
     function loadActivityToUpdate(activityIdParam: string) {
@@ -111,14 +111,14 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
             .get({ id: activityIdParam })
             .then((result) => {
                 if (result["data"] != undefined) {
-                    const activityDateTimeFromDatabaseAsString = result["data"]["dateTime"]
-                    const activityDateTimeFromDatabaseAsDate = Date.parse(activityDateTimeFromDatabaseAsString)
-                    const activityDateTimeLocal = new Date(activityDateTimeFromDatabaseAsDate - timeZoneOffset * 60 * 1000)
-                    const activityDateTimeToSetToDateTimePicker = activityDateTimeLocal.toISOString().split(".")[0]
+                    const activityDateFromDatabaseAsString = result["data"]["date"]
+                    const activityDateFromDatabaseAsDate = Date.parse(activityDateFromDatabaseAsString)
+                    const activityDateLocal = new Date(activityDateFromDatabaseAsDate - timeZoneOffset * 60 * 1000)
+                    const activityDateToSetToDatePicker = activityDateLocal.toISOString().split("T")[0]
 
                     setActivityId(result["data"]["id"]);
                     setActivityPerson(result["data"]["user"]);
-                    setActivityDateTime(activityDateTimeToSetToDateTimePicker);
+                    setActivityDate(activityDateToSetToDatePicker);
                     setActivityType(result["data"]["type"]);
                     setActivityExp(result["data"]["exp"].toString());
                     setActivityComment(result["data"]["comment"]);
@@ -149,7 +149,7 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
                     setWorkRequestUrgency(result["data"]["urgency"].toString());
                     setWorkRequestInstructions(result["data"]["instructions"]);
 
-                    setActivityDateTime(currentDateTime);
+                    setActivityDate(currentDate);
                     setActivityType(result["data"]["type"]);
                     setActivityExp(result["data"]["exp"].toString());
                 }
@@ -159,8 +159,8 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
             })
     }
   
-    function handleActivityDateTimeChange(e: any) {
-        setActivityDateTime(e.target.value)
+    function handleActivityDateChange(e: any) {
+        setActivityDate(e.target.value)
     }
 
     function handleActivityPersonChange(e: any) {
@@ -209,8 +209,8 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
     }
 
     function createActivityObjectFromState() {
-        if (activityDateTime === undefined) {
-            throw new Error(reportError("State activityDateTime is undefined during creation of a new activity object"))
+        if (activityDate === undefined) {
+            throw new Error(reportError("State activityDate is undefined during creation of a new activity object"))
         }
         if (activityPerson === undefined) {
             throw new Error(reportError("State activityPerson is undefined during creation of a new activity object"))
@@ -223,7 +223,7 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
         }
         return {
             id: activityId,
-            dateTime: new Date(activityDateTime).toISOString(),
+            date: activityDate,
             user: activityPerson,
             type: activityType,
             exp: Number(activityExp),
@@ -371,14 +371,17 @@ function ActivityEdit({users}: {users: Map<string, User>}) {
         <p className="pageTitle">{pageTitle}</p>
         <form onSubmit={handleSubmit}>
             <div className="entryDetails">
-                <p className="label">Data i godzina wykonania czynności</p>
-                <p><input
-                        id="activityDateTime"
-                        aria-label="Date and time"
-                        type="datetime-local"
-                        defaultValue={activityDateTime}
-                        onChange={handleActivityDateTimeChange}
-                    /></p>
+                <p className="label">Data wykonania czynności</p>
+                <button type="button" onClick={() => setActivityDate(yesterdayDate)}>Wczoraj</button>
+                <button type="button" onClick={() => setActivityDate(currentDate)}>Dziś</button>
+
+                <input
+                    id="activityDate"
+                    aria-label="Date"
+                    type="date"
+                    value={activityDate}
+                    onChange={handleActivityDateChange}
+                />
 
                 <p className="label">Wykonawca</p>
                 { activityPersonErrorMessage.length > 0 ? (<p className="validationMessage">{activityPersonErrorMessage}</p>) : (<></>) }

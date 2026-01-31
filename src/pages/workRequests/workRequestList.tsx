@@ -2,7 +2,7 @@ import type { Schema } from "../../../amplify/data/resource";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { generateClient } from "aws-amplify/data";
-import { dateToString } from "../../utils/dateUtils";
+import { dateTimeToString } from "../../utils/dateUtils";
 import { List, AutoSizer, CellMeasurer, CellMeasurerCache } from 'react-virtualized';
 
 import User from "../../model/User";
@@ -84,7 +84,7 @@ function WorkRequestList({users}: {users: Map<string, User>}) {
                         onClick={() => showWorkRequest(workRequest.id)}
                         key={workRequest.id}>
                         <div>
-                            <p className="entityDateTime">{dateToString(workRequest.createdDateTime)}</p>
+                            <p className="entityDateTime">{dateTimeToString(workRequest.createdDateTime)}</p>
                             <p className="entityPerson">{users.get(workRequest.createdBy)?.nickname}</p>
                             <p className="entityType">{workRequest.type}</p>
                             <p className="entityExp">{workRequest.exp} xp</p>

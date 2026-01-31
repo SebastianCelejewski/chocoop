@@ -5,7 +5,7 @@ const schema = a.schema({
         .model({
             id: a.id().required(),
             user: a.string().required(),
-            dateTime: a.datetime().required(),
+            date: a.date().required(),
             type: a.string().required(),
             exp: a.integer().required(),
             comment: a.string().required(),

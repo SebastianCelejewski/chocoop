@@ -65,5 +65,7 @@
 ## Version v0.4.11
 - Fixed exp stats processing problem by increasing Lambda function timeout from 3 to 10 seconds
 
-## Version v0.4.11
+## Version v0.4.12
 - Refactoring
+- Changed type of activity completion field from datetime to date
+- Added "Today" and "Yesterday" buttons to add activities quicker

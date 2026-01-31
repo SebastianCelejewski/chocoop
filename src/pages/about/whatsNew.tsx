@@ -5,7 +5,8 @@ function WhatsNew() {
             <h1>Co nowego w aplikacji</h1>
             <p className="label"><b>Wersja 0.4.12</b></p>
             <ul>
-                <li>...</li>
+                <li>Rezygnacja z zapisywania czasu wykonania czynności, zostaje sama data</li>
+                <li>Dodanie przycisków ,,Wczoraj'' i ,,Dzisiaj'' dla szybszego wprowadzania wykonanych czynności</li>
             </ul>
 
             <p className="label"><b>Wersja 0.4.11</b></p>

@@ -158,6 +158,11 @@ ul {
   font-weight: bold;
 }
 
+.entityDate {
+  margin-left: 5px;
+  font-weight: bold;
+}
+
 .entityPerson {
   margin-left: 6px;
   margin-right: 6px;

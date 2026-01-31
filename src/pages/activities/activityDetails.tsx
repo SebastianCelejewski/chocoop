@@ -99,8 +99,8 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
         <p className="pageTitle">Szczegóły wykonanej czynności</p>
         <div className="entryDetails">
             <ReactionsPopup/>
-            <p className="label">Data i godzina czynności</p>
-            <p>{dateToString(activity.dateTime)}</p>
+            <p className="label">Data wykonania czynności</p>
+            <p>{dateToString(activity.date)}</p>
 
             <p className="label">Tryb</p>
             <WorkRequestInfo activity={activity}/>

@@ -42,5 +42,5 @@ export function useActivityListDetails() {
 }
 
 function sortByDateTime(activities: Array<Schema["Activity"]["type"]>) {
-    return activities.sort((a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime());
+    return activities.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
