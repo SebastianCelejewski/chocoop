@@ -1,6 +1,6 @@
 function WhatsNew() {
     return <>
-        <p className="pageTitle">O aplikacji</p>
+        <h2 className="pageTitle" data-testid="about-page">O aplikacji</h2>
         <ul className="richText">
             <h1>Co nowego w aplikacji</h1>
             <p className="label"><b>Wersja 0.4.12</b></p>

@@ -89,7 +89,7 @@ function WorkRequestDetails({users}: {users: Map<string, User>}) {
         </>
     } else {
         return <>
-            <p className="pageTitle">Szczegóły zlecenia</p>
+            <h2 className="pageTitle" data-testid="work-request-details-page">Szczegóły zlecenia</h2>
             <div className="entryDetails">
                 <p className="label">Status</p>
                 <WorkRequestCompletness workRequest={workRequest}/>

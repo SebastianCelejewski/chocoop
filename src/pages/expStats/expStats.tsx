@@ -77,7 +77,8 @@ function ExpStats({users}: {users: Map<string, User>}) {
     };
 
     return <>
-        <p className="pageTitle">Statystyki doświadczenia</p>
+        <h2 className="pageTitle" data-testid="exp-stats-page">Statystyki doświadczenia</h2>
+
         <ul className="entityList">
             <Box sx={{ width: '100%'}}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>

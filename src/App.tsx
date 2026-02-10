@@ -10,20 +10,15 @@ import Routing from "./components/routing";
 
 function App() {
 
-    const [userNickname, setUserNickname] = useState("")
-    const [allUsers, setAllUsers] = useState<Map<string, User>>(new Map<string, User>())
+    const version = "0.4.13"
+    const [userNickname, setUserNickname] = useState<string | null>(null)
+    const [allUsers, setAllUsers] = useState<Map<string, User> | null>(null)
 
     useEffect(() => {
-        fetchAllUsers()
-            .then((fetchedUsers) => {
-                setAllUsers(fetchedUsers)
-            });
-        fetchUserAttributes()
-            .then((attributes) => {
-                if (attributes.nickname !== undefined) {
-                    setUserNickname(attributes.nickname)
-                }
-            })
+        fetchAllUsers().then(setAllUsers);
+        fetchUserAttributes().then((attributes) => {
+                    setUserNickname(attributes.nickname ?? "")
+                });
     }, [])
 
     return (
@@ -34,14 +29,19 @@ function App() {
                         <AppMenu/>
                         <UserMenu signoutFunction={signOut}/>
                         <h1>Chores Cooperative</h1>
-                        <p className="versionInfo">Wersja 0.4.12</p>
+                        <p className="versionInfo">{version}</p>
 
                         <div className="subheader">
                             <p className="userInfo">Witaj, {userNickname}</p>
                             
                         </div>
                         <div style={{clear: 'both'}}/>
-                        <Routing allUsers={allUsers}/>
+
+                        {userNickname === null || allUsers === null ? (
+                            <div>Ładuję dane...</div>
+                        ) : (
+                            <Routing allUsers={allUsers}/>
+                        )}
                     </main>
                 )
             }}

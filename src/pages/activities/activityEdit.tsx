@@ -365,7 +365,7 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
     }
 
     return <>
-        <p className="pageTitle">{pageTitle}</p>
+        <h2 className="pageTitle" data-testid="activity-edit-page">{pageTitle}</h2>
         <form onSubmit={handleSubmit}>
             <div className="entryDetails">
                 <p className="label">Data wykonania czynności</p>

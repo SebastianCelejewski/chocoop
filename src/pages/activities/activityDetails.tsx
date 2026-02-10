@@ -96,7 +96,7 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
     }
 
     return <>
-        <p className="pageTitle">Szczegóły wykonanej czynności</p>
+        <h2 className="pageTitle" data-testid="activity-details-page">Szczegóły wykonanej czynności</h2>
         <div className="entryDetails">
             <ReactionsPopup/>
             <p className="label">Data wykonania czynności</p>

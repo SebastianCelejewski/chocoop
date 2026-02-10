@@ -250,7 +250,7 @@ function WorkRequestEdit({users}: {users: Map<string, User>}) {
     }
 
     return <>
-        <p className="pageTitle">Dodawanie zlecenia</p>
+        <h2 className="pageTitle" data-testid="work-request-edit-page">Dodawanie zlecenia</h2>
         <form onSubmit={handleSubmit}>
             <div className="entryDetails">
                 <p className="label">Data i godzina utworzenia zlecenia</p>

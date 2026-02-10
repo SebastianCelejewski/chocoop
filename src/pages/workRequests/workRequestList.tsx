@@ -102,7 +102,8 @@ function WorkRequestList({ users }: { users: Map<string, User> }) {
     cache.clearAll()
 
     return <>
-        <p className="pageTitle" onClick={navigateToActivities}>Lista zleceń do wykonania</p>
+        <h2 className="pageTitle" data-testid="work-request-list-page" onClick={navigateToActivities}>Lista zleceń do wykonania</h2>
+
         <p><input type="checkbox" name="showCompleted" id="showCompleted" checked={showCompletedWorkRequests} onChange={handleShowCompletedToggled} />Pokaż ukończone</p>
         <ul className="entityList">
             <AutoSizer>

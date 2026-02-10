@@ -58,7 +58,7 @@ function ActivityList({users}: {users: Map<string, User>}) {
 
     return (
         <>
-            <p className="pageTitle" onClick={navigateToWorkRequests}>Lista wykonanych czynności</p>
+            <h2 className="pageTitle" data-testid="activity-list-page" onClick={navigateToWorkRequests}>Lista wykonanych czynności</h2>
             <ul className="entityList">
                 <AutoSizer>
                 {
