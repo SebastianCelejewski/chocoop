@@ -44,12 +44,18 @@ type WorkRequestFormState = {
 type ValidationErrors<T> = Partial<Record<keyof T, string>>;
 type ActivityValidationResult = ValidationErrors<ActivityFormState>;
 
+const pageTitleMap: Record<string, string> = {
+  "create": 'Dodawanie wykonanej czynności',
+  "update": 'Edycja czynności',
+  "promoteWorkRequest": 'Wykonane zlecenie'
+};
+
 function ActivityEdit({ users }: { users: Map<string, User> }) {
 
     const navigate = useNavigate();
 
     const params = useParams();
-    const operationParam = params["operation"]
+    const operationParam = params["operation"] || "Nieznana operacja"
     const objectIdParam = params["id"]
 
     const currentDateTimeUTC = new Date()
@@ -76,17 +82,13 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
     const [activityExpErrorMessage, setActivityExpErrorMessage] = useState("");
     const [activityCommentErrorMessage, setActivityCommentErrorMessage] = useState("");
 
-    let pageTitle = "";
-
     useEffect(() => {
         if (operationParam === "create") {
-            pageTitle = "Dodawanie wykonanej czynności";
             setActivityUser();
             setActivityDateToCurrentDate();
         }
 
         if (operationParam === "update") {
-            pageTitle = "Edycja czynności";
             if (objectIdParam === undefined) {
                 throw new Error(reportError("Error while fetching activity " + objectIdParam + " to be updated: id is undefined"));
             }
@@ -94,7 +96,6 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
         }
 
         if (operationParam == "promoteWorkRequest") {
-            pageTitle = "Wykonane zlecenie zlecenie";
             if (objectIdParam === undefined) {
                 throw new Error(reportError("Error while fetching work request " + objectIdParam + " to be promoted: id is undefined"));
             }
@@ -365,7 +366,7 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
     }
 
     return <>
-        <h2 className="pageTitle" data-testid="activity-edit-page">{pageTitle}</h2>
+        <h2 className="pageTitle" data-testid="activity-edit-page" data-mode={operationParam}>{pageTitleMap[operationParam]}</h2>
         <form onSubmit={handleSubmit}>
             <div className="entryDetails">
                 <p className="label">Data wykonania czynności</p>
@@ -444,8 +445,8 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
                 /></p>
             </div>
             <div>
-                <button type="submit">Zatwierdź</button>
-                <button type="button" onClick={handleCancel}>Anuluj</button>
+                <button type="submit" data-testId="commit-button">Zatwierdź</button>
+                <button type="button" data-testId="cancel-button" onClick={handleCancel}>Anuluj</button>
             </div>
         </form>
     </>

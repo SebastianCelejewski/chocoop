@@ -121,10 +121,10 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
             <ReactionsByUser reactions={reactions} users={users}/>
         </div>
         <div>
-            <button type="button" onClick={handleBack}>Wróć</button>
-            <button type="button" onClick={handleEdit}>Edytuj</button>
-            <button type="button" onClick={handleDelete}>Usuń</button>
-            <button type="button" onClick={handleReaction}>Zareaguj</button>
+            <button type="button" data-testId="back-button" onClick={handleBack}>Wróć</button>
+            <button type="button" data-testId="edit-button" onClick={handleEdit}>Edytuj</button>
+            <button type="button" data-testId="delete-button" onClick={handleDelete}>Usuń</button>
+            <button type="button" data-testId="react-button" onClick={handleReaction}>Zareaguj</button>
         </div>
     </>
 }

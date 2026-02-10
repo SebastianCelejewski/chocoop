@@ -39,7 +39,7 @@ function ActivityList({users}: {users: Map<string, User>}) {
                 rowIndex={index}>
                 {({registerChild}) => (
                     <div style={style} className="row" ref={registerChild}>
-                        <li
+                        <li data-testid="activity-card"
                             className="entityListElement"
                             onClick={() => showActivity(activity.id)}
                             key={activity.id}>
@@ -75,7 +75,7 @@ function ActivityList({users}: {users: Map<string, User>}) {
                 </AutoSizer>
             </ul>
             <div className="buttonPanel">
-                <button onClick={createActivity}>Dodaj czynność</button>
+                <button data-testId="create-button" onClick={createActivity}>Dodaj czynność</button>
             </div>
         </>
     );
