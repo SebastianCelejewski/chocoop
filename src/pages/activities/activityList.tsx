@@ -40,13 +40,15 @@ function ActivityList({users}: {users: Map<string, User>}) {
                 {({registerChild}) => (
                     <div style={style} className="row" ref={registerChild}>
                         <li data-testid="activity-card"
+                            data-objectid={activity.id}
                             className="entityListElement"
                             onClick={() => showActivity(activity.id)}
                             key={activity.id}>
-                            <p className="entityDate">{dateToString(activity.date)}</p>
-                            <p className="entityPerson">{users.get(activity.user)?.nickname}</p>
-                            <p className="entityType">{activity.type}</p>
-                            <p className="entityExp">{activity.exp} xp</p>
+                            {activity.comment && <p className="entityCommentIcon" data-testId="comment-property">📝</p>}
+                            <p className="entityDate" data-testId="date-property">{dateToString(activity.date)}</p>
+                            <p className="entityPerson" data-testId="person-property">{users.get(activity.user)?.nickname}</p>
+                            <p className="entityType" data-testId="type-property">{activity.type}</p>
+                            <p className="entityExp" data-testId="exp-property">{activity.exp} xp</p>
                             <div style={{clear: 'both'}}/>
                             <ReactionsFromAllUsers activityId={activity.id} reactions={reactions}/>
                         </li>

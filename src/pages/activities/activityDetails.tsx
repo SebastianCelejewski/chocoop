@@ -24,7 +24,7 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
 
     const [reactionsPopupVisible, setReactionsPopupVisible] = useState<boolean>(false);
 
-    if (loading) {
+    if (!activityId || loading) {
         return <div className="loadingData">Ładowanie danych</div>;
     }
 

@@ -164,6 +164,10 @@ ul {
   font-weight: bold;
 }
 
+.entityCommentIcon {
+  float: right;
+}
+
 .entityPerson {
   margin-left: 6px;
   margin-right: 6px;

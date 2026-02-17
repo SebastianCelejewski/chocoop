@@ -354,10 +354,10 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
             navigate("/ActivityList")
         } else if (operationParam == "promoteWorkRequest") {
             if (workRequest !== null) {
-                navigate("/WorkRequestDetails/" + workRequest.id)
+                navigate("/WorkRequestDetails/" + objectIdParam)
             }
         } else {
-            navigate("/ActivityDetails/" + activity.id)
+            navigate("/ActivityDetails/" + objectIdParam)
         }
     }
 
@@ -376,6 +376,7 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
 
                     <input
                         id="activityDate"
+                        data-testid="activity-date-input"
                         aria-label="Date"
                         type="date"
                         value={activity.date}
@@ -388,6 +389,7 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
                 {activityPersonErrorMessage.length > 0 ? (<p className="validationMessage">{activityPersonErrorMessage}</p>) : (<></>)}
                 <p><select
                     id="activityPerson"
+                    data-testid="activity-person-input"
                     className="entityText"
                     value={activity.user}
                     onChange={e => handleActivityChange("user", e.target.value)}
@@ -418,6 +420,7 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
                 {activityTypeErrorMessage.length > 0 ? (<p className="validationMessage">{activityTypeErrorMessage}</p>) : (<></>)}
                 <p><input
                         id="activityType"
+                        data-testid="activity-type-input"
                         type="text"
                         className="entityTextArea"
                         value={activity.type}
@@ -428,6 +431,7 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
                 {activityExpErrorMessage.length > 0 ? (<p className="validationMessage">{activityExpErrorMessage}</p>) : (<></>)}
                 <p><input
                     id="activityExp"
+                    data-testid="activity-exp-input"
                     type="text"
                     className="entityText"
                     value={activity.exp}
@@ -438,6 +442,7 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
                 {activityCommentErrorMessage.length > 0 ? (<p className="validationMessage">{activityCommentErrorMessage}</p>) : (<></>)}
                 <p><textarea
                     id="activityComment"
+                    data-testid="activity-comment-input"
                     className="entityTextArea"
                     rows={5}
                     value={activity.comment}
@@ -445,7 +450,7 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
                 /></p>
             </div>
             <div>
-                <button type="submit" data-testId="commit-button">Zatwierdź</button>
+                <button type="submit" data-testId="submit-button">Zatwierdź</button>
                 <button type="button" data-testId="cancel-button" onClick={handleCancel}>Anuluj</button>
             </div>
         </form>
