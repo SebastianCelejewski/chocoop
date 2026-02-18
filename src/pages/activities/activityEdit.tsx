@@ -371,8 +371,8 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
             <div className="entryDetails">
                 <p className="label">Data wykonania czynności</p>
                 <div>
-                    <button type="button" className="entityButton" onClick={() => setActivity( prev => ({...prev, date: yesterdayDate}))}>Wczoraj</button>
-                    <button type="button" className="entityButton" onClick={() => setActivity( prev => ({...prev, date: currentDate}))}>Dziś</button>
+                    <button type="button" data-testId="today-button" className="entityButton" onClick={() => setActivity( prev => ({...prev, date: yesterdayDate}))}>Wczoraj</button>
+                    <button type="button" data-testid="yesterday-button" className="entityButton" onClick={() => setActivity( prev => ({...prev, date: currentDate}))}>Dziś</button>
 
                     <input
                         id="activityDate"

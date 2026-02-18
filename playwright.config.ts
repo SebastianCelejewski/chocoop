@@ -9,6 +9,7 @@ export default defineConfig({
     baseURL: 'http://localhost:5173',
     storageState: 'tests/e2e/.auth/state.json',
     headless: true,
+    locale: 'pl-PL',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',

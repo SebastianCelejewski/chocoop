@@ -32,7 +32,7 @@ function App() {
                         <p className="versionInfo">{version}</p>
 
                         <div className="subheader">
-                            <p className="userInfo">Witaj, {userNickname}</p>
+                            <p className="userInfo">Witaj, <span data-testId="user-nickname">{userNickname}</span></p>
                             
                         </div>
                         <div style={{clear: 'both'}}/>
