@@ -44,11 +44,11 @@ function ActivityList({users}: {users: Map<string, User>}) {
                             className="entityListElement"
                             onClick={() => showActivity(activity.id)}
                             key={activity.id}>
-                            {activity.comment && <p className="entityCommentIcon" data-testId="comment-property">📝</p>}
-                            <p className="entityDate" data-testId="date-property">{dateToString(activity.date)}</p>
-                            <p className="entityPerson" data-testId="person-property">{users.get(activity.user)?.nickname}</p>
-                            <p className="entityType" data-testId="type-property">{activity.type}</p>
-                            <p className="entityExp" data-testId="exp-property">{activity.exp} xp</p>
+                            {activity.comment && <p className="entityCommentIcon" data-testid="comment-property">📝</p>}
+                            <p className="entityDate" data-testid="date-property">{dateToString(activity.date)}</p>
+                            <p className="entityPerson" data-testid="person-property">{users.get(activity.user)?.nickname}</p>
+                            <p className="entityType" data-testid="type-property">{activity.type}</p>
+                            <p className="entityExp" data-testid="exp-property">{activity.exp} xp</p>
                             <div style={{clear: 'both'}}/>
                             <ReactionsFromAllUsers activityId={activity.id} reactions={reactions}/>
                         </li>
@@ -77,7 +77,7 @@ function ActivityList({users}: {users: Map<string, User>}) {
                 </AutoSizer>
             </ul>
             <div className="buttonPanel">
-                <button data-testId="create-button" onClick={createActivity}>Dodaj czynność</button>
+                <button data-testid="create-button" onClick={createActivity}>Dodaj czynność</button>
             </div>
         </>
     );

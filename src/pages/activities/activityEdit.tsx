@@ -371,8 +371,8 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
             <div className="entryDetails">
                 <p className="label">Data wykonania czynności</p>
                 <div>
-                    <button type="button" data-testId="today-button" className="entityButton" onClick={() => setActivity( prev => ({...prev, date: yesterdayDate}))}>Wczoraj</button>
-                    <button type="button" data-testid="yesterday-button" className="entityButton" onClick={() => setActivity( prev => ({...prev, date: currentDate}))}>Dziś</button>
+                    <button type="button" data-testid="yesterday-button" className="entityButton" onClick={() => setActivity( prev => ({...prev, date: yesterdayDate}))}>Wczoraj</button>
+                    <button type="button" data-testid="today-button" className="entityButton" onClick={() => setActivity( prev => ({...prev, date: currentDate}))}>Dziś</button>
 
                     <input
                         id="activityDate"
@@ -402,18 +402,18 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
 
                 <p className="label">Szablony</p>
                 <div className="templateActivities">
-                    <img src={vacuuming} onClick={() => fillTemplate("odkurzanie", 10)} alt="odkurzanie"></img>
-                    <img src={dishwashing} onClick={() => fillTemplate("zmywanie naczyń", 20)} alt="zmywanie naczyń"></img>
-                    <img src={shopping_local} onClick={() => fillTemplate("zakupy osiedle", 10)} alt="zakupy osiedle"></img>
-                    <img src={shopping_Auchan} onClick={() => fillTemplate("zakupy Auchan", 20)} alt="zakupy Auchan"></img>
-                    <img src={cooking} onClick={() => fillTemplate("ugotowanie obiadu", 40)} alt="ugotowanie obiadu"></img>
+                    <img src={vacuuming} data-testid="template-button" onClick={() => fillTemplate("odkurzanie", 10)} alt="odkurzanie"></img>
+                    <img src={dishwashing} data-testid="template-button" onClick={() => fillTemplate("zmywanie naczyń", 20)} alt="zmywanie naczyń"></img>
+                    <img src={shopping_local} data-testid="template-button" onClick={() => fillTemplate("zakupy osiedle", 10)} alt="zakupy osiedle"></img>
+                    <img src={shopping_Auchan} data-testid="template-button" onClick={() => fillTemplate("zakupy Auchan", 20)} alt="zakupy Auchan"></img>
+                    <img src={cooking} data-testid="template-button" onClick={() => fillTemplate("ugotowanie obiadu", 40)} alt="ugotowanie obiadu"></img>
                 </div>
                 <div className="templateActivities">
-                    <img src={laundry_start} onClick={() => fillTemplate("nastawianie prania", 10)} alt="nastawianie prania"></img>
-                    <img src={laundry_end} onClick={() => fillTemplate("wywieszanie prania", 10)} alt="wywieszanie prania"></img>
-                    <img src={laundry_sorting} onClick={() => fillTemplate("ściąganie prania", 10)} alt="ściąganie prania"></img>
-                    <img src={taking_garbage_out} onClick={() => fillTemplate("wyniesienie śmieci", 10)} alt="wyniesienie śmieci"></img>
-                    <img src={unpacking_frisco} onClick={() => fillTemplate("rozpakowanie zakupów Frisco", 5)} alt="rozpakowanie zakupów Frisco"></img>
+                    <img src={laundry_start} data-testid="template-button" onClick={() => fillTemplate("nastawianie prania", 10)} alt="nastawianie prania"></img>
+                    <img src={laundry_end} data-testid="template-button" onClick={() => fillTemplate("wywieszanie prania", 10)} alt="wywieszanie prania"></img>
+                    <img src={laundry_sorting} data-testid="template-button" onClick={() => fillTemplate("ściąganie prania", 10)} alt="ściąganie prania"></img>
+                    <img src={taking_garbage_out} data-testid="template-button" onClick={() => fillTemplate("wyniesienie śmieci", 10)} alt="wyniesienie śmieci"></img>
+                    <img src={unpacking_frisco} data-testid="template-button" onClick={() => fillTemplate("rozpakowanie zakupów Frisco", 5)} alt="rozpakowanie zakupów Frisco"></img>
                 </div>
 
                 <p className="label">Czynność</p>
@@ -450,8 +450,8 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
                 /></p>
             </div>
             <div>
-                <button type="submit" data-testId="submit-button">Zatwierdź</button>
-                <button type="button" data-testId="cancel-button" onClick={handleCancel}>Anuluj</button>
+                <button type="submit" data-testid="submit-button">Zatwierdź</button>
+                <button type="button" data-testid="cancel-button" onClick={handleCancel}>Anuluj</button>
             </div>
         </form>
     </>
