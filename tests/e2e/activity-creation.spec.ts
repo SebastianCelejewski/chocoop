@@ -1,8 +1,8 @@
 import { test, expect, Page } from '@playwright/test';
 
-const activityListDateFormat = new Intl.DateTimeFormat(undefined, {dateStyle: "full"});
+const activityListDateFormat = new Intl.DateTimeFormat(undefined, { dateStyle: "full" });
 
-test('current day is used as activity date if no date is selected', async({page}) => {
+test('current day is used as activity date if no date is selected', async ({ page }) => {
   await goToActivityList(page);
   await goToActivityCreate(page);
 
@@ -20,7 +20,7 @@ test('current day is used as activity date if no date is selected', async({page}
   await expect(dateField).toHaveValue(today);
 })
 
-test('current day is used as activity date if current date button is clicked', async({page}) => {
+test('current day is used as activity date if current date button is clicked', async ({ page }) => {
   await goToActivityList(page);
   await goToActivityCreate(page);
 
@@ -44,7 +44,7 @@ test('current day is used as activity date if current date button is clicked', a
   await expect(dateField).toHaveValue(today);
 })
 
-test('previous day is used as activity date if previous date button is clicked', async({page}) => {
+test('previous day is used as activity date if previous date button is clicked', async ({ page }) => {
   await goToActivityList(page);
   await goToActivityCreate(page);
 
@@ -65,12 +65,12 @@ test('previous day is used as activity date if previous date button is clicked',
     const day = String(d.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   });
-  
+
   await expect(dateField).toHaveValue(yesterday);
 })
 
-test('custom date is used as activity day if date is selected via date picker', async({page}) => {
- await goToActivityList(page);
+test('custom date is used as activity day if date is selected via date picker', async ({ page }) => {
+  await goToActivityList(page);
   await goToActivityCreate(page);
 
   const yesterdayButton = page.getByTestId('yesterday-button');
@@ -82,7 +82,7 @@ test('custom date is used as activity day if date is selected via date picker', 
   await expect(dateField).toHaveValue(new Date().toISOString().split("T")[0]);
 })
 
-test('activity type and exp is filled in after template icon is clicked', async({page}) => {
+test('activity type and exp is filled in after template icon is clicked', async ({ page }) => {
   await goToActivityList(page);
   await goToActivityCreate(page);
 
@@ -96,7 +96,7 @@ test('activity type and exp is filled in after template icon is clicked', async(
   await expect(expField).toHaveValue("10");
 })
 
-test('created activity appears on activity list', async({ page }) => {
+test('created activity appears on activity list', async ({ page }) => {
   const activityId = (await createActivity(page, false)).id;
 
   await test.step("System navigated to the activity list", async () => {
@@ -105,21 +105,21 @@ test('created activity appears on activity list', async({ page }) => {
 
   const activityCard = page.locator('[data-testid="activity-card"][data-objectid="' + activityId + '"]');
 
-  scrollTheListToLoadAllElements(page);
-  
+  await scrollTheListToLoadAllElements(page);
+
   await test.step("Created activity appears on activity list", async () => {
     await expect(activityCard).toBeVisible();
   })
 });
 
-test('created activity has properties with values set during the creation', async({ page }) => {
+test('created activity has properties with values set during the creation', async ({ page }) => {
   const createdActivity = await createActivity(page, false);
-  
+
   await expect(page.getByTestId('activity-list-page')).toBeVisible();
-  
+
   const activityCard = page.locator('[data-testid="activity-card"][data-objectid="' + createdActivity.id + '"]');
 
-  scrollTheListToLoadAllElements(page);
+  await scrollTheListToLoadAllElements(page);
 
   await expect(activityCard).toBeVisible();
 
@@ -131,14 +131,14 @@ test('created activity has properties with values set during the creation', asyn
   })
 });
 
-test('created activity that has a comment should have a comment icon on activity list', async({ page }) => {
+test('created activity that has a comment should have a comment icon on activity list', async ({ page }) => {
   const activityId = (await createActivity(page, true)).id;
 
   await expect(page.getByTestId('activity-list-page')).toBeVisible();
 
   const activityCard = page.locator('[data-testid="activity-card"][data-objectid="' + activityId + '"]');
-  
-  scrollTheListToLoadAllElements(page);
+
+  await scrollTheListToLoadAllElements(page);
 
   await expect(activityCard).toBeVisible();
 
@@ -147,14 +147,13 @@ test('created activity that has a comment should have a comment icon on activity
   })
 });
 
-test('created activity that does not have a comment should not have a comment icon on activity list', async({ page }) => {
+test('created activity that does not have a comment should not have a comment icon on activity list', async ({ page }) => {
   const activityId = (await createActivity(page, false)).id;
 
   await expect(page.getByTestId('activity-list-page')).toBeVisible();
 
   const activityCard = page.locator('[data-testid="activity-card"][data-objectid="' + activityId + '"]');
-  
-  scrollTheListToLoadAllElements(page);
+  await scrollTheListToLoadAllElements(page);
 
   await expect(activityCard).toBeVisible();
 
@@ -242,7 +241,7 @@ function generateTestComment(testId: string): string {
 
 async function scrollTheListToLoadAllElements(page: Page) {
   const grid = page.locator('.ReactVirtualized__Grid');
-  
+
   await grid.evaluate(el => {
     el.scrollTop = el.scrollHeight;
   });

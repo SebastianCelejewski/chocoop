@@ -16,7 +16,7 @@ export function useActivityListDetails() {
 
     useEffect(() => {
         const activitiesQuery = client.models.Activity.observeQuery().subscribe({
-            next: (data: ActivityQueryResult) => { 
+            next: (data: ActivityQueryResult) => {
                 setActivities(sortByDateTime([...data.items]))
             }
         });
