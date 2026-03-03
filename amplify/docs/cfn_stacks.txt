@@ -1,0 +1,8 @@
+- amplify-amplifyvitereacttemplate-Sebastian-sandbox-159558c659
+  - amplify-amplifyvitereacttemplate-Sebastian-sandbox-159558c659-auth179371D7-15XGZU9V8DIJ4
+  - amplify-amplifyvitereacttemplate-Sebastian-sandbox-159558c659-data7552DF31-1URZTO35OR3PZ
+    - amplify-amplifyvitereacttemplate-Sebastian-amplifyDataAmplifyTableManagerNestedStackA-KXDBCM7G9TGE
+    - amplify-amplifyvitereacttemplate-Sebastian-amplifyDataWorkRequestNestedStackWorkReque-1VOYRU63ISIZC
+    - amplify-amplifyvitereacttemplate-Sebastian-amplifyDataExperienceStatisticsNestedStack-1A907P1RS1PPD
+    - amplify-amplifyvitereacttemplate-Sebastian-amplifyDataReactionNestedStackReactionNest-G8CC90JRUS6D
+  - amplify-amplifyvitereacttemplate-Sebastian-sandbox-159558c659-function1351588B-V1G35NTDM2PK

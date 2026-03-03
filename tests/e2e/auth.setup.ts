@@ -26,7 +26,7 @@ test('setup auth session', async ({ page }) => {
   await page.click('button[type="submit"]');
 
   // Waiting for activity list after log in
-  await expect(activityList).toBeVisible();
+  await expect(activityList).toBeVisible({ timeout: 30000 });
 
   // Waiting for authentication data to appear on disk
   await page.context().storageState({

@@ -20,10 +20,10 @@ function ActivityList({users}: {users: Map<string, User>}) {
 
     if (activities.length == 0) {
         return <>
-            <p className="pageTitle" onClick={navigateToWorkRequests}>Lista wykonanych czynności</p>
+            <p className="pageTitle" data-testid="activity-list-page" onClick={navigateToWorkRequests}>Lista wykonanych czynności</p>
             <div className="loadingData">Ładowanie danych</div>
             <div className="buttonPanel">
-                <button onClick={createActivity}>Dodaj czynność</button>
+                <button onClick={createActivity} data-testid="create-button">Dodaj czynność</button>
             </div>
         </>
     }
