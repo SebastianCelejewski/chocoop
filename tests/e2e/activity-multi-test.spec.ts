@@ -53,9 +53,23 @@ test('activity multi-test', async({page}) => {
     await created_activity_that_does_not_have_a_comment_should_not_have_a_comment_icon_on_activity_list(page, activityWithoutComment);
   });
 
+  await test.step('Action: cancelled attempt to delete an activity', async () => {
+    await cancelled_attempt_to_delete_an_activity(page, activityWithComment);
+  });
+
+  await test.step("Test: after cancelled deletion activity still exists on activity list", async () => {
+    await created_activity_appears_on_activity_list(page, activityWithComment);
+    await created_activity_appears_on_activity_list(page, activityWithoutComment);
+  });
+
   await test.step('Action: delete activities', async () => {
     await deleteActivity(page, activityWithComment);
     await deleteActivity(page, activityWithoutComment);
+  });
+
+  await test.step("Test: after confirmed deletion activities do not exist on activity list", async () => {
+    await deleted_activity_does_not_appear_on_activity_list(page, activityWithComment);
+    await deleted_activity_does_not_appear_on_activity_list(page, activityWithoutComment);
   });
 
 });
@@ -129,26 +143,25 @@ async function activity_type_and_exp_is_filled_in_after_template_icon_is_clicked
   await expect(expField).toHaveValue("10");
 }
 
-async function create_activity_with_a_comment(page: Page) {
-  await createActivity(page, true);
-}
-
-async function create_activity_without_a_comment(page: Page) {
-  const activityId = (await createActivity(page, false)).id;
-  return activityId;
-}
-
 async function after_activity_is_created_system_navigates_to_activity_list(page: Page) {
   await expect(page.getByTestId('activity-list-page')).toBeVisible();
 }
 
 async function created_activity_appears_on_activity_list(page: Page, activity: any) {
+  await goToActivityList(page);
   const activityCard = page.locator('[data-testid="activity-card"][data-objectid="' + activity.id + '"]');
   await scrollTheListToLoadAllElements(page);
   await expect(activityCard).toBeVisible();
 };
 
+async function deleted_activity_does_not_appear_on_activity_list(page: Page, activity: any) {
+  await goToActivityList(page);
+  const activityCard = page.locator('[data-testid="activity-card"][data-objectid="' + activity.id + '"]');
+  await expect(activityCard).not.toBeVisible();
+};
+
 async function created_activity_has_properties_with_values_set_during_the_creation(page: Page, activity: any) {
+  await goToActivityList(page);
   const activityCard = page.locator('[data-testid="activity-card"][data-objectid="' + activity.id + '"]');
   await expect(activityCard.getByTestId('person-property')).toHaveText(activity.personNickName);
   await expect(activityCard.getByTestId('date-property')).toHaveText(activity.date);
@@ -157,12 +170,14 @@ async function created_activity_has_properties_with_values_set_during_the_creati
 };
 
 async function created_activity_that_has_a_comment_should_have_a_comment_icon_on_activity_list(page: Page, activity: any) {
+  await goToActivityList(page);
   const activityCard = page.locator('[data-testid="activity-card"][data-objectid="' + activity.id + '"]');
   await scrollTheListToLoadAllElements(page);
   await expect(activityCard.getByTestId('comment-property')).toBeVisible();
 };
 
 async function created_activity_that_does_not_have_a_comment_should_not_have_a_comment_icon_on_activity_list(page: Page, activity: any) {
+  await goToActivityList(page);
   const activityCard = page.locator('[data-testid="activity-card"][data-objectid="' + activity.id + '"]');
   await scrollTheListToLoadAllElements(page);
   await expect(activityCard.getByTestId('comment-property')).not.toBeVisible();
@@ -179,6 +194,7 @@ async function goToActivityCreate(page: Page) {
 }
 
 async function deleteActivity(page: Page, activity: any) {
+  await page.goto('/ActivityList/');
   const activityCard = page.locator('[data-testid="activity-card"][data-objectid="' + activity.id + '"]');
   await scrollTheListToLoadAllElements(page);
   await expect(activityCard).toBeVisible();
@@ -188,7 +204,27 @@ async function deleteActivity(page: Page, activity: any) {
 
   await page.once('dialog', async dialog => {
     expect(dialog.type()).toBe('confirm');
-    await dialog.accept(); // kliknięcie "OK"
+    await dialog.accept();
+  });
+
+  const deleteButton = page.getByTestId('delete-button');
+
+  await expect(deleteButton).toBeVisible();
+  await deleteButton.click();
+}
+
+async function cancelled_attempt_to_delete_an_activity(page: Page, activity: any) {
+  await goToActivityList(page);
+  const activityCard = page.locator('[data-testid="activity-card"][data-objectid="' + activity.id + '"]');
+  await scrollTheListToLoadAllElements(page);
+  await expect(activityCard).toBeVisible();
+  await activityCard.click();
+
+  await expect(page.getByTestId('activity-details-page')).toBeVisible();
+
+  await page.once('dialog', async dialog => {
+    expect(dialog.type()).toBe('confirm');
+    await dialog.dismiss();
   });
 
   const deleteButton = page.getByTestId('delete-button');
