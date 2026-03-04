@@ -53,7 +53,7 @@ function AppContent() {
 
       <div className="subheader">
         <p className="userInfo">
-          Witaj, <span data-testid="user-nickname">{userNickname}</span>
+          Witaj, <span data-testid="user-nickname" data-currentuserid={user.userId}>{userNickname}</span>
         </p>
       </div>
 

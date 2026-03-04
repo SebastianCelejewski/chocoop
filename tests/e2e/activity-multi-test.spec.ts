@@ -1,9 +1,11 @@
 import { test, expect, Page } from '@playwright/test';
+import { Activity } from './model/Activity'
+import { goToActivityList, goToActivityCreate } from './actions/Navigation';
 
 const activityListDateFormat = new Intl.DateTimeFormat(undefined, { dateStyle: "full" });
 
 test('activity multi-test', async({page}) => {
-  await test.step("Navigation: create activity page", async () => {
+  await test.step("Navigation: activity creation page", async () => {
     await goToActivityList(page);
     await goToActivityCreate(page);
   });
@@ -24,12 +26,12 @@ test('activity multi-test', async({page}) => {
     await activity_type_and_exp_is_filled_in_after_template_icon_is_clicked(page);
   });
 
-  var activityWithComment = {};
-  var activityWithoutComment = {};
+  var activityWithComment = await Activity.withComment(page);
+  var activityWithoutComment = await Activity.withoutComment(page);
 
   await test.step('Action: creation of two activities', async() => {
-    activityWithComment = await createActivity(page, true);
-    activityWithoutComment = await createActivity(page, false);
+    await createActivity(page, activityWithComment);
+    await createActivity(page, activityWithoutComment);
   })
 
   await test.step('Test: after activity is created system navigates to activity list', async() => {
@@ -42,7 +44,7 @@ test('activity multi-test', async({page}) => {
   });
 
   await test.step('Test: created activity has properties with values set during the creation', async () => {
-    await created_activity_has_properties_with_values_set_during_the_creation(page, activityWithComment);
+    await checkActivityProperties(page, activityWithComment);
   });
 
   await test.step('Test: created activity that has a comment should have a comment icon on activity list', async () => {
@@ -51,6 +53,16 @@ test('activity multi-test', async({page}) => {
 
   await test.step('Test: created activity that does not have a comment should not have a comment icon on activity list', async () => {
     await created_activity_that_does_not_have_a_comment_should_not_have_a_comment_icon_on_activity_list(page, activityWithoutComment);
+  });
+
+  var modifiedActivityWithComment = await Activity.withComment(page);
+
+  await test.step('Action: modification of existing activity', async () => {
+    await modifyActivity(page, activityWithComment, modifiedActivityWithComment);
+  });
+
+  await test.step('Test: modified activity has properties with values set during the modification', async () => {
+    await checkActivityProperties(page, activityWithComment);
   });
 
   await test.step('Action: cancelled attempt to delete an activity', async () => {
@@ -160,11 +172,12 @@ async function deleted_activity_does_not_appear_on_activity_list(page: Page, act
   await expect(activityCard).not.toBeVisible();
 };
 
-async function created_activity_has_properties_with_values_set_during_the_creation(page: Page, activity: any) {
+async function checkActivityProperties(page: Page, activity: Activity) {
   await goToActivityList(page);
   const activityCard = page.locator('[data-testid="activity-card"][data-objectid="' + activity.id + '"]');
+
   await expect(activityCard.getByTestId('person-property')).toHaveText(activity.personNickName);
-  await expect(activityCard.getByTestId('date-property')).toHaveText(activity.date);
+  await expect(activityCard.getByTestId('date-property')).toHaveText(activityListDateFormat.format(new Date(activity.date)));
   await expect(activityCard.getByTestId('type-property')).toHaveText(activity.type);
   await expect(activityCard.getByTestId('exp-property')).toHaveText(activity.exp + " xp");
 };
@@ -182,36 +195,6 @@ async function created_activity_that_does_not_have_a_comment_should_not_have_a_c
   await scrollTheListToLoadAllElements(page);
   await expect(activityCard.getByTestId('comment-property')).not.toBeVisible();
 };
-
-async function goToActivityList(page: Page) {
-  await page.goto('/ActivityList/');
-  await expect(page.getByTestId('activity-list-page')).toBeVisible();
-}
-
-async function goToActivityCreate(page: Page) {
-  await page.getByTestId('create-button').first().click();
-  await expect(page.getByTestId('activity-edit-page')).toBeVisible();
-}
-
-async function deleteActivity(page: Page, activity: any) {
-  await page.goto('/ActivityList/');
-  const activityCard = page.locator('[data-testid="activity-card"][data-objectid="' + activity.id + '"]');
-  await scrollTheListToLoadAllElements(page);
-  await expect(activityCard).toBeVisible();
-  await activityCard.click();
-
-  await expect(page.getByTestId('activity-details-page')).toBeVisible();
-
-  await page.once('dialog', async dialog => {
-    expect(dialog.type()).toBe('confirm');
-    await dialog.accept();
-  });
-
-  const deleteButton = page.getByTestId('delete-button');
-
-  await expect(deleteButton).toBeVisible();
-  await deleteButton.click();
-}
 
 async function cancelled_attempt_to_delete_an_activity(page: Page, activity: any) {
   await goToActivityList(page);
@@ -233,26 +216,15 @@ async function cancelled_attempt_to_delete_an_activity(page: Page, activity: any
   await deleteButton.click();
 }
 
-async function createActivity(page: Page, generateComment: boolean) {
+async function createActivity(page: Page, activity: Activity) {
   await goToActivityList(page);
   await goToActivityCreate(page);
 
-  const activityTestId = generateTestId();
-  const activityType = generateTestType(activityTestId);
-  const activityExp = generateTestExp();
-  const activityDate = generateTestDate();
-  const activityPerson = await page.getByTestId('user-nickname').textContent();
-  const activityDateForActivityList = activityListDateFormat.format(Date.parse(activityDate));
-  var activityComment = "";
-
-  await page.getByTestId('activity-date-input').first().fill(activityDate);
-  await page.getByTestId('activity-type-input').first().fill(activityType);
-  await page.getByTestId('activity-exp-input').first().fill(activityExp);
-
-  if (generateComment) {
-    activityComment = generateTestComment(activityTestId);
-    await page.getByTestId('activity-comment-input').first().fill(activityComment);
-  }
+  await page.getByTestId('activity-person-input').first().selectOption({label: activity.personNickName});
+  await page.getByTestId('activity-date-input').first().fill(activity.date.toString());
+  await page.getByTestId('activity-type-input').first().fill(activity.type);
+  await page.getByTestId('activity-exp-input').first().fill(activity.exp);
+  await page.getByTestId('activity-comment-input').first().fill(activity.comment);
 
   const responsePromise = page.waitForResponse(resp =>
     resp.url().includes('/graphql') &&
@@ -265,39 +237,54 @@ async function createActivity(page: Page, generateComment: boolean) {
   const body = await response.json();
   const activityId = body.data.createActivity.id
 
-  return {
-    id: activityId,
-    personNickName: activityPerson || '',
-    date: activityDateForActivityList,
-    type: activityType,
-    exp: activityExp,
-    comment: activityComment
-  }
+  activity.id = activityId;
 }
 
-function generateTestId(): string {
-  const id = crypto.randomUUID().split("-").at(-1);
-  if (!id) throw new Error("Failed to generate test ID");
-  return id;
+async function modifyActivity(page: Page, activityToModify: Activity, modifiedActivity: Activity) {
+  await goToActivityList(page);
+  const activityCard = page.locator('[data-testid="activity-card"][data-objectid="' + activityToModify.id + '"]');
+  await scrollTheListToLoadAllElements(page);
+  await expect(activityCard).toBeVisible();
+  await activityCard.click();
+  await expect(page.getByTestId('activity-details-page')).toBeVisible();
+  const editButton = page.getByTestId('edit-button');
+  await expect(editButton).toBeVisible();
+  await editButton.click();
+  await expect(page.getByTestId('activity-edit-page')).toBeVisible();
+
+  await page.getByTestId('activity-person-input').first().selectOption({label: modifiedActivity.personNickName});
+  await page.getByTestId('activity-date-input').first().fill(modifiedActivity.date.toString());
+  await page.getByTestId('activity-type-input').first().fill(modifiedActivity.type);
+  await page.getByTestId('activity-exp-input').first().fill(modifiedActivity.exp);
+  await page.getByTestId('activity-comment-input').first().fill(modifiedActivity.comment);
+
+  await page.getByTestId('submit-button').first().click();
+
+  activityToModify.personNickName = modifiedActivity.personNickName;
+  activityToModify.date = modifiedActivity.date;
+  activityToModify.type = modifiedActivity.type;
+  activityToModify.exp = modifiedActivity.exp;
+  activityToModify.comment = modifiedActivity.comment;
 }
 
-function generateTestType(testId: string): string {
-  return "Test " + testId;
-}
+async function deleteActivity(page: Page, activity: Activity) {
+  await page.goto('/ActivityList/');
+  const activityCard = page.locator('[data-testid="activity-card"][data-objectid="' + activity.id + '"]');
+  await scrollTheListToLoadAllElements(page);
+  await expect(activityCard).toBeVisible();
+  await activityCard.click();
 
-function generateTestExp(): string {
-  return Math.floor(Math.random() * 200 + 1).toString();
-}
+  await expect(page.getByTestId('activity-details-page')).toBeVisible();
 
-function generateTestDate(): string {
-  const today = new Date();
-  const randomDayOffset = Math.floor(Math.random() * 100) - 100;
-  today.setDate(today.getDate() + randomDayOffset);
-  return today.toISOString().split("T")[0];
-}
+  await page.once('dialog', async dialog => {
+    expect(dialog.type()).toBe('confirm');
+    await dialog.accept();
+  });
 
-function generateTestComment(testId: string): string {
-  return "Test comment " + testId;
+  const deleteButton = page.getByTestId('delete-button');
+
+  await expect(deleteButton).toBeVisible();
+  await deleteButton.click();
 }
 
 async function scrollTheListToLoadAllElements(page: Page) {
