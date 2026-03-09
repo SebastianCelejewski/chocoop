@@ -71,8 +71,9 @@ test('activity multi-test', async({page}) => {
   });
 
   await test.step("Checking if activities still show on activities list", async () => {
-      await CheckIf.activityAppearsOnActivityList(page, activityWithComment.id);
-      await CheckIf.activityAppearsOnActivityList(page, activityWithoutComment.id);
+    await NavigateTo.activityListPage(page);
+    await CheckIf.activityAppearsOnActivityList(page, activityWithComment.id);
+    await CheckIf.activityAppearsOnActivityList(page, activityWithoutComment.id);
   });
 
   await test.step('Tests for deletion of activities', async () => {
@@ -108,11 +109,6 @@ async function modifyActivity(page: Page, activityToModify: Locator, modifiedAct
   await Click.editButton(page);
   await CheckIf.navigatedToActivityEditPage(page);
 
-  console.log(await page.getByTestId('activity-person-input').first().textContent());
-  console.log(await page.getByTestId('activity-date-input').first().textContent());
-  console.log(await page.getByTestId('activity-type-input').first().textContent());
-  console.log(await page.getByTestId('activity-exp-input').first().textContent());
-
   await Form.waitForActivityDateToBeLoaded(page);
   await Form.waitForActivityTypeToBeLoaded(page);
   await Form.waitForActivityExpToBeLoaded(page);
@@ -128,19 +124,6 @@ async function modifyActivity(page: Page, activityToModify: Locator, modifiedAct
   await WaitFor.httpResponse(response);
 }
 
-async function deleteActivity(page: Page, activity: Activity) {
-  await NavigateTo.activityListPage(page);
-  await CheckIf.navigatedToActivityListPage(page);
-  const activityToRemoveCard = await CheckIf.activityAppearsOnActivityList(page, activity.id);
-  await Click.activityCard(page, activityToRemoveCard);
-  await CheckIf.navigatedToActivityDetailsPage(page);
-
-  await Browser.configureConfirmDialogToClickAccept(page);
-  const response = Intercept.httpResponse(page);
-  await Click.deleteButton(page);
-  await WaitFor.httpResponse(response);
-}
-
 async function attemptActivityDeletionAndCancel(page: Page, activityId: string | undefined ) {
   await NavigateTo.activityListPage(page);
   await CheckIf.navigatedToActivityListPage(page);
@@ -150,4 +133,17 @@ async function attemptActivityDeletionAndCancel(page: Page, activityId: string |
 
   await Browser.configureConfirmDialogToClickDismiss(page);
   await Click.deleteButton(page);
+}
+
+async function deleteActivity(page: Page, activity: Activity) {
+  await NavigateTo.activityListPage(page);
+  await CheckIf.navigatedToActivityListPage(page);
+  const activityToRemoveCard = await CheckIf.activityAppearsOnActivityList(page, activity.id);
+  await Click.activityCard(page, activityToRemoveCard);
+  await CheckIf.navigatedToActivityDetailsPage(page);
+
+  const response = Intercept.httpResponse(page);
+  await Browser.configureConfirmDialogToClickAccept(page);
+  await Click.deleteButton(page);
+  await WaitFor.httpResponse(response);
 }

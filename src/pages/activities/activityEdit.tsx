@@ -1,12 +1,17 @@
 import type { Schema } from "../../../amplify/data/resource";
 
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 import { generateClient } from "aws-amplify/data";
 import { getCurrentUser, type AuthUser } from 'aws-amplify/auth';
 
 import User from "../../model/User";
 import reportError from "../../utils/reportError"
+
+import { ActivityFormState } from "../../model/ActivityFormState";
+import { WorkRequestFormState } from "../../model/WorkRequestFormState";
+import { ActivityFormErrorMessages } from "../../model/ActivityFormErrorMessages";
+import { useActivityEditActions } from "./hooks/useActivityEditActions";
 
 import vacuuming from "../../assets/images/activities/v2/vacuuming_64x64.png?url";
 import dishwashing from "../../assets/images/activities/v2/dishwashing_64x64.png?url";
@@ -21,29 +26,6 @@ import unpacking_frisco from "../../assets/images/activities/v2/unpacking_frisco
 
 const client = generateClient<Schema>();
 
-type ActivityFormState = {
-  id?: string;
-  date: string;
-  user?: string;
-  type: string;
-  exp: string;
-  comment: string;
-  requestedAs?: string;
-}
-
-type WorkRequestFormState = {
-  id?: string;
-  createdDateTime?: string;
-  createdBy?: string;
-  type: string;
-  exp: string;
-  urgency: string;
-  instructions: string;
-}
-
-type ValidationErrors<T> = Partial<Record<keyof T, string>>;
-type ActivityValidationResult = ValidationErrors<ActivityFormState>;
-
 const pageTitleMap: Record<string, string> = {
   "create": 'Dodawanie wykonanej czynności',
   "update": 'Edycja czynności',
@@ -52,7 +34,7 @@ const pageTitleMap: Record<string, string> = {
 
 function ActivityEdit({ users }: { users: Map<string, User> }) {
 
-    const navigate = useNavigate();
+    const { handleSubmit, handleCancel } = useActivityEditActions();
 
     const params = useParams();
     const operationParam = params["operation"] || "Nieznana operacja"
@@ -74,13 +56,16 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
         requestedAs: undefined,
     };
 
-    const [activity, setActivity] = useState<ActivityFormState>(initialActivity);
-    const [workRequest, setWorkRequest] = useState<WorkRequestFormState | null>(null);
+    const initialErrorMessages: ActivityFormErrorMessages = {
+        activityPersonErrorMessage: "",
+        activityTypeErrorMessage: "",
+        activityExpErrorMessage: "",
+        activityCommentErrorMessage: ""
+    }
 
-    const [activityPersonErrorMessage, setActivityPersonErrorMessage] = useState("")
-    const [activityTypeErrorMessage, setActivityTypeErrorMessage] = useState("");
-    const [activityExpErrorMessage, setActivityExpErrorMessage] = useState("");
-    const [activityCommentErrorMessage, setActivityCommentErrorMessage] = useState("");
+    const [activity, setActivity] = useState<ActivityFormState>(initialActivity);
+    const [errorMessages, setErrorMessages] = useState<ActivityFormErrorMessages>(initialErrorMessages);
+    const [workRequest, setWorkRequest] = useState<WorkRequestFormState | null>(null);
 
     useEffect(() => {
         if (operationParam === "create") {
@@ -182,192 +167,34 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
         setActivity(prev => ({ ...prev, [key]: value }));
     }
 
-    function isNaturalNumber(value: string): boolean {
-        return /^\d+$/.test(value);
-    }
-
-    function validateInputs(form: ActivityFormState): ActivityValidationResult {
-        const errors: ActivityValidationResult = {};
-
-        if (!form.user) errors.user = "Wpisz wykonawcę czynności";
-        if (!form.type) errors.type = "Wpisz rodzaj czynności";
-        if (!form.exp) errors.exp = "Wpisz zdobyte punkty doświadczenia";
-        if (!isNaturalNumber(form.exp)) errors.exp = "Punkty doświadczenia muszą być liczbą naturalną";
-
-        return errors;
-    }
-
-    function createActivityObjectFromState() {
-        if (activity.date === undefined) {
-            throw new Error(reportError("State activityDate is undefined during creation of a new activity object"))
-        }
-        if (activity.user === undefined) {
-            throw new Error(reportError("State activityPerson is undefined during creation of a new activity object"))
-        }
-        if (activity.type === undefined) {
-            throw new Error(reportError("State activityType is undefined during creation of a new activity object"))
-        }
-        if (activity.exp === undefined || isNaN(Number(activity.exp))) {
-            throw new Error(reportError("State activityExp is undefined during creation of a new activity object"))
-        }
-        return {
-            id: activity.id,
-            date: activity.date,
-            user: activity.user,
-            type: activity.type,
-            exp: Number(activity.exp),
-            comment: activity.comment,
-            requestedAs: workRequest?.id
-        }
-    }
-
-    function createWorkRequestObjectFromState(newActivityId: string) {
-        if (workRequest === null) {
-            throw new Error(reportError("State workRequest is null during creation of a new work request object"))
-        }
-        if (newActivityId === undefined) {
-            throw new Error(reportError("Argument newActivityId is undefined during creation of a new work request object"))
-        }
-        if (workRequest.id === undefined) {
-            throw new Error(reportError("State workRequestId is undefined during creation of a new work request object"))
-        }
-        if (workRequest.createdDateTime === undefined) {
-            throw new Error(reportError("State workRequestCreatedDateTime is undefined during creation of a new work request object"))
-        }
-        if (workRequest.createdBy === undefined) {
-            throw new Error(reportError("State workRequestCreatedBy is undefined during creation of a new work request object"))
-        }
-        if (workRequest.type === undefined) {
-            throw new Error(reportError("State workRequestType is undefined during creation of a new work request object"))
-        }
-        if (workRequest.exp === undefined || isNaN(Number(workRequest.exp))) {
-            throw new Error(reportError("State workRequestExp is undefined during creation of a new work request object"))
-        }
-        if (workRequest.urgency === undefined || isNaN(Number(workRequest.urgency))) {
-            throw new Error(reportError("State workRequestUrgency is undefined during creation of a new work request object"))
-        }
-        if (workRequest.instructions === undefined) {
-            throw new Error(reportError("State workRequestInstructions is undefined during creation of a new work request object"))
-        }
-        return {
-            id: workRequest.id,
-            createdDateTime: new Date(workRequest.createdDateTime).toISOString(),
-            createdBy: workRequest.createdBy,
-            type: workRequest.type,
-            exp: Number(workRequest.exp),
-            urgency: Number(workRequest.urgency),
-            instructions: workRequest.instructions,
-            completed: true,
-            completedAs: newActivityId
-        }
-    }
-
-    function handleSubmit(e: any) {
-        e.preventDefault();
-        const errors = validateInputs(activity);
-        const isValid = Object.keys(errors).length === 0;
-
-        if (!isValid) {
-            setActivityPersonErrorMessage(errors.user ?? "")
-            setActivityTypeErrorMessage(errors.type ?? "")
-            setActivityExpErrorMessage(errors.exp ?? "")
-            setActivityCommentErrorMessage(errors.comment ?? "")
-            return
-        }
-
-        if (operationParam === "create") {
-            const newActivity = createActivityObjectFromState();
-
-            client.models.Activity
-                .create(newActivity)
-                .then((createActivityResponse) => {
-                    if (createActivityResponse?.errors?.length) {
-                        reportError("Failed to create a new activity in the database", createActivityResponse.errors);
-                        return;
-                    }
-                    navigate("/ActivityList")
-                })
-                .catch((error) => {
-                    reportError("Failed to create a new activity in the database", error);
-                })
-        }
-
-        if (operationParam === "promoteWorkRequest") {
-            const newActivity = createActivityObjectFromState();
-
-            client.models.Activity
-                .create(newActivity)
-                .then((createActivityResponse) => {
-                    if (createActivityResponse?.errors?.length) {
-                        reportError("Failed to create new activity in the database when promoting a work request", createActivityResponse.errors);
-                        return;
-                    }
-
-                    if (createActivityResponse["data"] === null || createActivityResponse["data"]["id"] === null) {
-                        reportError("Failed to fetch created activity id from the database")
-                        return;
-                    }
-
-                    const newActivityId = createActivityResponse["data"]["id"]
-
-                    const updatedWorkRequest = createWorkRequestObjectFromState(newActivityId);
-
-                    client.models.WorkRequest
-                        .update(updatedWorkRequest)
-                        .then((updateWorkRequestResponse) => {
-                            if (updateWorkRequestResponse?.errors?.length) {
-                                reportError("Failed to update a work request in the database", updateWorkRequestResponse.errors);
-                            }
-                            navigate("/ActivityList")
-                        })
-                        .catch((error) => {
-                            reportError("Failed to update a work request in the database", error);
-                        })
-                })
-                .catch((error) => {
-                    reportError("Failed to create new activity in the database when promoting a work request", error);
-                })
-        }
-
-        if (operationParam === "update") {
-            const updatedActivity = createActivityObjectFromState();
-            if (updatedActivity.id === undefined) {
-                throw new Error(reportError("State activityId is undefined during creation of a new activity object"))
-            }
-
-            client.models.Activity
-                .update({ ...updatedActivity, id: updatedActivity.id })
-                .then((updateActivityResponse) => {
-                    if (updateActivityResponse?.errors?.length) {
-                        reportError("Failed to update an activity in the database", updateActivityResponse.errors);
-                    }
-                    navigate("/ActivityDetails/" + activity.id)
-                })
-                .catch((error) => {
-                    reportError("Failed to update an activity in the database", error);
-                })
-        }
-    }
-
-    function handleCancel() {
-        if (operationParam == "create") {
-            navigate("/ActivityList")
-        } else if (operationParam == "promoteWorkRequest") {
-            if (workRequest !== null) {
-                navigate("/WorkRequestDetails/" + objectIdParam)
-            }
-        } else {
-            navigate("/ActivityDetails/" + objectIdParam)
-        }
-    }
-
     function fillTemplate(type: string, exp: number) {
         setActivity(prev => ({...prev, type: type, exp: exp.toString()} ));
     }
 
+    function submit(e: any) {
+        e.preventDefault();
+        const errors = handleSubmit(activity, workRequest, operationParam);
+        const isValid = Object.keys(errors).length === 0;
+
+        if (!isValid) {
+            const newErrorMessages: ActivityFormErrorMessages = {
+                activityPersonErrorMessage: errors.user ?? "",
+                activityTypeErrorMessage: errors.type ?? "",
+                activityExpErrorMessage: errors.exp ?? "",
+                activityCommentErrorMessage: errors.comment ?? ""
+            }
+
+            setErrorMessages(newErrorMessages);
+        }
+    }
+
+    function cancel(e: any) {
+        handleCancel(e, operationParam, workRequest);
+    }
+
     return <>
         <h2 className="pageTitle" data-testid="activity-edit-page" data-mode={operationParam}>{pageTitleMap[operationParam]}</h2>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={submit}>
             <div className="entryDetails">
                 <p className="label">Data wykonania czynności</p>
                 <div>
@@ -386,7 +213,7 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
                 </div>
 
                 <p className="label">Wykonawca</p>
-                {activityPersonErrorMessage.length > 0 ? (<p className="validationMessage">{activityPersonErrorMessage}</p>) : (<></>)}
+                {errorMessages.activityPersonErrorMessage.length > 0 ? (<p className="validationMessage">{errorMessages.activityPersonErrorMessage}</p>) : (<></>)}
                 <p><select
                     id="activityPerson"
                     data-testid="activity-person-input"
@@ -417,7 +244,7 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
                 </div>
 
                 <p className="label">Czynność</p>
-                {activityTypeErrorMessage.length > 0 ? (<p className="validationMessage">{activityTypeErrorMessage}</p>) : (<></>)}
+                {errorMessages.activityTypeErrorMessage.length > 0 ? (<p className="validationMessage">{errorMessages.activityTypeErrorMessage}</p>) : (<></>)}
                 <p><input
                         id="activityType"
                         data-testid="activity-type-input"
@@ -428,7 +255,7 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
                 /></p>
 
                 <p className="label">Zdobyte punkty doświadczenia</p>
-                {activityExpErrorMessage.length > 0 ? (<p className="validationMessage">{activityExpErrorMessage}</p>) : (<></>)}
+                {errorMessages.activityExpErrorMessage.length > 0 ? (<p className="validationMessage">{errorMessages.activityExpErrorMessage}</p>) : (<></>)}
                 <p><input
                     id="activityExp"
                     data-testid="activity-exp-input"
@@ -439,7 +266,7 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
                 /></p>
 
                 <p className="label">Komentarz</p>
-                {activityCommentErrorMessage.length > 0 ? (<p className="validationMessage">{activityCommentErrorMessage}</p>) : (<></>)}
+                {errorMessages.activityCommentErrorMessage.length > 0 ? (<p className="validationMessage">{errorMessages.activityCommentErrorMessage}</p>) : (<></>)}
                 <p><textarea
                     id="activityComment"
                     data-testid="activity-comment-input"
@@ -451,7 +278,7 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
             </div>
             <div>
                 <button type="submit" data-testid="submit-button">Zatwierdź</button>
-                <button type="button" data-testid="cancel-button" onClick={handleCancel}>Anuluj</button>
+                <button type="button" data-testid="cancel-button" onClick={cancel}>Anuluj</button>
             </div>
         </form>
     </>

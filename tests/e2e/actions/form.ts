@@ -41,15 +41,15 @@ export class Form {
     }
 
     static async waitForActivityDateToBeLoaded(page: Page) {
-        await expect(page.getByTestId('activity-date-input').first().textContent()).not.toBeUndefined();
+        await expect(page.getByTestId('activity-date-input').first()).not.toHaveValue('');
     }
 
     static async waitForActivityTypeToBeLoaded(page: Page) {
-        await expect(page.getByTestId('activity-type-input').first().textContent()).not.toBeUndefined();
+        await expect(page.getByTestId('activity-type-input').first()).not.toHaveValue('');
     }
 
     static async waitForActivityExpToBeLoaded(page: Page) {
-        await expect(page.getByTestId('activity-exp-input').first().textContent()).not.toBeUndefined();
+        await expect(page.getByTestId('activity-exp-input').first()).not.toHaveValue('');
     }
 
 }
