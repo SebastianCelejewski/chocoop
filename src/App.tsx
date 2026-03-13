@@ -38,7 +38,7 @@ function AppContent() {
       <>
         <h1>Chores Cooperative</h1>
         <p className="versionInfo">{version}</p>
-        <div>Trwa uruchamianie aplikacji...</div>;
+        <div>Trwa uruchamianie aplikacji...</div>
       </>
     );
   }

@@ -54,6 +54,17 @@ test('activity multi-test', async({page}) => {
   // Tests for activity modification
   var modifiedActivityWithComment = await Activity.withComment(page);
 
+  await test.step('Attempt to modify an existing activity and cancel', async() => {
+    await attemptToModifyActivityAndCancel(page, activityWithCommentLocator, modifiedActivityWithComment);
+  });
+
+  await test.step("Checking if activity after cancelled modification shows correctly on activities list", async () => {
+    await CheckIf.navigatedToActivityDetailsPage(page);
+    await NavigateTo.activityListPage(page);
+    activityWithCommentLocator = await CheckIf.activityAppearsOnActivityList(page, activityWithComment.id);
+    await CheckIf.activityHasCorrectProperties(page, activityWithCommentLocator, activityWithComment);
+  })
+
   await test.step('Modification of an existing activity', async () => {
     await modifyActivity(page, activityWithCommentLocator, modifiedActivityWithComment);
   });
@@ -101,6 +112,27 @@ async function createActivity(page: Page, activity: Activity) {
   const response = Intercept.httpResponse(page);
   await Click.submitButton(page);
   activity.id = await Intercepted.createdActivityId(response);;
+}
+
+async function attemptToModifyActivityAndCancel(page: Page, activityToModify: Locator, modifiedActivity: Activity) {
+  await Click.activityCard(page, activityToModify);
+  await CheckIf.navigatedToActivityDetailsPage(page);
+  await Click.editButton(page);
+  await CheckIf.navigatedToActivityEditPage(page);
+
+  await Form.waitForActivityDateToBeLoaded(page);
+  await Form.waitForActivityTypeToBeLoaded(page);
+  await Form.waitForActivityExpToBeLoaded(page);
+
+  await Form.setActivityPerson(page, modifiedActivity.personNickName);
+  await Form.setActivityDate(page, modifiedActivity.date);
+  await Form.setActivityType(page, modifiedActivity.type);
+  await Form.setActivityExp(page, modifiedActivity.exp);
+  await Form.setActivityComment(page, modifiedActivity.comment);
+
+  const response = Intercept.httpResponse(page);
+  await Click.cancelButton(page);
+  await WaitFor.httpResponse(response);
 }
 
 async function modifyActivity(page: Page, activityToModify: Locator, modifiedActivity: Activity) {

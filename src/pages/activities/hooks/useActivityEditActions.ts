@@ -4,6 +4,7 @@ import { WorkRequestFormState } from "../../../model/WorkRequestFormState";
 import reportError from "../../../utils/reportError"
 import { useNavigate } from "react-router";
 import { generateClient } from "aws-amplify/data";
+import { ActivityOperations, ActivityOperation } from "../../../model/ActivityOperation";
 
 export function useActivityEditActions() {
 
@@ -13,15 +14,11 @@ export function useActivityEditActions() {
     const client = generateClient<Schema>();
     const navigate = useNavigate();
 
-    function handleSubmit(activity: ActivityFormState, workRequest: WorkRequestFormState | null, operationParam: string): ActivityValidationResult {
+    function handleSubmit(activity: ActivityFormState, workRequest: WorkRequestFormState | null, operationParam: string | undefined): ActivityValidationResult {
         const errors = validateInputs(activity);
         const isValid = Object.keys(errors).length === 0;
 
         if (!isValid) {
-            // setActivityPersonErrorMessage(errors.user ?? "")
-            // setActivityTypeErrorMessage(errors.type ?? "")
-            // setActivityExpErrorMessage(errors.exp ?? "")
-            // setActivityCommentErrorMessage(errors.comment ?? "")
             return errors;
         }
 
@@ -101,21 +98,18 @@ export function useActivityEditActions() {
         return errors;
     }
 
-    function handleCancel(operationParam: string, objectIdParam: string, workRequest: WorkRequestFormState | null) {
-        if (operationParam == "create") {
+    function handleCancel(operation: ActivityOperation | undefined, objectId: string | undefined) {
+        if (operation === ActivityOperations.CREATE) {
             navigate("/ActivityList")
-        } else if (operationParam == "promoteWorkRequest") {
-            if (workRequest !== null) {
-                navigate("/WorkRequestDetails/" + objectIdParam)
-            }
+        } else if (operation === ActivityOperations.PROMOTE_WORK_REQUEST) {
+            navigate("/WorkRequestDetails/" + objectId)
         } else {
-            navigate("/ActivityDetails/" + objectIdParam)
+            navigate("/ActivityDetails/" + objectId)
         }
     }
 
     function validateInputs(form: ActivityFormState): ActivityValidationResult {
         const errors: ActivityValidationResult = {};
-
         if (!form.user) errors.user = "Wpisz wykonawcę czynności";
         if (!form.type) errors.type = "Wpisz rodzaj czynności";
         if (!form.exp) errors.exp = "Wpisz zdobyte punkty doświadczenia";

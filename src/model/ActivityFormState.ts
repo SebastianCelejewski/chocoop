@@ -1,7 +1,7 @@
 export type ActivityFormState = {
   id?: string;
   date: string;
-  user?: string;
+  user: string;
   type: string;
   exp: string;
   comment: string;

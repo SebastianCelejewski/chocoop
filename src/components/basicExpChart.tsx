@@ -62,6 +62,7 @@ function BasicExpChart({periodType, labels, chartData}: {periodType: string,labe
                 }
             },
             x: {
+                offset: false,
                 title: {
                     display: false
                 },
