@@ -25,10 +25,10 @@ const calculationStrategies = new Map<string, object>([
 function PeriodDetails({periodType, subPeriodType, selectedPeriod, users, expStats, onPeriodSelected}: {periodType:string, subPeriodType: string, selectedPeriod: string, users: Map<string, User>, expStats: Array<Schema["ExperienceStatistics"]["type"]>, onPeriodSelected: (period: string) => void} ) {
     const calculationStrategy = calculationStrategies.get(periodType) as CalculationStrategy
     
-    const gridData = new Map<string, Map<string, number>>();
+    const gridData = new Map<string, Map<string, number | null>>();
     const chartLabels = Array<string>();
-    const chartData: Array<Array<number>> = Array.from({length: users.size}, () => []);
-    const summarizedChartData: Array<Array<number>> = Array.from({length: users.size}, () => []);
+    const chartData: Array<Array<number | null>> = Array.from({length: users.size}, () => []);
+    const summarizedChartData: Array<Array<number | null>> = Array.from({length: users.size}, () => []);
 
     const expStatsForPeriodType = expStats
         .filter((record) => record.periodType == subPeriodType)
@@ -62,20 +62,43 @@ function PeriodDetails({periodType, subPeriodType, selectedPeriod, users, expSta
 
         let idx = 0;
         users.forEach((user) => {
-            const exp = expStats
-                .filter((record) => record.user == user.id && record.period == dateStr && record.periodType == subPeriodType)
-                .reduce((sum, record) => sum + record.exp, 0)
-            userDataForThisSubPeriod.set(user.id, exp);
-            chartData[idx].push(exp);
-            if (dateIdx == 0) {
-                summarizedChartData[idx].push(exp);
+            const filteredExpStats =  expStats
+                .filter((record) => record.user == user.id && record.period == dateStr && record.periodType == subPeriodType);
+
+            if (filteredExpStats.length > 0) {
+                const exp = filteredExpStats.reduce((sum, record) => sum + record.exp, 0)
+                chartData[idx].push(exp);
+                
+                userDataForThisSubPeriod.set(user.id, exp);
+                if (dateIdx == 0) {
+                    summarizedChartData[idx].push(exp);
+                } else {
+                    summarizedChartData[idx].push(summarizedChartData[idx][dateIdx - 1] || 0 + exp)
+                }
+
+                for (var z = 0; z < chartData[idx].length; z++) {
+                    if (chartData[idx][z] == null) {
+                        chartData[idx][z] = 0;
+                    }
+                };
+
+                for (var z = 0; z < summarizedChartData[idx].length; z++) {
+                    if (summarizedChartData[idx][z] == null) {
+                        if (z == 0) {
+                            summarizedChartData[idx][z] = 0;
+                        } else {
+                            summarizedChartData[idx][z] = summarizedChartData[idx][z - 1];
+                        }
+                    }
+                };
             } else {
-                summarizedChartData[idx].push(summarizedChartData[idx][dateIdx - 1] + exp)
+                chartData[idx].push(null);
+                summarizedChartData[idx].push(null);
             }
             
             idx++;
         })
-        
+
         gridData.set(dateStr, userDataForThisSubPeriod);
         chartLabels.push(dateStr);
         subPeriod++;
@@ -83,9 +106,11 @@ function PeriodDetails({periodType, subPeriodType, selectedPeriod, users, expSta
         dateIdx++;
     }
 
+    const seriesNames = Array.from(users.values(), (user) => user.nickname)
+
     return <>
-        <BasicExpChart periodType={periodType} labels={chartLabels} chartData={chartData}/>
-        <AccumulatedExpChart periodType={periodType} labels={chartLabels} chartData={summarizedChartData}/>
+        <BasicExpChart periodType={periodType} axisLabels={chartLabels} seriesNames={seriesNames} chartData={chartData}/>
+        <AccumulatedExpChart periodType={periodType} axisLabels={chartLabels} seriesNames={seriesNames} chartData={chartData}/>
         <ExpDataTable periodType={periodType} users={users} gridData={gridData} onRowSelected={onPeriodSelected} />
     </>
 }

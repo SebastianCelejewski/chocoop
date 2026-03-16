@@ -28,10 +28,10 @@ const periodTypeToAutoSkipPadding = new Map<string, number>([
     ["TOTAL", 1]
 ]);
 
-function BasicExpChart({periodType, labels, chartData}: {periodType: string,labels: Array<string>, chartData: Array<Array<number>>}) {
+function BasicExpChart({periodType, axisLabels, seriesNames, chartData}: {periodType: string, axisLabels: Array<string>, seriesNames: Array<string>, chartData: Array<Array<number | null>>}) {
     const datasets = chartData.map((data, index) => {
         return {
-            label: labels[index],
+            label: seriesNames[index],
             data: data,
             borderColor: userColors[index],
             fill: false,
@@ -41,7 +41,7 @@ function BasicExpChart({periodType, labels, chartData}: {periodType: string,labe
     });
     
     const data = {
-        labels: labels,
+        labels: axisLabels,
         datasets: datasets
     };
 

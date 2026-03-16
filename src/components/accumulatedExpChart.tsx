@@ -28,11 +28,27 @@ const periodTypeToAutoSkipPadding = new Map<string, number>([
     ["TOTAL", 1]
 ]);
 
-function AccumulatedExpChart({periodType, labels, chartData}: {periodType: string, labels: Array<string>, chartData: Array<Array<number>>}) {
+function accumulate(data: Array<number | null>): Array<number | null> {
+    const result = new Array(data.length);
+    let sum = 0;
+    for (let i = 0; i < data.length; i++) {
+        const value = data[i];
+        if (value !== null) {
+            sum += value;
+            result[i] = sum;
+        } else {
+            result[i] = null;
+        }
+        
+    }
+    return result;
+}
+
+function AccumulatedExpChart({periodType, axisLabels, seriesNames, chartData}: {periodType: string, axisLabels: Array<string>, seriesNames: Array<string>, chartData: Array<Array<number | null>>}) {
     const datasets = chartData.map((data, index) => {
         return {
-            label: labels[index],
-            data: data,
+            label: seriesNames[index],
+            data: accumulate(data),
             borderColor: userColors[index],
             fill: false,
             stepped: true,
@@ -41,7 +57,7 @@ function AccumulatedExpChart({periodType, labels, chartData}: {periodType: strin
     });
     
     const data = {
-        labels: labels,
+        labels: axisLabels,
         datasets: datasets
     };
 

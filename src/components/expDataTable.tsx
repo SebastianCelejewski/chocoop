@@ -4,7 +4,7 @@ import userColors from "../utils/userColours";
 interface ExpDataTableProps {
     periodType: string;
     users: Map<string, User>;
-    gridData: Map<string, Map<string, number>>;
+    gridData: Map<string, Map<string, number | null>>;
     onRowSelected: (key: string) => void
 }
 
@@ -31,7 +31,7 @@ function ExpDataTable({periodType, users, gridData, onRowSelected}: ExpDataTable
                     <tr key={key} onClick={() => onRowSelected(key)}>
                         <td className="headingCell">{key}</td>
                         {Array.from(users.keys()).map((userId, idx) => (
-                            <td key={userId} style={{backgroundColor: userColors[idx]}}>{gridData.get(key)?.get(userId) || 0}</td>
+                            <td key={userId} style={{backgroundColor: userColors[idx]}}>{gridData.get(key)?.get(userId) || ""}</td>
                         ))}
                     </tr>
                 ))}
