@@ -75,5 +75,6 @@
 ## Version v0.4.13
 - End-to-end tests for activity workflow
 - Series lines on charts no longer go to the right edge of the chart
+- Tables no longer contain zeroes for days somebody did nothing
 - Fixed bug for page titles for creation and modification of an activity
 - Expanded README

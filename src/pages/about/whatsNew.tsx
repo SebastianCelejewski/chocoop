@@ -6,6 +6,7 @@ function WhatsNew() {
             <p className="label"><b>Wersja 0.4.13</b></p>
             <ul>
                 <li>Linie na wykresach przy braku danych dla danych dni, miesięcy lub lat nie biegną do prawej krawędzi wykresu</li>
+                <li>Tabelki nie zawierają zer dla dni, kiedy użytkownicy nie wykonali żadnych prac</li>
             </ul>
 
             <p className="label"><b>Wersja 0.4.12</b></p>

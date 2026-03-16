@@ -28,7 +28,6 @@ function PeriodDetails({periodType, subPeriodType, selectedPeriod, users, expSta
     const gridData = new Map<string, Map<string, number | null>>();
     const chartLabels = Array<string>();
     const chartData: Array<Array<number | null>> = Array.from({length: users.size}, () => []);
-    const summarizedChartData: Array<Array<number | null>> = Array.from({length: users.size}, () => []);
 
     const expStatsForPeriodType = expStats
         .filter((record) => record.periodType == subPeriodType)
@@ -70,30 +69,14 @@ function PeriodDetails({periodType, subPeriodType, selectedPeriod, users, expSta
                 chartData[idx].push(exp);
                 
                 userDataForThisSubPeriod.set(user.id, exp);
-                if (dateIdx == 0) {
-                    summarizedChartData[idx].push(exp);
-                } else {
-                    summarizedChartData[idx].push(summarizedChartData[idx][dateIdx - 1] || 0 + exp)
-                }
 
                 for (var z = 0; z < chartData[idx].length; z++) {
                     if (chartData[idx][z] == null) {
                         chartData[idx][z] = 0;
                     }
                 };
-
-                for (var z = 0; z < summarizedChartData[idx].length; z++) {
-                    if (summarizedChartData[idx][z] == null) {
-                        if (z == 0) {
-                            summarizedChartData[idx][z] = 0;
-                        } else {
-                            summarizedChartData[idx][z] = summarizedChartData[idx][z - 1];
-                        }
-                    }
-                };
             } else {
                 chartData[idx].push(null);
-                summarizedChartData[idx].push(null);
             }
             
             idx++;
