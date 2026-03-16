@@ -71,3 +71,9 @@
 - Added "Today" and "Yesterday" buttons to add activities quicker
 - New activity icons (v2)
 - Users fetched from Cognito are sorted by nickname
+
+## Version v0.4.13
+- End-to-end tests for activity workflow
+- Series lines on charts no longer go to the right edge of the chart
+- Fixed bug for page titles for creation and modification of an activity
+- Expanded README

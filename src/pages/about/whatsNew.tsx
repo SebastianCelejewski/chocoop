@@ -3,6 +3,11 @@ function WhatsNew() {
         <h2 className="pageTitle" data-testid="about-page">O aplikacji</h2>
         <ul className="richText">
             <h1>Co nowego w aplikacji</h1>
+            <p className="label"><b>Wersja 0.4.13</b></p>
+            <ul>
+                <li>Linie na wykresach przy braku danych dla danych dni, miesięcy lub lat nie biegną do prawej krawędzi wykresu</li>
+            </ul>
+
             <p className="label"><b>Wersja 0.4.12</b></p>
             <ul>
                 <li>Rezygnacja z zapisywania czasu wykonania czynności, zostaje sama data</li>
