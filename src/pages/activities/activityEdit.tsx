@@ -4,7 +4,7 @@ import { useCurrentUser } from "./hooks/useCurrentUser";
 
 import User from "../../model/User";
 
-import { ActivityFormState } from "../../model/ActivityFormState";
+import { ActivityEditFormState } from "../../model/ActivityFormState";
 import { ActivityFormErrorMessages } from "../../model/ActivityFormErrorMessages";
 import { useActivityEditDetails } from "./hooks/useActivityEditDetails";
 import { useActivityEditActions } from "./hooks/useActivityEditActions";
@@ -58,9 +58,9 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
         return <div className="notFoundState">Activity nie jest załadowane</div>;
     }
 
-    function handleActivityChange<K extends keyof ActivityFormState>(
+    function handleActivityChange<K extends keyof ActivityEditFormState>(
         key: K,
-        value: ActivityFormState[K]
+        value: ActivityEditFormState[K]
     ) {
         setActivity(prev => prev ? { ...prev, [key]: value } : prev);
     }

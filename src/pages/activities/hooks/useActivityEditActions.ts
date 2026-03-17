@@ -1,20 +1,21 @@
 import type { Schema } from "../../../../amplify/data/resource";
-import { ActivityFormState } from "../../../model/ActivityFormState";
-import { WorkRequestFormState } from "../../../model/WorkRequestFormState";
+import { ActivityEditFormState } from "../../../model/ActivityFormState";
+import { WorkRequestEditFormState } from "../../../model/WorkRequestFormState";
 import reportError from "../../../utils/reportError"
 import { useNavigate } from "react-router";
 import { generateClient } from "aws-amplify/data";
 import { ActivityOperations, ActivityOperation } from "../../../model/ActivityOperation";
+import { createActivityObjectFromState, createWorkRequestObjectFromState } from "../../../model/mappers/activityMapper";
 
 export function useActivityEditActions() {
 
     type ValidationErrors<T> = Partial<Record<keyof T, string>>;
-    type ActivityValidationResult = ValidationErrors<ActivityFormState>;
+    type ActivityValidationResult = ValidationErrors<ActivityEditFormState>;
 
     const client = generateClient<Schema>();
     const navigate = useNavigate();
 
-    function handleSubmit(activity: ActivityFormState, workRequest: WorkRequestFormState | null, operationParam: string | undefined): ActivityValidationResult {
+    function handleSubmit(activity: ActivityEditFormState, workRequest: WorkRequestEditFormState | null, operationParam: string | undefined): ActivityValidationResult {
         const errors = validateInputs(activity);
         const isValid = Object.keys(errors).length === 0;
 
@@ -23,76 +24,15 @@ export function useActivityEditActions() {
         }
 
         if (operationParam === ActivityOperations.CREATE) {
-            const newActivity = createActivityObjectFromState(activity, workRequest);
-
-            client.models.Activity
-                .create(newActivity)
-                .then((createActivityResponse) => {
-                    if (createActivityResponse?.errors?.length) {
-                        reportError("Failed to create a new activity in the database", createActivityResponse.errors);
-                        return;
-                    }
-                    navigate("/ActivityList")
-                })
-                .catch((error) => {
-                    reportError("Failed to create a new activity in the database", error);
-                })
-        }
-
-        if (operationParam === ActivityOperations.PROMOTE_WORK_REQUEST) {
-            const newActivity = createActivityObjectFromState(activity, workRequest);
-
-            client.models.Activity
-                .create(newActivity)
-                .then((createActivityResponse) => {
-                    if (createActivityResponse?.errors?.length) {
-                        reportError("Failed to create new activity in the database when promoting a work request", createActivityResponse.errors);
-                        return;
-                    }
-
-                    if (createActivityResponse["data"] === null || createActivityResponse["data"]["id"] === null) {
-                        reportError("Failed to fetch created activity id from the database")
-                        return;
-                    }
-
-                    const newActivityId = createActivityResponse["data"]["id"]
-
-                    const updatedWorkRequest = createWorkRequestObjectFromState(newActivityId, workRequest);
-
-                    client.models.WorkRequest
-                        .update(updatedWorkRequest)
-                        .then((updateWorkRequestResponse) => {
-                            if (updateWorkRequestResponse?.errors?.length) {
-                                reportError("Failed to update a work request in the database", updateWorkRequestResponse.errors);
-                            }
-                            navigate("/ActivityList")
-                        })
-                        .catch((error) => {
-                            reportError("Failed to update a work request in the database", error);
-                        })
-                })
-                .catch((error) => {
-                    reportError("Failed to create new activity in the database when promoting a work request", error);
-                })
+            handleActivityCreation(activity, workRequest)
         }
 
         if (operationParam === ActivityOperations.UPDATE) {
-            const updatedActivity = createActivityObjectFromState(activity, workRequest);
-            if (updatedActivity.id === undefined) {
-                throw new Error(reportError("State activityId is undefined during creation of a new activity object"))
-            }
+            handleActivityModification(activity, workRequest)
+        }
 
-            client.models.Activity
-                .update({ ...updatedActivity, id: updatedActivity.id })
-                .then((updateActivityResponse) => {
-                    if (updateActivityResponse?.errors?.length) {
-                        reportError("Failed to update an activity in the database", updateActivityResponse.errors);
-                    }
-                    navigate("/ActivityDetails/" + activity.id)
-                })
-                .catch((error) => {
-                    reportError("Failed to update an activity in the database", error);
-                })
+        if (operationParam === ActivityOperations.PROMOTE_WORK_REQUEST) {
+            handleWorkRequestPromotion(activity, workRequest)
         }
 
         return errors;
@@ -108,7 +48,7 @@ export function useActivityEditActions() {
         }
     }
 
-    function validateInputs(form: ActivityFormState): ActivityValidationResult {
+    function validateInputs(form: ActivityEditFormState): ActivityValidationResult {
         const errors: ActivityValidationResult = {};
         if (!form.user) errors.user = "Wpisz wykonawcę czynności";
         if (!form.type) errors.type = "Wpisz rodzaj czynności";
@@ -118,73 +58,81 @@ export function useActivityEditActions() {
         return errors;
     }
 
-    function createActivityObjectFromState(activity: ActivityFormState, workRequest: WorkRequestFormState | null) {
-        if (activity.date === undefined) {
-            throw new Error(reportError("State activityDate is undefined during creation of a new activity object"))
-        }
-        if (activity.user === undefined) {
-            throw new Error(reportError("State activityPerson is undefined during creation of a new activity object"))
-        }
-        if (activity.type === undefined) {
-            throw new Error(reportError("State activityType is undefined during creation of a new activity object"))
-        }
-        if (activity.exp === undefined || isNaN(Number(activity.exp))) {
-            throw new Error(reportError("State activityExp is undefined during creation of a new activity object"))
-        }
-        return {
-            id: activity.id,
-            date: activity.date,
-            user: activity.user,
-            type: activity.type,
-            exp: Number(activity.exp),
-            comment: activity.comment,
-            requestedAs: workRequest?.id
-        }
-    }
-
-    function createWorkRequestObjectFromState(newActivityId: string, workRequest: WorkRequestFormState | null) {
-        if (workRequest === null) {
-            throw new Error(reportError("State workRequest is null during creation of a new work request object"))
-        }
-        if (newActivityId === undefined) {
-            throw new Error(reportError("Argument newActivityId is undefined during creation of a new work request object"))
-        }
-        if (workRequest.id === undefined) {
-            throw new Error(reportError("State workRequestId is undefined during creation of a new work request object"))
-        }
-        if (workRequest.createdDateTime === undefined) {
-            throw new Error(reportError("State workRequestCreatedDateTime is undefined during creation of a new work request object"))
-        }
-        if (workRequest.createdBy === undefined) {
-            throw new Error(reportError("State workRequestCreatedBy is undefined during creation of a new work request object"))
-        }
-        if (workRequest.type === undefined) {
-            throw new Error(reportError("State workRequestType is undefined during creation of a new work request object"))
-        }
-        if (workRequest.exp === undefined || isNaN(Number(workRequest.exp))) {
-            throw new Error(reportError("State workRequestExp is undefined during creation of a new work request object"))
-        }
-        if (workRequest.urgency === undefined || isNaN(Number(workRequest.urgency))) {
-            throw new Error(reportError("State workRequestUrgency is undefined during creation of a new work request object"))
-        }
-        if (workRequest.instructions === undefined) {
-            throw new Error(reportError("State workRequestInstructions is undefined during creation of a new work request object"))
-        }
-        return {
-            id: workRequest.id,
-            createdDateTime: new Date(workRequest.createdDateTime).toISOString(),
-            createdBy: workRequest.createdBy,
-            type: workRequest.type,
-            exp: Number(workRequest.exp),
-            urgency: Number(workRequest.urgency),
-            instructions: workRequest.instructions,
-            completed: true,
-            completedAs: newActivityId
-        }
-    }
-
     function isNaturalNumber(value: string): boolean {
         return /^\d+$/.test(value);
+    }
+
+    function handleActivityCreation(activity: ActivityEditFormState, workRequest: WorkRequestEditFormState | null) {
+        const newActivity = createActivityObjectFromState(activity, workRequest);
+
+        client.models.Activity
+            .create(newActivity)
+            .then((createActivityResponse) => {
+                if (createActivityResponse?.errors?.length) {
+                    reportError("Failed to create a new activity in the database", createActivityResponse.errors);
+                    return;
+                }
+                navigate("/ActivityList")
+            })
+            .catch((error) => {
+                reportError("Failed to create a new activity in the database", error);
+            })
+    }
+
+    function handleActivityModification(activity: ActivityEditFormState, workRequest: WorkRequestEditFormState | null) {
+        const updatedActivity = createActivityObjectFromState(activity, workRequest);
+        if (updatedActivity.id === undefined) {
+            throw new Error(reportError("State activityId is undefined during creation of a new activity object"))
+        }
+
+        client.models.Activity
+            .update({ ...updatedActivity, id: updatedActivity.id })
+            .then((updateActivityResponse) => {
+                if (updateActivityResponse?.errors?.length) {
+                    reportError("Failed to update an activity in the database", updateActivityResponse.errors);
+                }
+                navigate("/ActivityDetails/" + activity.id)
+            })
+            .catch((error) => {
+                reportError("Failed to update an activity in the database", error);
+            })
+    }
+
+    function handleWorkRequestPromotion(activity: ActivityEditFormState, workRequest: WorkRequestEditFormState | null) {
+        const newActivity = createActivityObjectFromState(activity, workRequest);
+
+        client.models.Activity
+            .create(newActivity)
+            .then((createActivityResponse) => {
+                if (createActivityResponse?.errors?.length) {
+                    reportError("Failed to create new activity in the database when promoting a work request", createActivityResponse.errors);
+                    return;
+                }
+
+                if (createActivityResponse["data"] === null || createActivityResponse["data"]["id"] === null) {
+                    reportError("Failed to fetch created activity id from the database")
+                    return;
+                }
+
+                const newActivityId = createActivityResponse["data"]["id"]
+
+                const updatedWorkRequest = createWorkRequestObjectFromState(newActivityId, workRequest);
+
+                client.models.WorkRequest
+                    .update(updatedWorkRequest)
+                    .then((updateWorkRequestResponse) => {
+                        if (updateWorkRequestResponse?.errors?.length) {
+                            reportError("Failed to update a work request in the database", updateWorkRequestResponse.errors);
+                        }
+                        navigate("/ActivityList")
+                    })
+                    .catch((error) => {
+                        reportError("Failed to update a work request in the database", error);
+                    })
+            })
+            .catch((error) => {
+                reportError("Failed to create new activity in the database when promoting a work request", error);
+            })
     }
 
     return { handleSubmit, handleCancel }

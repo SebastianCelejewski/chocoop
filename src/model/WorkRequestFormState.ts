@@ -1,4 +1,4 @@
-export type WorkRequestFormState = {
+export type WorkRequestEditFormState = {
   id?: string;
   createdDateTime?: string;
   createdBy?: string;

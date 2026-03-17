@@ -1,3 +1,5 @@
+const timeZoneOffset = new Date().getTimezoneOffset()
+
 function dateTimeToString(dateTime: string) {
     return Intl
         .DateTimeFormat(undefined, {dateStyle: "full", timeStyle: "short"})
@@ -10,4 +12,16 @@ function dateToString(date: string) {
         .format(Date.parse(date + "T00:00:00"))
 }
 
-export { dateTimeToString, dateToString };
+function toLocalDate(date: string) {
+    const activityDateFromDatabaseAsDate = Date.parse(date)
+    const activityDateLocal = new Date(activityDateFromDatabaseAsDate - timeZoneOffset * 60 * 1000)
+    return activityDateLocal.toISOString().split("T")[0]
+}
+
+function getCurrentDate() {
+    const currentDateTimeLocal = new Date(new Date().getTime() - timeZoneOffset * 60 * 1000)
+    const currentDate = currentDateTimeLocal.toISOString().split("T")[0]
+    return currentDate;
+}
+
+export { dateTimeToString, dateToString, toLocalDate, getCurrentDate };
