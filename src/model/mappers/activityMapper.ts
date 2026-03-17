@@ -75,7 +75,7 @@ function mapActivityEditFormStateToActivityModel(activity: ActivityEditFormState
     }
 }
 
-function mapActivityEditFormStateToWorkRequestModel(newActivityId: string, workRequest: WorkRequestEditFormState | null) {
+function mapWorkRequestEditFormStateToWorkRequestModel(newActivityId: string, workRequest: WorkRequestEditFormState | null) {
     if (workRequest === null) {
         throw new Error(reportError("State workRequest is null during creation of a new work request object"))
     }
@@ -122,5 +122,5 @@ export {
     mapWorkRequestModelToActivityEditFormState as workRequestModelToActivityEditFormState,
     mapWorkRequestModelToWorkRequestFormState as workRequestModelToWorkRequestFormState,
     mapActivityEditFormStateToActivityModel as createActivityObjectFromState,
-    mapActivityEditFormStateToWorkRequestModel as createWorkRequestObjectFromState
+    mapWorkRequestEditFormStateToWorkRequestModel as createWorkRequestObjectFromState
 }

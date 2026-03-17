@@ -6,11 +6,9 @@ import { useNavigate } from "react-router";
 import { generateClient } from "aws-amplify/data";
 import { ActivityOperations, ActivityOperation } from "../../../model/ActivityOperation";
 import { createActivityObjectFromState, createWorkRequestObjectFromState } from "../../../model/mappers/activityMapper";
+import { ActivityValidationResult } from "../../../model/ActivityValidationResult";
 
 export function useActivityEditActions() {
-
-    type ValidationErrors<T> = Partial<Record<keyof T, string>>;
-    type ActivityValidationResult = ValidationErrors<ActivityEditFormState>;
 
     const client = generateClient<Schema>();
     const navigate = useNavigate();

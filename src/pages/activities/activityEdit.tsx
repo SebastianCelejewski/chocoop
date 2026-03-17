@@ -10,6 +10,7 @@ import { useActivityEditDetails } from "./hooks/useActivityEditDetails";
 import { useActivityEditActions } from "./hooks/useActivityEditActions";
 import TemplateButtons from "../../components/templateButtons";
 import { ActivityOperations, ActivityOperation } from "../../model/ActivityOperation";
+import { ActivityValidationResult } from "../../model/ActivityValidationResult";
 
 const pageTitleMap: Record<ActivityOperation, string> = {
   [ActivityOperations.CREATE]: "Dodawanie wykonanej czynności",
@@ -72,22 +73,26 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
     const submit = function(e: any) {
         e.preventDefault();
         const errors = handleSubmit(activity, workRequest, operation);
+        setErrorMessages(mapSubmissionErrorsToErrorMessages(errors))
+    }
+
+    function cancel() {
+        handleCancel(operation, objectId);
+    }
+
+    function mapSubmissionErrorsToErrorMessages(errors: ActivityValidationResult): ActivityFormErrorMessages {
         const isValid = Object.keys(errors).length === 0;
 
-        if (!isValid) {
-            const newErrorMessages: ActivityFormErrorMessages = {
+        if (isValid) {
+            return initialErrorMessages;
+        } else {
+            return {
                 activityPersonErrorMessage: errors.user ?? "",
                 activityTypeErrorMessage: errors.type ?? "",
                 activityExpErrorMessage: errors.exp ?? "",
                 activityCommentErrorMessage: errors.comment ?? ""
             }
-
-            setErrorMessages(newErrorMessages);
         }
-    }
-
-    function cancel() {
-        handleCancel(operation, objectId);
     }
 
 return <>
