@@ -22,7 +22,7 @@ export function useActivityEditActions() {
             return errors;
         }
 
-        if (operationParam === "create") {
+        if (operationParam === ActivityOperations.CREATE) {
             const newActivity = createActivityObjectFromState(activity, workRequest);
 
             client.models.Activity
@@ -39,7 +39,7 @@ export function useActivityEditActions() {
                 })
         }
 
-        if (operationParam === "promoteWorkRequest") {
+        if (operationParam === ActivityOperations.PROMOTE_WORK_REQUEST) {
             const newActivity = createActivityObjectFromState(activity, workRequest);
 
             client.models.Activity
@@ -76,7 +76,7 @@ export function useActivityEditActions() {
                 })
         }
 
-        if (operationParam === "update") {
+        if (operationParam === ActivityOperations.UPDATE) {
             const updatedActivity = createActivityObjectFromState(activity, workRequest);
             if (updatedActivity.id === undefined) {
                 throw new Error(reportError("State activityId is undefined during creation of a new activity object"))

@@ -80,14 +80,14 @@ export function useActivityEditDetails(operation?: ActivityOperation, objectId?:
       }
     }
 
-    if (operation === "create") {
+    if (operation === ActivityOperations.CREATE) {
       createEmptyActivity();
-    } else if (operation === "update") {
+    } else if (operation === ActivityOperations.UPDATE) {
       if (!objectId) {
         throw new Error("Argument objectId is missing");
       }
       loadActivity(objectId);
-    } else if (operation === "promoteWorkRequest") {
+    } else if (operation === ActivityOperations.PROMOTE_WORK_REQUEST) {
       if (!objectId) {
         throw new Error("Argument objectId is missing");
       }
