@@ -5,16 +5,20 @@ import { ActivityOperations, ActivityOperation } from "../../../model/ActivityOp
 import { ActivityValidationResult } from "../../../model/ActivityValidationResult";
 import ActivityService from "../../../services/activityService";
 import reportError from "../../../utils/reportError";
+import { OperationResult } from "../../../model/OperationResult";
 
 export function useActivityEditActions() {
 
     const navigate = useNavigate();
     const activityService = ActivityService();
 
-    async function handleSubmit(activity: ActivityEditFormState, workRequest: WorkRequestEditFormState | null, operationParam: ActivityOperation | undefined): Promise<ActivityValidationResult> {
+    async function handleSubmit(
+        activity: ActivityEditFormState,
+        workRequest: WorkRequestEditFormState | null,
+        operationParam: ActivityOperation | undefined
+    ): Promise<ActivityValidationResult> {
         const errors = validateInputs(activity);
         const isValid = Object.keys(errors).length === 0;
-        let result = null;
 
         if (!isValid) {
             return errors;
@@ -22,29 +26,23 @@ export function useActivityEditActions() {
 
         switch(operationParam) {
             case ActivityOperations.CREATE:
-                result = await activityService.handleActivityCreation(activity, workRequest);
-                if (result.success) {
-                    navigate("/ActivityList")
-                } else {
-                    throw new Error(reportError(result.message, result.details));
-                }
-                break
+                handleResult(
+                    await activityService.handleActivityCreation(activity, workRequest),
+                    () => navigate("/ActivityList")
+                );
+                break;
             case ActivityOperations.UPDATE:
-                result = await activityService.handleActivityModification(activity, workRequest)
-                if (result.success) {
-                    navigate("/ActivityDetails/" + activity.id)
-                } else {
-                    throw new Error(reportError(result.message, result.details));
-                }
-                break
+                handleResult(
+                    await activityService.handleActivityModification(activity, workRequest),
+                    () => navigate("/ActivityDetails/" + activity.id)
+                );
+                break;
             case ActivityOperations.PROMOTE_WORK_REQUEST:
-                result = await activityService.handleWorkRequestPromotion(activity, workRequest)
-                if (result.success) {
-                    navigate("/ActivityList")
-                } else {
-                    throw new Error(reportError(result.message, result.details));
-                }
-                break
+                handleResult(
+                    await activityService.handleWorkRequestPromotion(activity, workRequest),
+                    () => navigate("/ActivityList")
+                );
+                break;
         }
 
         return errors;
@@ -72,6 +70,14 @@ export function useActivityEditActions() {
 
     function isNaturalNumber(value: string): boolean {
         return /^\d+$/.test(value);
+    }
+
+    function handleResult(result: OperationResult, onSuccess: () => void) {
+        if (result.success) {
+            onSuccess();
+        } else {
+            throw new Error(reportError(result.message, result.details));
+        }
     }
 
     return { handleSubmit, handleCancel }
