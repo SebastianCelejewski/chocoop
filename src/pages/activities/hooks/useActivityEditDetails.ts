@@ -34,7 +34,7 @@ export function useActivityEditDetails(operation?: ActivityOperation, objectId?:
 
     let aborted = false;
 
-    const createEmptyActivity = async function () {
+    const createEmptyActivity = function () {
       setActivity({
         date: getCurrentDate(),
         user: currentUser.userId,

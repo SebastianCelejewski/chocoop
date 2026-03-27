@@ -70,9 +70,9 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
         setActivity(prev => prev ? {...prev, type, exp: exp.toString()} : prev);
     }
 
-    const submit = function(e: any) {
+    const submit = async function(e: any) {
         e.preventDefault();
-        const errors = handleSubmit(activity, workRequest, operation);
+        const errors = await handleSubmit(activity, workRequest, operation);
         setErrorMessages(mapSubmissionErrorsToErrorMessages(errors))
     }
 
