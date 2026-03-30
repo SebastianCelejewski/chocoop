@@ -1,4 +1,4 @@
-import { ActivityEditFormState } from "./ActivityFormState";
+import { ActivityFormState } from "./ActivityFormState";
 
 export type ValidationErrors<T> = Partial<Record<keyof T, string>>;
-export type ActivityValidationResult = ValidationErrors<ActivityEditFormState>;
+export type ActivityValidationResult = ValidationErrors<ActivityFormState>;

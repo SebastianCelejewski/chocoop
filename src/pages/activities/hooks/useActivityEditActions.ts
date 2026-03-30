@@ -1,11 +1,10 @@
-import { ActivityEditFormState } from "../../../model/ActivityFormState";
+import { ActivityFormState } from "../../../model/ActivityFormState";
 import { WorkRequestEditFormState } from "../../../model/WorkRequestFormState";
 import { useNavigate } from "react-router";
 import { ActivityOperations, ActivityOperation } from "../../../model/ActivityOperation";
-import { ActivityValidationResult } from "../../../model/ActivityValidationResult";
-import ActivityService from "../../../services/activityService";
 import reportError from "../../../utils/reportError";
 import { OperationResult } from "../../../model/OperationResult";
+import ActivityService from "../../../services/ActivityService";
 
 export function useActivityEditActions() {
 
@@ -13,17 +12,10 @@ export function useActivityEditActions() {
     const activityService = ActivityService();
 
     async function handleSubmit(
-        activity: ActivityEditFormState,
+        activity: ActivityFormState,
         workRequest: WorkRequestEditFormState | null,
         operationParam: ActivityOperation | undefined
-    ): Promise<ActivityValidationResult> {
-        const errors = validateInputs(activity);
-        const isValid = Object.keys(errors).length === 0;
-
-        if (!isValid) {
-            return errors;
-        }
-
+    ) {
         switch(operationParam) {
             case ActivityOperations.CREATE:
                 handleResult(
@@ -44,8 +36,6 @@ export function useActivityEditActions() {
                 );
                 break;
         }
-
-        return errors;
     }
 
     function handleCancel(operation: ActivityOperation | undefined, objectId: string | undefined) {
@@ -58,19 +48,7 @@ export function useActivityEditActions() {
         }
     }
 
-    function validateInputs(form: ActivityEditFormState): ActivityValidationResult {
-        const errors: ActivityValidationResult = {};
-        if (!form.user) errors.user = "Wpisz wykonawcę czynności";
-        if (!form.type) errors.type = "Wpisz rodzaj czynności";
-        if (!form.exp) errors.exp = "Wpisz zdobyte punkty doświadczenia";
-        if (!isNaturalNumber(form.exp)) errors.exp = "Punkty doświadczenia muszą być liczbą naturalną";
 
-        return errors;
-    }
-
-    function isNaturalNumber(value: string): boolean {
-        return /^\d+$/.test(value);
-    }
 
     function handleResult(result: OperationResult, onSuccess: () => void) {
         if (result.success) {

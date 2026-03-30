@@ -2,7 +2,7 @@ import type { Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 import reportError from "../utils/reportError"
 import { createActivityObjectFromState, createWorkRequestObjectFromState } from "../model/mappers/activityMapper";
-import { ActivityEditFormState} from "../model/ActivityFormState";
+import { ActivityFormState} from "../model/ActivityFormState";
 import { WorkRequestEditFormState } from "../model/WorkRequestFormState";
 import { OperationResult } from "../model/OperationResult";
 import { success, failure } from "../model/OperationResult";
@@ -10,7 +10,7 @@ import { success, failure } from "../model/OperationResult";
 export default function ActivityService() {
     const client = generateClient<Schema>();
 
-    async function handleActivityCreation(activity: ActivityEditFormState, workRequest: WorkRequestEditFormState | null): Promise<OperationResult> {
+    async function handleActivityCreation(activity: ActivityFormState, workRequest: WorkRequestEditFormState | null): Promise<OperationResult> {
         const newActivity = createActivityObjectFromState(activity, workRequest);
 
         try {
@@ -27,7 +27,7 @@ export default function ActivityService() {
         }
     }
 
-    async function handleActivityModification(activity: ActivityEditFormState, workRequest: WorkRequestEditFormState | null): Promise<OperationResult>
+    async function handleActivityModification(activity: ActivityFormState, workRequest: WorkRequestEditFormState | null): Promise<OperationResult>
     {
         const updatedActivity = createActivityObjectFromState(activity, workRequest);
         if (updatedActivity.id === undefined) {
@@ -45,7 +45,7 @@ export default function ActivityService() {
         }
     }
 
-    async function handleWorkRequestPromotion(activity: ActivityEditFormState, workRequest: WorkRequestEditFormState | null): Promise<OperationResult> {
+    async function handleWorkRequestPromotion(activity: ActivityFormState, workRequest: WorkRequestEditFormState | null): Promise<OperationResult> {
         const newActivity = createActivityObjectFromState(activity, workRequest);
         var newActivityId: string;
         try {

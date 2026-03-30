@@ -1,4 +1,4 @@
-export type ActivityEditFormState = {
+export type ActivityFormState = {
   id?: string;
   date: string;
   user: string;

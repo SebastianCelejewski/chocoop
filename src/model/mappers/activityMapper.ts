@@ -1,11 +1,11 @@
 import type { Schema } from "../../../amplify/data/resource";
-import type { ActivityEditFormState } from "../../model/ActivityFormState";
+import type { ActivityFormState } from "../../model/ActivityFormState";
 import { WorkRequestEditFormState } from "../../model/WorkRequestFormState";
 import { AuthUser } from "aws-amplify/auth";
 import { toLocalDate, getCurrentDate } from "../../utils/dateUtils";
 import reportError from "../../utils/reportError"
 
-function mapActivityModelToActivityEditFormState(model: Schema["Activity"]["type"] | null): ActivityEditFormState | null {
+function mapActivityModelToActivityFormState(model: Schema["Activity"]["type"] | null): ActivityFormState | null {
   if (model === null) {
       return null;
   }
@@ -20,7 +20,7 @@ function mapActivityModelToActivityEditFormState(model: Schema["Activity"]["type
   }
 }
 
-function mapWorkRequestModelToActivityEditFormState(model: Schema["WorkRequest"]["type"] | null, currentUser: AuthUser): ActivityEditFormState | null {
+function mapWorkRequestModelToActivityFormState(model: Schema["WorkRequest"]["type"] | null, currentUser: AuthUser): ActivityFormState | null {
   if (model === null) {
       return null;
   }
@@ -51,7 +51,7 @@ function mapWorkRequestModelToWorkRequestFormState(model: Schema["WorkRequest"][
   }
 }
 
-function mapActivityEditFormStateToActivityModel(activity: ActivityEditFormState, workRequest: WorkRequestEditFormState | null) {
+function mapActivityFormStateToActivityModel(activity: ActivityFormState, workRequest: WorkRequestEditFormState | null) {
     if (activity.date === undefined) {
         throw new Error(reportError("State activityDate is undefined during creation of a new activity object"))
     }
@@ -118,9 +118,9 @@ function mapWorkRequestEditFormStateToWorkRequestModel(newActivityId: string, wo
 
 
 export {
-    mapActivityModelToActivityEditFormState as activityModelToActivityEditFormState,
-    mapWorkRequestModelToActivityEditFormState as workRequestModelToActivityEditFormState,
+    mapActivityModelToActivityFormState as activityModelToActivityFormState,
+    mapWorkRequestModelToActivityFormState as workRequestModelToActivityFormState,
     mapWorkRequestModelToWorkRequestFormState as workRequestModelToWorkRequestFormState,
-    mapActivityEditFormStateToActivityModel as createActivityObjectFromState,
+    mapActivityFormStateToActivityModel as createActivityObjectFromState,
     mapWorkRequestEditFormStateToWorkRequestModel as createWorkRequestObjectFromState
 }

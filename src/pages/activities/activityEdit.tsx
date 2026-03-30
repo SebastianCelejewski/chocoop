@@ -4,12 +4,11 @@ import { useCurrentUser } from "./hooks/useCurrentUser";
 
 import User from "../../model/User";
 
-import { ActivityEditFormState } from "../../model/ActivityFormState";
-import { ActivityFormErrorMessages } from "../../model/ActivityFormErrorMessages";
+import { ActivityFormState } from "../../model/ActivityFormState";
 import { useActivityEditDetails } from "./hooks/useActivityEditDetails";
 import { useActivityEditActions } from "./hooks/useActivityEditActions";
-import TemplateButtons from "../../components/templateButtons";
 import { ActivityOperations, ActivityOperation } from "../../model/ActivityOperation";
+import { ActivityForm } from "../../components/activityForm";
 import { ActivityValidationResult } from "../../model/ActivityValidationResult";
 
 const pageTitleMap: Record<ActivityOperation, string> = {
@@ -23,25 +22,12 @@ function getPageTitle(operation?: ActivityOperation) {
 }
 
 function ActivityEdit({ users }: { users: Map<string, User> }) {
-    const currentDateTimeUTC = new Date()
-    const timeZoneOffset = currentDateTimeUTC.getTimezoneOffset()
-    const currentDateTimeLocal = new Date(currentDateTimeUTC.getTime() - timeZoneOffset * 60 * 1000)
-    const currentDate = currentDateTimeLocal.toISOString().split("T")[0]
-    const yesterdayDateTimeLocal = new Date(currentDateTimeLocal.getTime() - 24 * 60 * 60 * 1000);
-    const yesterdayDate = yesterdayDateTimeLocal.toISOString().split("T")[0]
-
-    const initialErrorMessages: ActivityFormErrorMessages = {
-        activityPersonErrorMessage: "",
-        activityTypeErrorMessage: "",
-        activityExpErrorMessage: "",
-        activityCommentErrorMessage: ""
-    }
 
     const currentUser = useCurrentUser() ?? undefined;
     const { handleSubmit, handleCancel } = useActivityEditActions();
     const { id: objectId, operation } = useParams<{id?: string, operation?: ActivityOperation}>();
     const { activity, setActivity, workRequest, loading, error } = useActivityEditDetails(operation, objectId, currentUser);
-    const [errorMessages, setErrorMessages] = useState<ActivityFormErrorMessages>(initialErrorMessages);
+    const [validationResult, setValidationResult] = useState<ActivityValidationResult>({});
 
     if (!currentUser) {
         return <div className="notFoundState">User nie jest załadowany</div>;
@@ -59,118 +45,59 @@ function ActivityEdit({ users }: { users: Map<string, User> }) {
         return <div className="notFoundState">Activity nie jest załadowane</div>;
     }
 
-    function handleActivityChange<K extends keyof ActivityEditFormState>(
-        key: K,
-        value: ActivityEditFormState[K]
-    ) {
+    function onActivityPropertyChanged<K extends keyof ActivityFormState>(key: K, value: ActivityFormState[K]) {
         setActivity(prev => prev ? { ...prev, [key]: value } : prev);
     }
 
-    function fillTemplate(type: string, exp: number) {
+    function onTemplateButtonClicked(type: string, exp: number) {
         setActivity(prev => prev ? {...prev, type, exp: exp.toString()} : prev);
     }
 
-    const submit = async function(e: any) {
+    const onSubmit = async function(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        const errors = await handleSubmit(activity, workRequest, operation);
-        setErrorMessages(mapSubmissionErrorsToErrorMessages(errors))
+        const newValidationResult = validateInputs(activity);
+        setValidationResult(newValidationResult);
+
+        if (hasErrors(newValidationResult)) {
+            return;
+        }
+
+        await handleSubmit(activity, workRequest, operation);
     }
 
-    function cancel() {
+    function hasErrors(validationResult: ActivityValidationResult) {
+        return Object.keys(validationResult).length > 0
+    }
+
+    function onCancel() {
         handleCancel(operation, objectId);
     }
 
-    function mapSubmissionErrorsToErrorMessages(errors: ActivityValidationResult): ActivityFormErrorMessages {
-        const isValid = Object.keys(errors).length === 0;
+    function validateInputs(form: ActivityFormState): ActivityValidationResult {
+        const errors: ActivityValidationResult = {};
 
-        if (isValid) {
-            return initialErrorMessages;
-        } else {
-            return {
-                activityPersonErrorMessage: errors.user ?? "",
-                activityTypeErrorMessage: errors.type ?? "",
-                activityExpErrorMessage: errors.exp ?? "",
-                activityCommentErrorMessage: errors.comment ?? ""
-            }
-        }
+        if (!form.user) errors.user = "Wpisz wykonawcę czynności";
+        if (!form.type) errors.type = "Wpisz rodzaj czynności";
+        if (!form.exp) errors.exp = "Wpisz zdobyte punkty doświadczenia";
+        if (!isNaturalNumber(form.exp)) errors.exp = "Punkty doświadczenia muszą być liczbą naturalną";
+        return errors;
     }
 
-return <>
+    function isNaturalNumber(value: string): boolean {
+        return /^\d+$/.test(value);
+    }
+
+    return <>
         <h2 className="pageTitle" data-testid="activity-edit-page" data-mode={operation}>{getPageTitle(operation)}</h2>
-        <form onSubmit={submit}>
-            <div className="entryDetails">
-                <p className="label">Data wykonania czynności</p>
-                <div>
-                    <button type="button" data-testid="yesterday-button" className="entityButton" onClick={() => handleActivityChange("date", yesterdayDate)}>Wczoraj</button>
-                    <button type="button" data-testid="today-button" className="entityButton" onClick={() => handleActivityChange("date", currentDate)}>Dziś</button>
-
-                    <input
-                        id="activityDate"
-                        data-testid="activity-date-input"
-                        aria-label="Date"
-                        type="date"
-                        value={activity.date}
-                        className="entityDatePicker"
-                        onChange={ e => handleActivityChange("date", e.target.value)}
-                    />
-                </div>
-
-                <p className="label">Wykonawca</p>
-                {errorMessages.activityPersonErrorMessage.length > 0 ? (<p className="validationMessage">{errorMessages.activityPersonErrorMessage}</p>) : (<></>)}
-                <p><select
-                    id="activityPerson"
-                    data-testid="activity-person-input"
-                    className="entityText"
-                    value={activity.user}
-                    onChange={e => handleActivityChange("user", e.target.value)}
-                    >
-                        {Array.from(users.values()).map((user: User) => {
-                            return <option key={user.id} value={user.id}>{user.nickname}</option>
-                        }
-                    )}
-                </select></p>
-
-                <p className="label">Szablony</p>
-                <TemplateButtons fillTemplate={fillTemplate} />
-
-                <p className="label">Czynność</p>
-                {errorMessages.activityTypeErrorMessage.length > 0 ? (<p className="validationMessage">{errorMessages.activityTypeErrorMessage}</p>) : (<></>)}
-                <p><input
-                        id="activityType"
-                        data-testid="activity-type-input"
-                        type="text"
-                        className="entityTextArea"
-                        value={activity.type}
-                        onChange={ e => handleActivityChange("type", e.target.value)}
-                /></p>
-
-                <p className="label">Zdobyte punkty doświadczenia</p>
-                {errorMessages.activityExpErrorMessage.length > 0 ? (<p className="validationMessage">{errorMessages.activityExpErrorMessage}</p>) : (<></>)}
-                <p><input
-                    id="activityExp"
-                    data-testid="activity-exp-input"
-                    type="text"
-                    className="entityText"
-                    value={activity.exp}
-                    onChange={ e => handleActivityChange("exp", e.target.value)}
-                /></p>
-
-                <p className="label">Komentarz</p>
-                {errorMessages.activityCommentErrorMessage.length > 0 ? (<p className="validationMessage">{errorMessages.activityCommentErrorMessage}</p>) : (<></>)}
-                <p><textarea
-                    id="activityComment"
-                    data-testid="activity-comment-input"
-                    className="entityTextArea"
-                    rows={5}
-                    value={activity.comment}
-                    onChange={ e => handleActivityChange("comment", e.target.value)}
-                /></p>
-            </div>
-            <div>
-                <button type="submit" data-testid="submit-button">Zatwierdź</button>
-                <button type="button" data-testid="cancel-button" onClick={cancel}>Anuluj</button>
-            </div>
-        </form>
+        <ActivityForm
+            activity={activity}
+            users={users}
+            validationResult={validationResult}
+            onTemplateButtonClicked={onTemplateButtonClicked}
+            onActivityPropertyChanged={onActivityPropertyChanged}
+            onSubmit={onSubmit}
+            onCancel={onCancel}
+        />
     </>
 }
 
