@@ -120,6 +120,18 @@ export class CheckIf {
         });
     };
 
+    static async confirmDialogIsDisplayed(page: Page) {
+        await test.step("Check: confirm dialog was displayed", async() => {
+            await expect(page.getByTestId('confirm-dialog')).toBeVisible();
+        })
+    }    
+
+    static async confirmDialogIsNotDisplayed(page: Page) {
+        await test.step("Check: confirm dialog was displayed", async() => {
+            await expect(page.getByTestId('confirm-dialog')).not.toBeVisible();
+        })
+    }    
+
     static async scrollTheListToLoadAllElements(page: Page) {
         const grid = page.locator('.ReactVirtualized__Grid');
 

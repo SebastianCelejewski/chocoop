@@ -163,8 +163,10 @@ async function attemptActivityDeletionAndCancel(page: Page, activityId: string |
   await Click.activityCard(page, activityCard);
   await CheckIf.navigatedToActivityDetailsPage(page);
 
-  await Browser.configureConfirmDialogToClickDismiss(page);
   await Click.deleteButton(page);
+  await CheckIf.confirmDialogIsDisplayed(page)
+  await Click.cancelButton(page);
+  await CheckIf.confirmDialogIsNotDisplayed(page)
 }
 
 async function deleteActivity(page: Page, activity: Activity) {
@@ -174,8 +176,8 @@ async function deleteActivity(page: Page, activity: Activity) {
   await Click.activityCard(page, activityToRemoveCard);
   await CheckIf.navigatedToActivityDetailsPage(page);
 
-  const response = Intercept.httpResponse(page);
-  await Browser.configureConfirmDialogToClickAccept(page);
   await Click.deleteButton(page);
-  await WaitFor.httpResponse(response);
+  await CheckIf.confirmDialogIsDisplayed(page)
+  await Click.confirmButton(page);
+  await CheckIf.confirmDialogIsNotDisplayed(page)
 }
