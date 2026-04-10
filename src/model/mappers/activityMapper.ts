@@ -1,6 +1,6 @@
 import type { Schema } from "../../../amplify/data/resource";
 import type { ActivityFormState } from "../../model/ActivityFormState";
-import { WorkRequestEditFormState } from "../../model/WorkRequestFormState";
+import { WorkRequestFormState } from "../../model/WorkRequestFormState";
 import { AuthUser } from "aws-amplify/auth";
 import { toLocalDate, getCurrentDate } from "../../utils/dateUtils";
 import reportError from "../../utils/reportError"
@@ -35,23 +35,30 @@ function mapWorkRequestModelToActivityFormState(model: Schema["WorkRequest"]["ty
   };
 }
 
-function mapWorkRequestModelToWorkRequestFormState(model: Schema["WorkRequest"]["type"] | null): WorkRequestEditFormState | null {
-  if (model === null) {
-    return null;
-  } 
-
-  return{
-    id: model.id,
-    createdBy: model.createdBy,
-    createdDateTime: model.createdDateTime,
-    type: model.type,
-    exp: model.exp.toString(),
-    urgency: model.urgency.toString(),
-    instructions: model.instructions
-  }
+function mapActivityFormStateToActivityModel(activity: ActivityFormState) {
+    if (activity.date === undefined) {
+        throw new Error(reportError("State activityDate is undefined during creation of a new activity object"))
+    }
+    if (activity.user === undefined) {
+        throw new Error(reportError("State activityPerson is undefined during creation of a new activity object"))
+    }
+    if (activity.type === undefined) {
+        throw new Error(reportError("State activityType is undefined during creation of a new activity object"))
+    }
+    if (activity.exp === undefined || isNaN(Number(activity.exp))) {
+        throw new Error(reportError("State activityExp is undefined during creation of a new activity object"))
+    }
+    return {
+        id: activity.id,
+        date: activity.date,
+        user: activity.user,
+        type: activity.type,
+        exp: Number(activity.exp),
+        comment: activity.comment
+    }
 }
 
-function mapActivityFormStateToActivityModel(activity: ActivityFormState, workRequest: WorkRequestEditFormState | null) {
+function mapActivityFormStateAndWorkRequestFormStateToActivityModel(activity: ActivityFormState, workRequest: WorkRequestFormState | null) {
     if (activity.date === undefined) {
         throw new Error(reportError("State activityDate is undefined during creation of a new activity object"))
     }
@@ -75,7 +82,7 @@ function mapActivityFormStateToActivityModel(activity: ActivityFormState, workRe
     }
 }
 
-function mapWorkRequestEditFormStateToWorkRequestModel(newActivityId: string, workRequest: WorkRequestEditFormState | null) {
+function mapWorkRequestEditFormStateToWorkRequestModel(newActivityId: string, workRequest: WorkRequestFormState | null) {
     if (workRequest === null) {
         throw new Error(reportError("State workRequest is null during creation of a new work request object"))
     }
@@ -120,7 +127,5 @@ function mapWorkRequestEditFormStateToWorkRequestModel(newActivityId: string, wo
 export {
     mapActivityModelToActivityFormState as activityModelToActivityFormState,
     mapWorkRequestModelToActivityFormState as workRequestModelToActivityFormState,
-    mapWorkRequestModelToWorkRequestFormState as workRequestModelToWorkRequestFormState,
-    mapActivityFormStateToActivityModel as createActivityObjectFromState,
-    mapWorkRequestEditFormStateToWorkRequestModel as createWorkRequestObjectFromState
+    mapActivityFormStateToActivityModel as createActivityObjectFromState
 }

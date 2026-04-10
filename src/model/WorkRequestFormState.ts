@@ -1,4 +1,4 @@
-export type WorkRequestEditFormState = {
+export type WorkRequestFormState = {
   id?: string;
   createdDateTime?: string;
   createdBy?: string;
@@ -6,4 +6,6 @@ export type WorkRequestEditFormState = {
   exp: string;
   urgency: string;
   instructions: string;
+  completed: boolean;
+  completedAs?: string;
 }

@@ -1,9 +1,9 @@
 export type OperationResult =
-  | { success: true }
+  | { success: true; data: string }
   | { success: false; message: string; details?: unknown };
 
-export function success(): OperationResult {
-  return { success: true};
+export function success(data: string): OperationResult {
+  return { success: true, data: data};
 }
 
 export function failure(message: string, details?: unknown): OperationResult {

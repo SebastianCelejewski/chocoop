@@ -1,37 +1,39 @@
 import { ActivityFormState } from "../../../model/ActivityFormState";
-import { WorkRequestEditFormState } from "../../../model/WorkRequestFormState";
+import { WorkRequestFormState } from "../../../model/WorkRequestFormState";
 import { useNavigate } from "react-router";
 import { ActivityOperations, ActivityOperation } from "../../../model/ActivityOperation";
 import reportError from "../../../utils/reportError";
 import { OperationResult } from "../../../model/OperationResult";
 import ActivityService from "../../../services/ActivityService";
+import WorkRequestPromotionUseCase from "../../../use_cases/WorkRequestPromotionUseCase";
 
 export function useActivityEditActions() {
 
     const navigate = useNavigate();
     const activityService = ActivityService();
+    const workServicePromotionUseCase = WorkRequestPromotionUseCase();
 
     async function handleSubmit(
         activity: ActivityFormState,
-        workRequest: WorkRequestEditFormState | null,
+        workRequest: WorkRequestFormState | null,
         operationParam: ActivityOperation | undefined
     ) {
         switch(operationParam) {
             case ActivityOperations.CREATE:
                 handleResult(
-                    await activityService.handleActivityCreation(activity, workRequest),
+                    await activityService.createActivity(activity),
                     () => navigate("/ActivityList")
                 );
                 break;
             case ActivityOperations.UPDATE:
                 handleResult(
-                    await activityService.handleActivityModification(activity, workRequest),
+                    await activityService.updateActivity(activity),
                     () => navigate("/ActivityDetails/" + activity.id)
                 );
                 break;
             case ActivityOperations.PROMOTE_WORK_REQUEST:
                 handleResult(
-                    await activityService.handleWorkRequestPromotion(activity, workRequest),
+                    await workServicePromotionUseCase.promoteWorkRequest(activity, workRequest!),
                     () => navigate("/ActivityList")
                 );
                 break;
