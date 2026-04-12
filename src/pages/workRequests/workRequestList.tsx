@@ -1,23 +1,19 @@
-import type { Schema } from "../../../amplify/data/resource";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { generateClient } from "aws-amplify/data";
+import type { Schema } from "../../../amplify/data/resource";
 import { dateTimeToString } from "../../utils/dateUtils";
 import { List, AutoSizer, CellMeasurer, CellMeasurerCache } from 'react-virtualized';
 
 import User from "../../model/User";
 import { urgencyList } from "../../model/Urgency"
-
-const client = generateClient<Schema>();
+import WorkRequestService from "../../services/WorkRequestService";
 
 const cache = new CellMeasurerCache({
     fixedWidth: true,
     defaultHeight: 100
 });
 
-class WorkRequestQueryResult {
-    items: Array<Schema["WorkRequest"]["type"]> = []
-}
+const workRequestService = WorkRequestService();
 
 function sortByUrgency(workRequests: Array<Schema["WorkRequest"]["type"]>) {
     return workRequests.sort((a, b) => a.urgency - b.urgency);
@@ -31,14 +27,9 @@ function WorkRequestList({ users }: { users: Map<string, User> }) {
     let visibleWorkRequests = workRequests.filter((workRequest) => !workRequest.completed || showCompletedWorkRequests)
 
     useEffect(() => {
-        const workRequestsQuery = client.models.WorkRequest.observeQuery().subscribe({
-            next: (data: WorkRequestQueryResult) => {
-                setWorkRequests(sortByUrgency([...data.items]))
-            }
+        return workRequestService.observeWorkRequests((items) => {
+            setWorkRequests(sortByUrgency([...items]))
         });
-        return () => {
-            workRequestsQuery.unsubscribe();
-        }
     }, []);
 
     function createWorkRequest() {
