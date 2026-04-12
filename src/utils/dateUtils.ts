@@ -18,10 +18,21 @@ function toLocalDate(date: string) {
     return activityDateLocal.toISOString().split("T")[0]
 }
 
+function toLocalDateTime(dateTime: string) {
+    const dateTimeFromDatabaseAsDate = Date.parse(dateTime)
+    const dateTimeLocal = new Date(dateTimeFromDatabaseAsDate - timeZoneOffset * 60 * 1000)
+    return dateTimeLocal.toISOString().split(".")[0]
+}
+
 function getCurrentDate() {
     const currentDateTimeLocal = new Date(new Date().getTime() - timeZoneOffset * 60 * 1000)
     const currentDate = currentDateTimeLocal.toISOString().split("T")[0]
     return currentDate;
 }
 
-export { dateTimeToString, dateToString, toLocalDate, getCurrentDate };
+function getCurrentDateTime() {
+    const currentDateTimeLocal = new Date(new Date().getTime() - timeZoneOffset * 60 * 1000)
+    return currentDateTimeLocal.toISOString().split(".")[0]
+}
+
+export { dateTimeToString, dateToString, toLocalDate, toLocalDateTime, getCurrentDate, getCurrentDateTime };

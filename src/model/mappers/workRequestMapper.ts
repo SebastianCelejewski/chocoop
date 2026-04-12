@@ -1,6 +1,6 @@
 import type { Schema } from "../../../amplify/data/resource";
 import { WorkRequestFormState } from "../WorkRequestFormState";
-import { toLocalDate } from "../../utils/dateUtils";
+import { toLocalDateTime } from "../../utils/dateUtils";
 import reportError from "../../utils/reportError"
 
 function mapWorkRequestModelToWorkRequestFormState(model: Schema["WorkRequest"]["type"] | null): WorkRequestFormState | null {
@@ -9,7 +9,7 @@ function mapWorkRequestModelToWorkRequestFormState(model: Schema["WorkRequest"][
   }
   return {
       id: model.id,
-      createdDateTime: toLocalDate(model.createdDateTime),
+      createdDateTime: toLocalDateTime(model.createdDateTime),
       createdBy: model.createdBy,
       type: model.type,
       exp: model.exp.toString(),
@@ -23,9 +23,6 @@ function mapWorkRequestModelToWorkRequestFormState(model: Schema["WorkRequest"][
 function mapWorkRequestFormStateToWorkRequestModel(workRequest: WorkRequestFormState | null) {
     if (workRequest === null) {
         throw new Error(reportError("State workRequest is null during creation of a new work request object"))
-    }
-    if (workRequest.id === undefined) {
-        throw new Error(reportError("State workRequestId is undefined during creation of a new work request object"))
     }
     if (workRequest.createdDateTime === undefined) {
         throw new Error(reportError("State workRequestCreatedDateTime is undefined during creation of a new work request object"))

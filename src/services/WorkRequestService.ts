@@ -9,6 +9,10 @@ import { mapWorkRequestFormStateToWorkRequestModel } from "../model/mappers/work
 export default function WorkRequestService() {
     const client = generateClient<Schema>();
 
+    class WorkRequestQueryResult {
+        items: Array<Schema["WorkRequest"]["type"]> = []
+    }
+
     async function createWorkRequest(workRequest: WorkRequestFormState): Promise<OperationResult> {
         const newWorkRequest = mapWorkRequestFormStateToWorkRequestModel(workRequest);
 
@@ -48,8 +52,47 @@ export default function WorkRequestService() {
         }
     }
 
+    async function getWorkRequest(id: string): Promise<Schema["WorkRequest"]["type"] | null> {
+        try {
+            const { data, errors } = await client.models.WorkRequest.get({ id });
+            if (errors?.length) {
+                throw errors;
+            }
+            return data ?? null;
+        } catch(error) {
+            throw new Error(reportError("Failed to fetch a workrequest from the database", error));
+        }
+    }
+
+    function observeWorkRequests(onChange: (workRequests: Array<Schema["WorkRequest"]["type"]>) => void) {
+        const workRequestsQuery = client.models.WorkRequest.observeQuery().subscribe({
+            next: (data: WorkRequestQueryResult) => {
+                onChange(data.items);
+            }
+        });
+
+        return () => {
+            workRequestsQuery.unsubscribe();
+        };
+    }
+
+    async function deleteWorkRequest(id: string): Promise<OperationResult> {
+        try {
+            const deleteWorkRequestResponse = await client.models.WorkRequest.delete({ id });
+            if (deleteWorkRequestResponse.errors?.length) {
+                return failure("Failed to delete a workrequest from the database", deleteWorkRequestResponse.errors);
+            }
+            return success(id);
+        } catch(error) {
+            return failure("Failed to delete a workrequest from the database", error);
+        }
+    }
+
     return {
+        deleteWorkRequest,
         createWorkRequest,
+        getWorkRequest,
+        observeWorkRequests,
         updateWorkRequest
     }
 }
