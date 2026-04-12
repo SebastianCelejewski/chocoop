@@ -10,6 +10,7 @@ import { useActivityActions } from "./hooks/useActivityActions";
 import { useActivityReactions } from "./hooks/useActivityReactions";
 import { ReactionsByUser } from "../../components/reactions"
 import { dateToString } from "../../utils/dateUtils";
+import { useConfirm } from "../../hooks/useConfirm";
 
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 
@@ -21,6 +22,7 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
     const currentUser = useCurrentUser();
     const { reactions, refetch } = useActivityReactions(activityId);
     const { deleteActivity, addReaction } = useActivityActions();
+    const { confirm, dialog } = useConfirm();
 
     const [reactionsPopupVisible, setReactionsPopupVisible] = useState<boolean>(false);
 
@@ -50,7 +52,8 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
     }
 
     const handleDelete = async () => {
-        if (!confirm("Czy na pewno usunąć aktywność?")) return;
+        const ok = await confirm("Czy na pewno usunąć aktywność?");
+        if (!ok) return;
 
         await deleteActivity(activity.id);
         navigate("/ActivityList");
@@ -126,6 +129,7 @@ function ActivityDetails({users}: {users: Map<string, User>}) {
             <button type="button" data-testid="delete-button" onClick={handleDelete}>Usuń</button>
             <button type="button" data-testid="react-button" onClick={handleReaction}>Zareaguj</button>
         </div>
+        {dialog}
     </>
 }
 

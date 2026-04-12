@@ -22,9 +22,6 @@ export class Browser {
     static async waitForHttpResponse(page: Page) {
         await test.step("Browser: waiting for HTTP response", async () => {
             console.log("Waiting for response " + new Date().toString());
-            // await page.waitForResponse(r =>
-            //     r.url().includes('updateActivity') && r.status() === 200
-            // );
             const response = await page.waitForResponse(r =>
                 r.url().includes('/graphql')
             );

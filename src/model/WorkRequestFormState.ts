@@ -6,4 +6,6 @@ export type WorkRequestFormState = {
   exp: string;
   urgency: string;
   instructions: string;
+  completed: boolean;
+  completedAs?: string;
 }

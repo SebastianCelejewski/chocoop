@@ -1,23 +1,19 @@
-import type { Schema } from "../../../amplify/data/resource";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { generateClient } from "aws-amplify/data";
+import type { Schema } from "../../../amplify/data/resource";
 import { dateTimeToString } from "../../utils/dateUtils";
-import { List, AutoSizer, CellMeasurer, CellMeasurerCache } from 'react-virtualized';
+import { List, AutoSizer, CellMeasurer, CellMeasurerCache } from "react-virtualized";
 
 import User from "../../model/User";
-import { urgencyList } from "../../model/Urgency"
-
-const client = generateClient<Schema>();
+import { urgencyList } from "../../model/Urgency";
+import WorkRequestService from "../../services/WorkRequestService";
 
 const cache = new CellMeasurerCache({
     fixedWidth: true,
     defaultHeight: 100
 });
 
-class WorkRequestQueryResult {
-    items: Array<Schema["WorkRequest"]["type"]> = []
-}
+const workRequestService = WorkRequestService();
 
 function sortByUrgency(workRequests: Array<Schema["WorkRequest"]["type"]>) {
     return workRequests.sort((a, b) => a.urgency - b.urgency);
@@ -28,40 +24,32 @@ function WorkRequestList({ users }: { users: Map<string, User> }) {
     const [showCompletedWorkRequests, setShowCompletedWorkRequests] = useState(false);
     const navigate = useNavigate();
 
-    let visibleWorkRequests = workRequests.filter((workRequest) => !workRequest.completed || showCompletedWorkRequests)
+    const visibleWorkRequests = workRequests.filter((workRequest) => !workRequest.completed || showCompletedWorkRequests);
 
     useEffect(() => {
-        const workRequestsQuery = client.models.WorkRequest.observeQuery().subscribe({
-            next: (data: WorkRequestQueryResult) => {
-                setWorkRequests(sortByUrgency([...data.items]))
-            }
+        return workRequestService.observeWorkRequests((items) => {
+            setWorkRequests(sortByUrgency([...items]));
         });
-        return () => {
-            workRequestsQuery.unsubscribe();
-        }
     }, []);
 
     function createWorkRequest() {
-        const navLink = `/WorkRequestEdit/create`
-        navigate(navLink)
+        navigate("/WorkRequestEdit/create");
     }
 
     function showWorkRequest(id: string) {
-        const navLink = `/WorkRequestDetails/${id}`
-        navigate(navLink)
+        navigate(`/WorkRequestDetails/${id}`);
     }
 
     function CompletnessStatus({ workRequest }: { workRequest: Schema["WorkRequest"]["type"] }) {
         if (workRequest.completed) {
-            return <p className="workItemCompletness">Zlecenie wykonane</p>
-        } else {
-            return <></>
+            return <p className="workItemCompletness" data-testid="completed-property">Zlecenie wykonane</p>;
         }
+
+        return null;
     }
 
     function navigateToActivities() {
-        const navLink = `/ActivityList`
-        navigate(navLink)
+        navigate("/ActivityList");
     }
 
     function handleShowCompletedToggled(): void {
@@ -80,16 +68,18 @@ function WorkRequestList({ users }: { users: Map<string, User> }) {
                 {({ registerChild }) => (
                     <div style={style} className="row" ref={registerChild}>
                         <li
+                            data-testid="work-request-card"
+                            data-objectid={workRequest.id}
                             className="entityListElement"
                             onClick={() => showWorkRequest(workRequest.id)}
                             key={workRequest.id}>
                             <div>
-                                <p className="entityDateTime">{dateTimeToString(workRequest.createdDateTime)}</p>
-                                <p className="entityPerson">{users.get(workRequest.createdBy)?.nickname}</p>
-                                <p className="entityType">{workRequest.type}</p>
-                                <p className="entityExp">{workRequest.exp} xp</p>
-                                <div style={{ clear: 'both' }} />
-                                <p className="workRequestUrgency">Pilność: {urgencyList[workRequest.urgency]?.label}</p>
+                                <p className="entityDateTime" data-testid="date-property">{dateTimeToString(workRequest.createdDateTime)}</p>
+                                <p className="entityPerson" data-testid="person-property">{users.get(workRequest.createdBy)?.nickname}</p>
+                                <p className="entityType" data-testid="type-property">{workRequest.type}</p>
+                                <p className="entityExp" data-testid="exp-property">{workRequest.exp} xp</p>
+                                <div style={{ clear: "both" }} />
+                                <p className="workRequestUrgency" data-testid="urgency-property">Pilność: {urgencyList[workRequest.urgency]?.label}</p>
                                 <CompletnessStatus workRequest={workRequest} />
                             </div>
                         </li>
@@ -99,16 +89,16 @@ function WorkRequestList({ users }: { users: Map<string, User> }) {
         );
     }
 
-    cache.clearAll()
+    cache.clearAll();
 
     return <>
         <h2 className="pageTitle" data-testid="work-request-list-page" onClick={navigateToActivities}>Lista zleceń do wykonania</h2>
 
-        <p><input type="checkbox" name="showCompleted" id="showCompleted" checked={showCompletedWorkRequests} onChange={handleShowCompletedToggled} />Pokaż ukończone</p>
+        <p><input data-testid="show-completed-checkbox" type="checkbox" name="showCompleted" id="showCompleted" checked={showCompletedWorkRequests} onChange={handleShowCompletedToggled} />Pokaż ukończone</p>
         <ul className="entityList">
             <AutoSizer>
-                {
-                    ({ width, height }) => (<List
+                {({ width, height }) => (
+                    <List
                         width={width}
                         height={height}
                         deferredMeasurementCache={cache}
@@ -116,14 +106,13 @@ function WorkRequestList({ users }: { users: Map<string, User> }) {
                         rowRenderer={renderRow}
                         rowCount={visibleWorkRequests.length}
                         overscanRowCount={3} />
-                    )
-                }
+                )}
             </AutoSizer>
         </ul>
         <div className="buttonPanel">
-            <button onClick={createWorkRequest}>Dodaj zlecenie</button>
+            <button data-testid="create-button" onClick={createWorkRequest}>Dodaj zlecenie</button>
         </div>
-    </>
+    </>;
 }
 
 export default WorkRequestList;

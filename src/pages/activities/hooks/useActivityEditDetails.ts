@@ -5,12 +5,11 @@ import type { ActivityFormState } from "../../../model/ActivityFormState";
 import { WorkRequestFormState } from "../../../model/WorkRequestFormState";
 import { AuthUser } from "aws-amplify/auth";
 import { ActivityOperations, ActivityOperation } from "../../../model/ActivityOperation";
+import { activityModelToActivityFormState, workRequestModelToActivityFormState} from "../../../model/mappers/activityMapper";
+import { mapWorkRequestModelToWorkRequestFormState } from "../../../model/mappers/workRequestMapper";
+import { getCurrentDate } from "../../../utils/dateUtils";
 
 const client = generateClient<Schema>();
-const currentDateTimeUTC = new Date()
-const timeZoneOffset = currentDateTimeUTC.getTimezoneOffset()
-const currentDateTimeLocal = new Date(currentDateTimeUTC.getTime() - timeZoneOffset * 60 * 1000)
-const currentDate = currentDateTimeLocal.toISOString().split("T")[0]
 
 export function useActivityEditDetails(operation?: ActivityOperation, objectId?: string, currentUser?: AuthUser) {
 
@@ -36,9 +35,9 @@ export function useActivityEditDetails(operation?: ActivityOperation, objectId?:
 
     let aborted = false;
 
-    const createEmptyActivity = async function () {
+    const createEmptyActivity = function () {
       setActivity({
-        date: currentDate,
+        date: getCurrentDate(),
         user: currentUser.userId,
         type: "",
         exp: "",
@@ -71,7 +70,7 @@ export function useActivityEditDetails(operation?: ActivityOperation, objectId?:
         const { data } = await client.models.WorkRequest.get({ id: id });
         if (!aborted) {
           setActivity(workRequestModelToActivityFormState(data, currentUser));
-          setWorkRequest(workRequestModelToWorkRequestFormState(data));
+          setWorkRequest(mapWorkRequestModelToWorkRequestFormState(data));
         }
       } catch (err) {
         if (!aborted) setError(err as Error);
@@ -80,14 +79,14 @@ export function useActivityEditDetails(operation?: ActivityOperation, objectId?:
       }
     }
 
-    if (operation === "create") {
+    if (operation === ActivityOperations.CREATE) {
       createEmptyActivity();
-    } else if (operation === "update") {
+    } else if (operation === ActivityOperations.UPDATE) {
       if (!objectId) {
         throw new Error("Argument objectId is missing");
       }
       loadActivity(objectId);
-    } else if (operation === "promoteWorkRequest") {
+    } else if (operation === ActivityOperations.PROMOTE_WORK_REQUEST) {
       if (!objectId) {
         throw new Error("Argument objectId is missing");
       }
@@ -102,56 +101,4 @@ export function useActivityEditDetails(operation?: ActivityOperation, objectId?:
   }, [objectId, operation, currentUser]);
 
   return { activity, setActivity, workRequest, loading, error };
-}
-
-function activityModelToActivityFormState(model: Schema["Activity"]["type"] | null): ActivityFormState | null {
-  if (model === null) {
-      return null;
-  }
-  return {
-      id: model.id,
-      date: toLocalDate(model.date),
-      user: model.user,
-      type: model.type,
-      exp: model.exp.toString(),
-      comment: model.comment ?? "",
-      requestedAs: model.requestedAs ?? undefined
-  }
-}
-
-function workRequestModelToActivityFormState(model: Schema["WorkRequest"]["type"] | null, currentUser: AuthUser): ActivityFormState | null {
-  if (model === null) {
-      return null;
-  }
-
-  return {
-    date: currentDate,
-    user: currentUser.userId,
-    type: model.type,
-    exp: model.exp.toString(),
-    comment: "",
-    requestedAs: model.id
-  };
-}
-
-function workRequestModelToWorkRequestFormState(model: Schema["WorkRequest"]["type"] | null): WorkRequestFormState | null {
-  if (model === null) {
-    return null;
-  } 
-
-  return{
-    id: model.id,
-    createdBy: model.createdBy,
-    createdDateTime: model.createdDateTime,
-    type: model.type,
-    exp: model.exp.toString(),
-    urgency: model.urgency.toString(),
-    instructions: model.instructions
-  }
-}
-
-function toLocalDate(date: string) {
-    const activityDateFromDatabaseAsDate = Date.parse(date)
-    const activityDateLocal = new Date(activityDateFromDatabaseAsDate - timeZoneOffset * 60 * 1000)
-    return activityDateLocal.toISOString().split("T")[0]
 }

@@ -31,6 +31,12 @@ export class Click {
         });
     }
 
+    static async confirmButton(page: Page) {
+        test.step("Action: click confirm button", async () => {
+            await page.getByTestId('confirm-button').first().click();
+        });
+    }
+
     static async backButton(page: Page) {
         test.step("Action: click back button", async () => {
             await page.getByTestId('back-button').first().click();
