@@ -1,13 +1,12 @@
-import { test, expect, Page, Locator } from '@playwright/test';
-import { Activity } from './model/Activity'
-import { NavigateTo } from './actions/navigate';
-import { Click } from './actions/click';
-import { Form } from './actions/form';
-import { CheckIf } from './checks';
-import { Intercept, Intercepted, WaitFor } from "./utils/intercept";
-import { Browser } from './utils/browser';
+import { test, expect, Page, Locator } from "@playwright/test";
+import { Activity } from "../model/Activity";
+import { NavigateTo } from "../actions/navigate";
+import { Click } from "../actions/click";
+import { Form } from "../actions/form";
+import { CheckIf } from "../checks";
+import { Intercept, Intercepted, WaitFor } from "../utils/intercept";
 
-test('activity multi-test', async({page}) => {
+test("activity multi-test", async({page}) => {
 
   await test.step("Going to activity creation page", async () => {
     await NavigateTo.activityListPage(page);
@@ -27,11 +26,10 @@ test('activity multi-test', async({page}) => {
     await CheckIf.typeAndExpFieldsAreFilledInForVacuuming(page);
   });
 
-  // Tests for activity creation
   const activityWithComment = await Activity.withComment(page);
   const activityWithoutComment = await Activity.withoutComment(page);
 
-  await test.step('Creation of two activities for further tests', async() => {
+  await test.step("Creation of two activities for further tests", async() => {
     await createActivity(page, activityWithComment);
     await createActivity(page, activityWithoutComment);
   });
@@ -39,7 +37,7 @@ test('activity multi-test', async({page}) => {
   let activityWithCommentLocator : Locator;
   let activityWithoutCommentLocator : Locator;
 
-  await test.step('Checking if created activities show correctly on activities list', async () => {
+  await test.step("Checking if created activities show correctly on activities list", async () => {
     await CheckIf.navigatedToActivityListPage(page);
     activityWithCommentLocator = await CheckIf.activityAppearsOnActivityList(page, activityWithComment.id);
     activityWithoutCommentLocator = await CheckIf.activityAppearsOnActivityList(page, activityWithoutComment.id);
@@ -51,10 +49,9 @@ test('activity multi-test', async({page}) => {
     await CheckIf.ActivityDoesNotHaveACommentIcon(page, activityWithoutCommentLocator);
   });
 
-  // Tests for activity modification
-  var modifiedActivityWithComment = await Activity.withComment(page);
+  const modifiedActivityWithComment = await Activity.withComment(page);
 
-  await test.step('Attempt to modify an existing activity and cancel', async() => {
+  await test.step("Attempt to modify an existing activity and cancel", async() => {
     await attemptToModifyActivityAndCancel(page, activityWithCommentLocator, modifiedActivityWithComment);
   });
 
@@ -63,9 +60,9 @@ test('activity multi-test', async({page}) => {
     await NavigateTo.activityListPage(page);
     activityWithCommentLocator = await CheckIf.activityAppearsOnActivityList(page, activityWithComment.id);
     await CheckIf.activityHasCorrectProperties(page, activityWithCommentLocator, activityWithComment);
-  })
+  });
 
-  await test.step('Modification of an existing activity', async () => {
+  await test.step("Modification of an existing activity", async () => {
     await modifyActivity(page, activityWithCommentLocator, modifiedActivityWithComment);
   });
 
@@ -74,10 +71,9 @@ test('activity multi-test', async({page}) => {
     await NavigateTo.activityListPage(page);
     activityWithCommentLocator = await CheckIf.activityAppearsOnActivityList(page, activityWithComment.id);
     await CheckIf.activityHasCorrectProperties(page, activityWithCommentLocator, modifiedActivityWithComment);
-  })
+  });
 
-  // Tests for activity deletion
-  await test.step('Cancelled deletion of an activity', async () => {
+  await test.step("Cancelled deletion of an activity", async () => {
     await attemptActivityDeletionAndCancel(page, activityWithComment.id);
   });
 
@@ -87,7 +83,7 @@ test('activity multi-test', async({page}) => {
     await CheckIf.activityAppearsOnActivityList(page, activityWithoutComment.id);
   });
 
-  await test.step('Tests for deletion of activities', async () => {
+  await test.step("Tests for deletion of activities", async () => {
     await deleteActivity(page, activityWithComment);
     await deleteActivity(page, activityWithoutComment);
   });
@@ -96,7 +92,6 @@ test('activity multi-test', async({page}) => {
     await CheckIf.activityDoesNotAppearOnActivityList(page, activityWithComment.id);
     await CheckIf.activityDoesNotAppearOnActivityList(page, activityWithoutComment.id);
   });
-
 });
 
 async function createActivity(page: Page, activity: Activity) {
@@ -111,7 +106,7 @@ async function createActivity(page: Page, activity: Activity) {
 
   const response = Intercept.httpResponse(page);
   await Click.submitButton(page);
-  activity.id = await Intercepted.createdActivityId(response);;
+  activity.id = await Intercepted.createdActivityId(response);
 }
 
 async function attemptToModifyActivityAndCancel(page: Page, activityToModify: Locator, modifiedActivity: Activity) {
@@ -164,9 +159,9 @@ async function attemptActivityDeletionAndCancel(page: Page, activityId: string |
   await CheckIf.navigatedToActivityDetailsPage(page);
 
   await Click.deleteButton(page);
-  await CheckIf.confirmDialogIsDisplayed(page)
+  await CheckIf.confirmDialogIsDisplayed(page);
   await Click.cancelButton(page);
-  await CheckIf.confirmDialogIsNotDisplayed(page)
+  await CheckIf.confirmDialogIsNotDisplayed(page);
 }
 
 async function deleteActivity(page: Page, activity: Activity) {
@@ -177,7 +172,7 @@ async function deleteActivity(page: Page, activity: Activity) {
   await CheckIf.navigatedToActivityDetailsPage(page);
 
   await Click.deleteButton(page);
-  await CheckIf.confirmDialogIsDisplayed(page)
+  await CheckIf.confirmDialogIsDisplayed(page);
   await Click.confirmButton(page);
-  await CheckIf.confirmDialogIsNotDisplayed(page)
+  await CheckIf.confirmDialogIsNotDisplayed(page);
 }
