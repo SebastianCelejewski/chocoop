@@ -75,10 +75,10 @@ function WorkRequestDetails({users}: {users: Map<string, User>}) {
     function WorkRequestCompletness({ workRequest }: { workRequest: Schema["WorkRequest"]["type"]}) {
         if (workRequest.completed) {
             const linkTarget = "/ActivityDetails/" + workRequest.completedAs;
-            return <p>Zlecenie wykonane. <NavLink to={linkTarget}>Przejdź do czynności</NavLink></p>;
+            return <p data-testid="work-request-completed-message">Zlecenie wykonane. <NavLink to={linkTarget}>Przejdź do czynności</NavLink></p>;
         }
 
-        return <p>Zlecenie niewykonane</p>;
+        return <p data-testid="work-request-pending-message">Zlecenie niewykonane</p>;
     }
 
     if (workRequest === undefined) {
@@ -97,28 +97,28 @@ function WorkRequestDetails({users}: {users: Map<string, User>}) {
             <WorkRequestCompletness workRequest={workRequest}/>
 
             <p className="label">Data i godzina utworzenia zlecenia</p>
-            <p>{dateTimeToString(workRequest.createdDateTime)}</p>
+            <p data-testid="work-request-created-datetime">{dateTimeToString(workRequest.createdDateTime)}</p>
 
             <p className="label">Twórca zlecenia</p>
-            <p>{users.get(workRequest.createdBy)?.nickname}</p>
+            <p data-testid="work-request-created-by">{users.get(workRequest.createdBy)?.nickname}</p>
 
             <p className="label">Rodzaj aktywności</p>
-            <p>{workRequest.type}</p>
+            <p data-testid="work-request-type">{workRequest.type}</p>
 
             <p className="label">Punkty doświadczenia do zdobycia</p>
-            <p>{workRequest.exp}</p>
+            <p data-testid="work-request-exp">{workRequest.exp}</p>
 
             <p className="label">Pilność</p>
-            <p>{urgencyList[workRequest.urgency].label}</p>
+            <p data-testid="work-request-urgency">{urgencyList[workRequest.urgency].label}</p>
 
             <p className="label">Instrukcje</p>
-            <p className="commentTextArea">{workRequest.instructions}</p>
+            <p data-testid="work-request-instructions" className="commentTextArea">{workRequest.instructions}</p>
         </div>
         <div>
-            <button type="button" onClick={handleBack}>Wróć</button>
-            <button type="button" onClick={handleEdit}>Edytuj</button>
-            <button type="button" onClick={handleDone} disabled={workRequest.completed}>Zrobione</button>
-            <button type="button" onClick={handleDelete}>Usuń</button>
+            <button data-testid="back-button" type="button" onClick={handleBack}>Wróć</button>
+            <button data-testid="edit-button" type="button" onClick={handleEdit}>Edytuj</button>
+            <button data-testid="done-button" type="button" onClick={handleDone} disabled={workRequest.completed}>Zrobione</button>
+            <button data-testid="delete-button" type="button" onClick={handleDelete}>Usuń</button>
         </div>
         {dialog}
     </>;

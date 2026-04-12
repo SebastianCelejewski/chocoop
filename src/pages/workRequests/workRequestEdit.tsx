@@ -167,6 +167,7 @@ function WorkRequestEdit({users}: {users: Map<string, User>}) {
             <div className="entryDetails">
                 <p className="label">Data i godzina utworzenia zlecenia</p>
                 <p><input
+                    data-testid="work-request-created-datetime-input"
                     id="workrequestCreatedDateTime"
                     aria-label="Date and time"
                     type="datetime-local"
@@ -176,6 +177,7 @@ function WorkRequestEdit({users}: {users: Map<string, User>}) {
 
                 <p className="label">Status</p>
                 <p>Zlecenie wykonane: <input
+                    data-testid="work-request-completed-input"
                     type="checkbox"
                     id="workRequestCompleted"
                     checked={workRequest.completed}
@@ -185,6 +187,7 @@ function WorkRequestEdit({users}: {users: Map<string, User>}) {
                 <p className="label">Zleceniodawca</p>
                 {validationState.createdBy ? <p className="validationMessage">{validationState.createdBy}</p> : null}
                 <p><select
+                    data-testid="work-request-created-by-input"
                     id="workRequestCreatedBy"
                     value={workRequest.createdBy ?? ""}
                     onChange={(e) => onPropertyChanged("createdBy", e.target.value)}
@@ -196,20 +199,21 @@ function WorkRequestEdit({users}: {users: Map<string, User>}) {
 
                 <p className="label">Szablony</p>
                 <div className="templateWorkRequests">
-                    <img src={vacuuming} onClick={() => fillTemplate("odkurzanie", 10)} alt="odkurzanie"></img>
-                    <img src={dishwashing} onClick={() => fillTemplate("zmywanie naczyń", 20)} alt="zmywanie naczyń"></img>
-                    <img src={shopping_local} onClick={() => fillTemplate("zakupy osiedle", 10)} alt="zakupy osiedle"></img>
-                    <img src={shopping_Auchan} onClick={() => fillTemplate("zakupy Auchan", 20)} alt="zakupy Auchan"></img>
-                    <img src={cooking} onClick={() => fillTemplate("ugotowanie obiadu", 40)} alt="ugotowanie obiadu"></img>
-                    <img src={laundry_start} onClick={() => fillTemplate("nastawianie prania", 10)} alt="nastawianie prania"></img>
-                    <img src={laundry_end} onClick={() => fillTemplate("wywieszanie prania", 10)} alt="wywieszanie prania"></img>
-                    <img src={laundry_sorting} onClick={() => fillTemplate("ściąganie prania", 10)} alt="ściąganie prania"></img>
-                    <img src={taking_garbage_out} onClick={() => fillTemplate("wyniesienie śmieci", 10)} alt="wyniesienie śmieci"></img>
+                    <img data-testid="work-request-template-button" src={vacuuming} onClick={() => fillTemplate("odkurzanie", 10)} alt="odkurzanie"></img>
+                    <img data-testid="work-request-template-button" src={dishwashing} onClick={() => fillTemplate("zmywanie naczyń", 20)} alt="zmywanie naczyń"></img>
+                    <img data-testid="work-request-template-button" src={shopping_local} onClick={() => fillTemplate("zakupy osiedle", 10)} alt="zakupy osiedle"></img>
+                    <img data-testid="work-request-template-button" src={shopping_Auchan} onClick={() => fillTemplate("zakupy Auchan", 20)} alt="zakupy Auchan"></img>
+                    <img data-testid="work-request-template-button" src={cooking} onClick={() => fillTemplate("ugotowanie obiadu", 40)} alt="ugotowanie obiadu"></img>
+                    <img data-testid="work-request-template-button" src={laundry_start} onClick={() => fillTemplate("nastawianie prania", 10)} alt="nastawianie prania"></img>
+                    <img data-testid="work-request-template-button" src={laundry_end} onClick={() => fillTemplate("wywieszanie prania", 10)} alt="wywieszanie prania"></img>
+                    <img data-testid="work-request-template-button" src={laundry_sorting} onClick={() => fillTemplate("ściąganie prania", 10)} alt="ściąganie prania"></img>
+                    <img data-testid="work-request-template-button" src={taking_garbage_out} onClick={() => fillTemplate("wyniesienie śmieci", 10)} alt="wyniesienie śmieci"></img>
                 </div>
 
                 <p className="label">Czynność</p>
                 {validationState.type ? <p className="validationMessage">{validationState.type}</p> : null}
                 <p><input
+                    data-testid="work-request-type-input"
                     type="text"
                     id="workRequestType"
                     className="entityTextArea"
@@ -220,6 +224,7 @@ function WorkRequestEdit({users}: {users: Map<string, User>}) {
                 <p className="label">Punkty doświadczenia do zdobycia</p>
                 {validationState.exp ? <p className="validationMessage">{validationState.exp}</p> : null}
                 <p><input
+                    data-testid="work-request-exp-input"
                     type="text"
                     id="workRequestExp"
                     className="newWorkrequestTextArea"
@@ -230,6 +235,7 @@ function WorkRequestEdit({users}: {users: Map<string, User>}) {
                 <p className="label">Pilność</p>
                 {validationState.urgency ? <p className="validationMessage">{validationState.urgency}</p> : null}
                 <p><select
+                    data-testid="work-request-urgency-input"
                     onChange={(e) => onPropertyChanged("urgency", e.target.value)}
                     value={workRequest.urgency}
                 >
@@ -240,6 +246,7 @@ function WorkRequestEdit({users}: {users: Map<string, User>}) {
 
                 <p className="label">Instrukcje</p>
                 <p><textarea
+                    data-testid="work-request-instructions-input"
                     id="workRequestInstructions"
                     className="entityTextArea"
                     rows={5}
@@ -248,8 +255,8 @@ function WorkRequestEdit({users}: {users: Map<string, User>}) {
                 /></p>
             </div>
             <div>
-                <button type="submit">Zatwierdź</button>
-                <button type="button" onClick={handleCancel}>Anuluj</button>
+                <button data-testid="submit-button" type="submit">Zatwierdź</button>
+                <button data-testid="cancel-button" type="button" onClick={handleCancel}>Anuluj</button>
             </div>
         </form>
     </>;
