@@ -22,6 +22,24 @@ export class CheckIf {
         })
     }
 
+        static async navigatedToWorkRequestListPage(page: Page) {
+        await test.step("Check: navigated to work request list page", async() => {
+            await expect(page.getByTestId('work-request-list-page')).toBeVisible();
+        })
+    }
+
+    static async navigatedToWorkRequestDetailsPage(page: Page) {
+        await test.step("Check: navigated to work request details page", async() => {
+            await expect(page.getByTestId('work-request-details-page')).toBeVisible();
+        })
+    }
+
+    static async navigatedToWorkRequestEditPage(page: Page) {
+        await test.step("Check: navigated to work request edit page", async() => {
+            await expect(page.getByTestId('work-request-edit-page')).toBeVisible();
+        })
+    }
+
     static async currentDayIsUsedAsActivityDate(page: Page) {
         await test.step("Test: current day is used as activity date if no date is selected", async () => {
             const dateField = page.getByTestId('activity-date-input');

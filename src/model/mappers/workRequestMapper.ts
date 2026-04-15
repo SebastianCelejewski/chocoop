@@ -1,6 +1,6 @@
 import type { Schema } from "../../../amplify/data/resource";
 import { WorkRequestFormState } from "../WorkRequestFormState";
-import { toLocalDateTime } from "../../utils/dateUtils";
+import { toLocalDate } from "../../utils/dateUtils";
 import reportError from "../../utils/reportError"
 
 function mapWorkRequestModelToWorkRequestFormState(model: Schema["WorkRequest"]["type"] | null): WorkRequestFormState | null {
@@ -9,7 +9,7 @@ function mapWorkRequestModelToWorkRequestFormState(model: Schema["WorkRequest"][
   }
   return {
       id: model.id,
-      createdDateTime: toLocalDateTime(model.createdDateTime),
+      createdDate: toLocalDate(model.createdDate),
       createdBy: model.createdBy,
       type: model.type,
       exp: model.exp.toString(),
@@ -24,8 +24,8 @@ function mapWorkRequestFormStateToWorkRequestModel(workRequest: WorkRequestFormS
     if (workRequest === null) {
         throw new Error(reportError("State workRequest is null during creation of a new work request object"))
     }
-    if (workRequest.createdDateTime === undefined) {
-        throw new Error(reportError("State workRequestCreatedDateTime is undefined during creation of a new work request object"))
+    if (workRequest.createdDate === undefined) {
+        throw new Error(reportError("State workRequestCreatedDate is undefined during creation of a new work request object"))
     }
     if (workRequest.createdBy === undefined) {
         throw new Error(reportError("State workRequestCreatedBy is undefined during creation of a new work request object"))
@@ -44,7 +44,7 @@ function mapWorkRequestFormStateToWorkRequestModel(workRequest: WorkRequestFormS
     }
     return {
         id: workRequest.id,
-        createdDateTime: new Date(workRequest.createdDateTime).toISOString(),
+        createdDate: workRequest.createdDate,
         createdBy: workRequest.createdBy,
         type: workRequest.type,
         exp: Number(workRequest.exp),
@@ -65,8 +65,8 @@ function mapWorkRequestFormStateAndActivityFormStateToWorkRequestModel(newActivi
     if (workRequest.id === undefined) {
         throw new Error(reportError("State workRequestId is undefined during creation of a new work request object"))
     }
-    if (workRequest.createdDateTime === undefined) {
-        throw new Error(reportError("State workRequestCreatedDateTime is undefined during creation of a new work request object"))
+    if (workRequest.createdDate === undefined) {
+        throw new Error(reportError("State workRequestCreatedDate is undefined during creation of a new work request object"))
     }
     if (workRequest.createdBy === undefined) {
         throw new Error(reportError("State workRequestCreatedBy is undefined during creation of a new work request object"))
@@ -85,7 +85,7 @@ function mapWorkRequestFormStateAndActivityFormStateToWorkRequestModel(newActivi
     }
     return {
         id: workRequest.id,
-        createdDateTime: new Date(workRequest.createdDateTime).toISOString(),
+        createdDate: workRequest.createdDate,
         createdBy: workRequest.createdBy,
         type: workRequest.type,
         exp: Number(workRequest.exp),

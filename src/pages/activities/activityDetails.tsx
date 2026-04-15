@@ -5,7 +5,7 @@ import { NavLink, useParams, useNavigate } from "react-router";
 
 import User from "../../model/User";
 import { useActivityDetails } from "./hooks/useActivityDetails";
-import { useCurrentUser } from "./hooks/useCurrentUser";
+import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { useActivityActions } from "./hooks/useActivityActions";
 import { useActivityReactions } from "./hooks/useActivityReactions";
 import { ReactionsByUser } from "../../components/reactions"

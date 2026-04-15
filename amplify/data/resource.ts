@@ -17,7 +17,7 @@ const schema = a.schema({
         .model({
             id: a.id().required(),
             createdBy: a.string().required(),
-            createdDateTime: a.datetime().required(),
+            createdDate: a.date().required(),
             type: a.string().required(),
             exp: a.integer().required(),
             urgency: a.integer().required(),

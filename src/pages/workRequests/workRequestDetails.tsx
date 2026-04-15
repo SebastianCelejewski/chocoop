@@ -2,7 +2,7 @@ import type { Schema } from "../../../amplify/data/resource";
 
 import { useEffect, useState } from "react";
 import { NavLink, useParams, useNavigate } from "react-router";
-import { dateTimeToString } from "../../utils/dateUtils";
+import { dateToString } from "../../utils/dateUtils";
 
 import reportError from "../../utils/reportError";
 import User from "../../model/User";
@@ -93,14 +93,14 @@ function WorkRequestDetails({users}: {users: Map<string, User>}) {
     return <>
         <h2 className="pageTitle" data-testid="work-request-details-page">Szczegóły zlecenia</h2>
         <div className="entryDetails">
-            <p className="label">Status</p>
-            <WorkRequestCompletness workRequest={workRequest}/>
-
-            <p className="label">Data i godzina utworzenia zlecenia</p>
-            <p data-testid="work-request-created-datetime">{dateTimeToString(workRequest.createdDateTime)}</p>
+            <p className="label">Data utworzenia zlecenia</p>
+            <p data-testid="work-request-created-date">{dateToString(workRequest.createdDate)}</p>
 
             <p className="label">Twórca zlecenia</p>
             <p data-testid="work-request-created-by">{users.get(workRequest.createdBy)?.nickname}</p>
+
+            <p className="label">Status</p>
+            <WorkRequestCompletness workRequest={workRequest}/>
 
             <p className="label">Rodzaj aktywności</p>
             <p data-testid="work-request-type">{workRequest.type}</p>

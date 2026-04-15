@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import type { Schema } from "../../../amplify/data/resource";
-import { dateTimeToString } from "../../utils/dateUtils";
+import { dateToString } from "../../utils/dateUtils";
 import { List, AutoSizer, CellMeasurer, CellMeasurerCache } from "react-virtualized";
 
 import User from "../../model/User";
@@ -74,13 +74,13 @@ function WorkRequestList({ users }: { users: Map<string, User> }) {
                             onClick={() => showWorkRequest(workRequest.id)}
                             key={workRequest.id}>
                             <div>
-                                <p className="entityDateTime" data-testid="date-property">{dateTimeToString(workRequest.createdDateTime)}</p>
+                                <p className="entityDate" data-testid="date-property">{dateToString(workRequest.createdDate)}</p>
                                 <p className="entityPerson" data-testid="person-property">{users.get(workRequest.createdBy)?.nickname}</p>
                                 <p className="entityType" data-testid="type-property">{workRequest.type}</p>
                                 <p className="entityExp" data-testid="exp-property">{workRequest.exp} xp</p>
                                 <div style={{ clear: "both" }} />
-                                <p className="workRequestUrgency" data-testid="urgency-property">Pilność: {urgencyList[workRequest.urgency]?.label}</p>
                                 <CompletnessStatus workRequest={workRequest} />
+                                <p className="workRequestUrgency" data-testid="urgency-property">Pilność: {urgencyList[workRequest.urgency]?.label}</p>
                             </div>
                         </li>
                     </div>

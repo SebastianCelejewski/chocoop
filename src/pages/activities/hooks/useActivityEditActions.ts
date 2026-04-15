@@ -50,8 +50,6 @@ export function useActivityEditActions() {
         }
     }
 
-
-
     function handleResult(result: OperationResult, onSuccess: () => void) {
         if (result.success) {
             onSuccess();

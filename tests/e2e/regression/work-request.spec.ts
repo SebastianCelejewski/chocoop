@@ -1,5 +1,10 @@
 import { test, expect, Locator, Page } from "@playwright/test";
 
+import { NavigateTo } from "../actions/navigate";
+import { Click } from "../actions/click";
+import { Form } from "../actions/form";
+import { CheckIf } from "../checks";
+
 type WorkRequestData = {
   id?: string;
   createdByNickname: string;
@@ -19,7 +24,14 @@ const urgencyLabels = [
   "Bez konkretnego terminu"
 ];
 
-test("work request create, edit and delete flow", async ({ page }) => {
+test("Work request creation, modification and deletion test", async ({ page }) => {
+  await test.step("Going to activity creation page", async () => {
+    await NavigateTo.workRequestListPage(page);
+    await CheckIf.navigatedToWorkRequestListPage(page);
+    await Click.createButton(page);
+    await CheckIf.navigatedToWorkRequestEditPage(page);
+  });
+
   const createdWorkRequest = await createWorkRequest(page);
 
   await test.step("Created work request appears on the work request list", async () => {
@@ -68,7 +80,7 @@ test("work request create, edit and delete flow", async ({ page }) => {
   });
 });
 
-test("work request can be promoted into an activity", async ({ page }) => {
+test("Work request promotion test", async ({ page }) => {
   const workRequest = await createWorkRequest(page);
 
   await test.step("Promotion opens activity edit page prefilled from work request", async () => {

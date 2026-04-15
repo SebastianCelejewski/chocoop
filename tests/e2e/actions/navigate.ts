@@ -6,4 +6,10 @@ export class NavigateTo {
             await page.goto('/ActivityList/');
         });
     }
+
+    static async workRequestListPage(page: Page) {
+        test.step("Action: navigate to work request list page", async () => {
+            await page.goto('/WorkRequestList/');
+        });
+    }
 }

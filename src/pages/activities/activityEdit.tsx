@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router";
-import { useCurrentUser } from "./hooks/useCurrentUser";
+import { useCurrentUser } from "../../hooks/useCurrentUser";
 
 import User from "../../model/User";
 
@@ -9,7 +9,7 @@ import { useActivityEditDetails } from "./hooks/useActivityEditDetails";
 import { useActivityEditActions } from "./hooks/useActivityEditActions";
 import { ActivityOperations, ActivityOperation } from "../../model/ActivityOperation";
 import { ActivityForm } from "../../components/activityForm";
-import { ActivityValidationResult } from "../../model/ActivityValidationResult";
+import { ActivityValidationResult } from "../../model/ValidationResult";
 
 const pageTitleMap: Record<ActivityOperation, string> = {
   [ActivityOperations.CREATE]: "Dodawanie wykonanej czynności",

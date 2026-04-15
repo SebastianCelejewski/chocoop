@@ -4,5 +4,4 @@ export const ActivityOperations = {
   PROMOTE_WORK_REQUEST: "promoteWorkRequest"
 } as const;
 
-export type ActivityOperation =
-  typeof ActivityOperations[keyof typeof ActivityOperations];
+export type ActivityOperation = typeof ActivityOperations[keyof typeof ActivityOperations];

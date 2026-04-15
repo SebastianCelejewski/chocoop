@@ -6,7 +6,7 @@ import { Form } from "../actions/form";
 import { CheckIf } from "../checks";
 import { Intercept, Intercepted, WaitFor } from "../utils/intercept";
 
-test("activity multi-test", async({page}) => {
+test("Activity creation, modification and deletion test", async({page}) => {
 
   await test.step("Going to activity creation page", async () => {
     await NavigateTo.activityListPage(page);
