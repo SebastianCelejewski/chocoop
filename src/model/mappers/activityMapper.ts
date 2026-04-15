@@ -1,13 +1,13 @@
 import type { Schema } from "../../../amplify/data/resource";
 import type { ActivityFormState } from "../../model/ActivityFormState";
-import { AuthUser } from "aws-amplify/auth";
-import { toLocalDate, getCurrentDate } from "../../utils/dateUtils";
+import { toLocalDate } from "../../utils/dateUtils";
 import reportError from "../../utils/reportError"
 
 function mapActivityModelToActivityFormState(model: Schema["Activity"]["type"] | null): ActivityFormState | null {
   if (model === null) {
       return null;
   }
+
   return {
       id: model.id,
       date: toLocalDate(model.date),
@@ -17,21 +17,6 @@ function mapActivityModelToActivityFormState(model: Schema["Activity"]["type"] |
       comment: model.comment ?? "",
       requestedAs: model.requestedAs ?? undefined
   }
-}
-
-function mapWorkRequestModelToActivityFormState(model: Schema["WorkRequest"]["type"] | null, currentUser: AuthUser): ActivityFormState | null {
-  if (model === null) {
-      return null;
-  }
-
-  return {
-    date: getCurrentDate(),
-    user: currentUser.userId,
-    type: model.type,
-    exp: model.exp.toString(),
-    comment: "",
-    requestedAs: model.id
-  };
 }
 
 function mapActivityFormStateToActivityModel(activity: ActivityFormState) {
@@ -60,6 +45,5 @@ function mapActivityFormStateToActivityModel(activity: ActivityFormState) {
 
 export {
     mapActivityModelToActivityFormState as activityModelToActivityFormState,
-    mapWorkRequestModelToActivityFormState as workRequestModelToActivityFormState,
     mapActivityFormStateToActivityModel as createActivityObjectFromState
 }

@@ -7,6 +7,7 @@ import { success, failure } from "../model/OperationResult";
 import { mapWorkRequestFormStateToWorkRequestModel } from "../model/mappers/workRequestMapper";
 
 export default function WorkRequestService() {
+    
     const client = generateClient<Schema>();
 
     class WorkRequestQueryResult {

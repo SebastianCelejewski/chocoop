@@ -1,13 +1,18 @@
 import type { Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 import reportError from "../utils/reportError"
-import { createActivityObjectFromState} from "../model/mappers/activityMapper";
 import { ActivityFormState} from "../model/ActivityFormState";
 import { OperationResult } from "../model/OperationResult";
 import { success, failure } from "../model/OperationResult";
+import { createActivityObjectFromState} from "../model/mappers/activityMapper";
 
 export default function ActivityService() {
+    
     const client = generateClient<Schema>();
+
+    class ActivitiesQueryResult {
+        items: Array<Schema["Activity"]["type"]> = []
+    }
 
     async function createActivity(activity: ActivityFormState): Promise<OperationResult> {
         const newActivity = createActivityObjectFromState(activity);
@@ -48,8 +53,47 @@ export default function ActivityService() {
         }
     }
 
+    async function getActivity(id: string): Promise<Schema["Activity"]["type"] | null> {
+        try {
+            const { data, errors } = await client.models.Activity.get({ id });
+            if (errors?.length) {
+                throw errors;
+            }
+            return data ?? null;
+        } catch(error) {
+            throw new Error(reportError("Failed to fetch an activity from the database", error));
+        }
+    }
+
+    function observeActivities(onChange: (activities: Array<Schema["Activity"]["type"]>) => void) {
+        const activitesQuery = client.models.Activity.observeQuery().subscribe({
+            next: (data: ActivitiesQueryResult) => {
+                onChange(data.items);
+            }
+        });
+
+        return () => {
+            ActivitiesQuery.unsubscribe();
+        };
+    }
+
+    async function deleteActivity(id: string): Promise<OperationResult> {
+        try {
+            const deleteActivityResponse = await client.models.Activity.delete({ id });
+            if (deleteActivityResponse.errors?.length) {
+                return failure("Failed to delete an activity from the database", deleteActivityResponse.errors);
+            }
+            return success(id);
+        } catch(error) {
+            return failure("Failed to delete an activity from the database", error);
+        }
+    }
+
     return {
         createActivity,
-        updateActivity
+        updateActivity,
+        deleteActivity,
+        getActivity,
+        observeActivities
     }
 }

@@ -5,7 +5,8 @@ import type { ActivityFormState } from "../../../model/ActivityFormState";
 import { WorkRequestFormState } from "../../../model/WorkRequestFormState";
 import { AuthUser } from "aws-amplify/auth";
 import { ActivityOperations, ActivityOperation } from "../../../model/ActivityOperation";
-import { activityModelToActivityFormState, workRequestModelToActivityFormState} from "../../../model/mappers/activityMapper";
+import { activityModelToActivityFormState} from "../../../model/mappers/activityMapper";
+import { workRequestModelToActivityFormState} from "../../../model/mappers/workRequestPromotionMapper";
 import { mapWorkRequestModelToWorkRequestFormState } from "../../../model/mappers/workRequestMapper";
 import { getCurrentDate } from "../../../utils/dateUtils";
 
